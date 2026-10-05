@@ -1,0 +1,507 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Claude Code Mod 入門</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;800&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: single reading column, like a lab notebook; timelines, tables and code break out in framed panels */
+:root {
+  --bg: #f6f7f5;
+  --paper: #ffffff;
+  --fg: #1d2421;
+  --muted: #5c6862;
+  --line: #d9dfdb;
+  --accent: #1f6f5c;
+  --accent-soft: #e2f0eb;
+  --warn: #9a5a12;
+  --warn-soft: #fbefdc;
+  --blue: #2f5f9a;
+  --blue-soft: #e4ecf6;
+  --code-bg: #f0f3f1;
+  --display: "Noto Serif TC", "Songti TC", serif;
+  --body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121715; --paper: #1a201d; --fg: #e3e9e5; --muted: #98a59e; --line: #2d3632;
+    --accent: #6cc6aa; --accent-soft: #1d332c; --warn: #e3a95c; --warn-soft: #33281a;
+    --blue: #8db4e6; --blue-soft: #1c2736; --code-bg: #151b18; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121715; --paper: #1a201d; --fg: #e3e9e5; --muted: #98a59e; --line: #2d3632;
+  --accent: #6cc6aa; --accent-soft: #1d332c; --warn: #e3a95c; --warn-soft: #33281a;
+  --blue: #8db4e6; --blue-soft: #1c2736; --code-bg: #151b18; color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.8; }
+.wrap { max-width: 800px; margin: 0 auto; padding-inline: 20px; padding-block: 48px 80px; display: grid; gap: 56px; }
+header { display: grid; gap: 12px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(30px, 6vw, 44px); line-height: 1.25; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); font-size: 17px; margin: 0; }
+nav.toc { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; font-size: 14px; }
+nav.toc ol { margin: 0; padding-left: 1.4em; display: grid; gap: 2px; }
+nav.toc a { color: var(--accent); text-decoration: none; }
+nav.toc a:hover, nav.toc a:focus-visible { text-decoration: underline; }
+section { display: grid; gap: 16px; min-width: 0; }
+h2 { font-family: var(--display); font-weight: 600; font-size: 25px; margin: 0; text-wrap: balance; display: flex; gap: 12px; align-items: baseline; }
+h2 .n { font-family: var(--mono); font-size: 14px; color: var(--accent); }
+h3 { font-size: 17px; margin: 12px 0 0; }
+p { margin: 0; }
+a { color: var(--accent); }
+code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+pre { margin: 0; background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 16px; overflow-x: auto; font-family: var(--mono); font-size: 13px; line-height: 1.65; }
+pre code { background: none; padding: 0; font-size: inherit; }
+.fname { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: -10px; }
+.c { color: var(--muted); }
+.k { color: var(--accent); font-weight: 600; }
+.s { color: var(--warn); }
+ul, ol { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; }
+.note { border-left: 3px solid var(--warn); background: var(--warn-soft); padding: 12px 16px; border-radius: 0 6px 6px 0; }
+.tip { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 12px 16px; border-radius: 0 6px 6px 0; }
+.table-box { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
+th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 700; color: var(--muted); font-size: 13px; background: var(--code-bg); }
+tr:last-child td { border-bottom: none; }
+td code { white-space: nowrap; }
+td.grp { font-weight: 700; color: var(--accent); white-space: nowrap; }
+
+/* timeline */
+.timeline { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 20px 18px; display: grid; gap: 0; }
+.step { display: grid; grid-template-columns: 22px 1fr; gap: 12px; }
+.rail { display: flex; flex-direction: column; align-items: center; }
+.dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); margin-top: 7px; flex: none; }
+.dot.who { background: var(--muted); }
+.dot.cls { background: var(--blue); }
+.bar { width: 2px; flex: 1; background: var(--line); min-height: 14px; }
+.step:last-child .bar { display: none; }
+.body { padding-bottom: 14px; min-width: 0; }
+.what { font-size: 15px; }
+.ev { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.chip { font-family: var(--mono); font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); border: 1px solid transparent; }
+.chip.cls { background: var(--blue-soft); color: var(--blue); }
+.chip.ex { background: var(--warn-soft); color: var(--warn); }
+.loop { border: 1.5px dashed var(--line); border-radius: 8px; padding: 12px 12px 0; margin: 4px 0 14px; display: grid; }
+.loop-label { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+/* trace */
+.trace { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; overflow-x: auto; }
+.trace ol { list-style: none; padding: 0; margin: 0; gap: 0; min-width: 480px; }
+.trace li { display: grid; grid-template-columns: 140px 1fr; gap: 14px; padding: 9px 14px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.trace li:last-child { border-bottom: none; }
+.trace li.hit { background: var(--warn-soft); }
+.trace .t { font-family: var(--mono); font-size: 12px; color: var(--muted); padding-top: 2px; }
+
+/* chain diagram */
+.chain { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 20px; display: grid; gap: 10px; overflow-x: auto; }
+.layer { border: 1.5px solid var(--accent); border-radius: 8px; padding: 10px 14px; display: grid; gap: 10px; }
+.layer.engine { border-style: dashed; border-color: var(--muted); }
+.layer-title { font-family: var(--mono); font-size: 13px; font-weight: 600; }
+.layer-sub { font-size: 13px; color: var(--muted); }
+.flow { font-family: var(--mono); font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.tree { font-family: var(--mono); font-size: 13px; line-height: 1.7; }
+.refs { display: grid; gap: 8px; padding-left: 1.2em; }
+footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 16px; }
+@media (max-width: 520px) { .trace li { grid-template-columns: 1fr; gap: 2px; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Claude Code · Mods / Function hooks</div>
+    <h1>Claude Code 的 Mod 功能：用程式碼改寫 Claude 的行為</h1>
+    <p class="lede">Mod 是一種 Claude Code 外掛，用 JavaScript 或 TypeScript 寫成，在 Claude Code 自己的程序裡執行。它可以在 Claude 呼叫工具、你送出提示、畫面重繪的那一刻插手。這一版先講清楚每個 hook 在「一輪對話」裡的哪個時間點觸發，再列出完整的事件與 <code>$</code> 介面清單。</p>
+  </header>
+
+  <nav class="toc" aria-label="目錄">
+    <ol>
+      <li><a href="#what">先建立直覺：hook 到底是什麼</a></li>
+      <li><a href="#timeline">一輪對話的時間線：每個事件何時觸發</a></li>
+      <li><a href="#replay">把三個範例放回時間線上</a></li>
+      <li><a href="#events">完整事件清單</a></li>
+      <li><a href="#api">引擎介面 <code>$</code> 的完整清單</a></li>
+      <li><a href="#files">檔案結構與載入</a></li>
+      <li><a href="#refs">參考連結</a></li>
+    </ol>
+  </nav>
+
+  <section id="what">
+    <h2><span class="n">01</span>先建立直覺：hook 到底是什麼</h2>
+    <p>Claude Code 平常做事的流程很固定：你送出提示，它組好系統提示，送給模型，模型決定呼叫工具，Claude Code 檢查權限，執行工具，把結果送回模型，重複到模型回答完為止。整個過程中畫面也不斷重繪。</p>
+    <p>Claude Code 每要做一件事之前，都會先發出一個<strong>事件</strong>，例如「我要執行 Bash 了」（<code>tool.call</code>）、「使用者按了 Enter」（<code>prompt.submit</code>）、「我要畫 spinner 了」（<code>ui.render</code>）。<strong>Hook 就是你登記在某個事件上的函式</strong>。事件發生時，Claude Code 會先呼叫你的函式，<em>再</em>決定要不要照原本的方式做。</p>
+    <p>用 EDA 的角度來看：這很像在 flow 的每個 step 前面插一個 pre-hook，或在訊號路徑上串進一級邏輯。訊號（事件 <code>e</code>）先經過你這一級，你可以讓它原樣通過、改掉它的值，或直接把它截斷，自己輸出一個結果。</p>
+
+    <div class="chain" aria-label="Hook 呼叫鏈示意">
+      <div class="flow"><span>事件 e 進入 ↓</span><span>↑ 結果回傳</span></div>
+      <div class="layer">
+        <div class="layer-title">Mod A 的 hook</div>
+        <div class="layer-sub">先看到事件，也最後拿到結果</div>
+        <div class="layer">
+          <div class="layer-title">Mod B 的 hook</div>
+          <div class="layer-sub">A 呼叫 next(e) 才會輪到 B</div>
+          <div class="layer engine">
+            <div class="layer-title">Claude Code 自己的行為</div>
+            <div class="layer-sub">真正執行工具、呼叫模型、畫出畫面</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p>每個 hook 都長這樣：<code>($, e, next) =&gt; 結果</code>。</p>
+    <ul>
+      <li><code>e</code>：事件內容，唯讀。例如 <code>tool.call</code> 的 <code>e.tool</code> 是工具名稱，<code>e.command</code> 是 Bash 指令。</li>
+      <li><code>next(e)</code>：交給下一層。最後一層是 Claude Code 本身，所以呼叫 <code>next</code> 才會「真的去做」。</li>
+      <li><code>$</code>：你能用的所有能力（畫面、檔案、模型、計時器……），第 05 節列出全部。</li>
+    </ul>
+    <div class="table-box">
+      <table>
+        <thead><tr><th>你在 hook 裡做的事</th><th>寫法</th><th>Claude Code 的反應</th></tr></thead>
+        <tbody>
+          <tr><td>觀察（Observe）</td><td><code>return next(e)</code></td><td>照常執行，你只是旁觀並記錄</td></tr>
+          <tr><td>事後處理</td><td><code>const r = await next(e); …; return r</code></td><td>先執行完，你再看結果做事</td></tr>
+          <tr><td>改寫（Rewrite）</td><td><code>return next({ ...e, command: '…' })</code></td><td>用你改過的內容去執行</td></tr>
+          <tr><td>攔截（Answer）</td><td><code>return { deny: '原因' }</code>，不呼叫 <code>next</code></td><td>完全不執行；Claude 讀到你給的原因</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="timeline">
+    <h2><span class="n">02</span>一輪對話的時間線：每個事件何時觸發</h2>
+    <p>這是理解 Mod 最重要的一張圖。從你開啟 Claude Code，到輸入一句話、Claude 讀檔改檔、最後回答，事件依下面的順序發生。綠點是 Mod 事件，藍點是原本 <code>settings.json</code> hooks 的事件（Mod 裡可以用 <code>classic.&lt;名稱&gt;</code> 攔截），灰點是使用者或模型的動作。</p>
+    <div class="legend">
+      <span><i style="background:var(--accent)"></i>Mod 事件</span>
+      <span><i style="background:var(--blue)"></i>Settings hook 事件（<code>classic.*</code>）</span>
+      <span><i style="background:var(--muted)"></i>使用者或模型的動作</span>
+    </div>
+
+    <div class="timeline" role="list">
+      <div class="step" role="listitem"><div class="rail"><div class="dot"></div><div class="bar"></div></div><div class="body">
+        <div class="what">Mod 載入，Claude Code 建立 <code>$</code> 並執行你的 <code>register(on)</code></div>
+        <div class="ev"><span class="chip">plugin.register</span><span class="chip">engine.create</span></div>
+      </div></div>
+      <div class="step" role="listitem"><div class="rail"><div class="dot"></div><div class="bar"></div></div><div class="body">
+        <div class="what">工作階段開始。適合在這裡註冊斜線指令、新工具，或打開面板</div>
+        <div class="ev"><span class="chip">session.start</span><span class="chip cls">classic.SessionStart</span></div>
+      </div></div>
+      <div class="step" role="listitem"><div class="rail"><div class="dot who"></div><div class="bar"></div></div><div class="body">
+        <div class="what">你在輸入框打字（每次編輯都會觸發）</div>
+        <div class="ev"><span class="chip">prompt.edit</span></div>
+      </div></div>
+      <div class="step" role="listitem"><div class="rail"><div class="dot who"></div><div class="bar"></div></div><div class="body">
+        <div class="what">你按下 Enter。若是斜線指令則走 <code>command.run</code>；一般提示則可被改寫、補充或擋下</div>
+        <div class="ev"><span class="chip">prompt.submit</span><span class="chip cls">classic.UserPromptSubmit</span><span class="chip">command.run</span></div>
+      </div></div>
+      <div class="step" role="listitem"><div class="rail"><div class="dot"></div><div class="bar"></div></div><div class="body">
+        <div class="what">Claude Code 組合要送給模型的內容：系統提示的每一段、第一則訊息附帶的 context、各工具的說明</div>
+        <div class="ev"><span class="chip">prompt.compose</span><span class="chip">prompt.section</span><span class="chip">prompt.context</span><span class="chip">tool.describe</span><span class="chip">prompt.attachment</span></div>
+      </div></div>
+      <div class="step" role="listitem"><div class="rail"><div class="dot"></div><div class="bar"></div></div><div class="body">
+        <div class="what">這一輪（turn）開始</div>
+        <div class="ev"><span class="chip">turn.start</span></div>
+      </div></div>
+      <div class="step" role="listitem"><div class="rail"><div class="dot who"></div><div class="bar"></div></div><div class="body">
+        <div class="loop">
+          <div class="loop-label">↻ 這一段會重複：模型每呼叫一次工具，就跑一圈</div>
+          <div class="step"><div class="rail"><div class="dot"></div><div class="bar"></div></div><div class="body">
+            <div class="what">送一次請求給模型（可換模型、可讀 token 用量）</div>
+            <div class="ev"><span class="chip">turn.step</span></div>
+          </div></div>
+          <div class="step"><div class="rail"><div class="dot who"></div><div class="bar"></div></div><div class="body">
+            <div class="what">模型回覆「我要用 Edit 改 top.sdc」</div>
+          </div></div>
+          <div class="step"><div class="rail"><div class="dot"></div><div class="bar"></div></div><div class="body">
+            <div class="what"><strong>工具即將執行。</strong>這是最常用的攔截點，<em>在權限提示出現之前</em></div>
+            <div class="ev"><span class="chip">tool.call</span><span class="chip ex">範例一、二在這裡</span></div>
+          </div></div>
+          <div class="step"><div class="rail"><div class="dot cls"></div><div class="bar"></div></div><div class="body">
+            <div class="what">你在 <code>next(e)</code> 之後：settings 裡的 PreToolUse hooks 執行</div>
+            <div class="ev"><span class="chip cls">classic.PreToolUse</span></div>
+          </div></div>
+          <div class="step"><div class="rail"><div class="dot"></div><div class="bar"></div></div><div class="body">
+            <div class="what">權限判定（allow / ask / deny）；需要時跳出詢問</div>
+            <div class="ev"><span class="chip">tool.check</span><span class="chip cls">classic.PermissionRequest</span></div>
+          </div></div>
+          <div class="step"><div class="rail"><div class="dot who"></div><div class="bar"></div></div><div class="body">
+            <div class="what">工具真正執行，結果回到 <code>tool.call</code> hook 的 <code>await next(e)</code></div>
+            <div class="ev"><span class="chip cls">classic.PostToolUse</span><span class="chip">session.append</span></div>
+          </div></div>
+          <div class="step"><div class="rail"><div class="dot who"></div><div class="bar"></div></div><div class="body">
+            <div class="what">若模型要開子代理，另外觸發</div>
+            <div class="ev"><span class="chip">agent.offer</span><span class="chip">agent.spawn</span></div>
+          </div></div>
+        </div>
+      </div></div>
+      <div class="step" role="listitem"><div class="rail"><div class="dot"></div><div class="bar"></div></div><div class="body">
+        <div class="what">模型不再呼叫工具，給出最終回答；這一輪結束</div>
+        <div class="ev"><span class="chip">turn.complete</span><span class="chip cls">classic.Stop</span><span class="chip ex">範例三的統計在這裡</span></div>
+      </div></div>
+      <div class="step" role="listitem"><div class="rail"><div class="dot"></div><div class="bar"></div></div><div class="body">
+        <div class="what">（整段期間不斷發生）畫面重繪：spinner、輸入框上方、面板。按鈕被按、輸入框輸入也是事件</div>
+        <div class="ev"><span class="chip">ui.render</span><span class="chip">ui.press</span><span class="chip">ui.input</span><span class="chip ex">範例三的資訊列在這裡</span></div>
+      </div></div>
+      <div class="step" role="listitem"><div class="rail"><div class="dot"></div><div class="bar"></div></div><div class="body">
+        <div class="what">你關閉 Claude Code 或執行 <code>/clear</code></div>
+        <div class="ev"><span class="chip">session.end</span><span class="chip cls">classic.SessionEnd</span></div>
+      </div></div>
+    </div>
+
+    <div class="tip"><strong>關鍵觀念：</strong>你寫的 hook 不是「定時跑」，也不是「Claude 想呼叫才跑」。它是 Claude Code 每走到時間線上的那個點時，<em>自動、同步地</em>先呼叫你，等你回覆才繼續。你的 hook 若遲遲不回，那個工具呼叫就一直暫停（有時間上限；等待 <code>$.ui.ask</code> 之類的使用者回應不計入）。</div>
+  </section>
+
+  <section id="replay">
+    <h2><span class="n">03</span>把三個範例放回時間線上</h2>
+    <p>上一版的範例只給了程式碼。下面用一個具體情境，逐步追蹤每個範例在什麼時刻被呼叫、收到什麼、回傳什麼。</p>
+
+    <h3>範例一：擋下對 signoff 檔案的修改</h3>
+<pre><code><span class="k">import type</span> { Register } <span class="k">from</span> <span class="s">'claude-code'</span>
+
+<span class="k">const</span> SIGNOFF = <span class="s">/\.(sdc|spef|gds|oas)$|(^|\/)signoff\//</span>
+
+<span class="k">export const</span> register: Register = on =&gt; {
+  on(<span class="s">'tool.call'</span>, { tool: [<span class="s">'Edit'</span>, <span class="s">'Write'</span>] }, ($, e, next) =&gt;
+    SIGNOFF.test(e.file_path)
+      ? { deny: <span class="s">`${e.file_path} 是 signoff 檔案，禁止修改。請改提出建議讓使用者自行修改。`</span> }
+      : next(e),
+  )
+}</code></pre>
+    <p>情境：你輸入「把 clock period 改成 2ns，順便更新 README」。</p>
+    <div class="trace"><ol>
+      <li><span class="t">prompt.submit</span><span>你按下 Enter。這個 mod 沒登記此事件，所以不受影響。</span></li>
+      <li><span class="t">turn.step</span><span>Claude Code 把提示送給模型。</span></li>
+      <li><span class="t">tool.call (Grep)</span><span>模型先搜尋 <code>create_clock</code>。篩選條件是 Edit/Write，Grep 不符合，<strong>hook 根本不會被呼叫</strong>。</span></li>
+      <li><span class="t">tool.call (Read)</span><span>模型讀 <code>constraints/top.sdc</code>。同樣不符合，照常執行。</span></li>
+      <li class="hit"><span class="t">tool.call (Edit)</span><span>模型要改 <code>constraints/top.sdc</code>。<strong>hook 被呼叫</strong>，<code>e.file_path</code> 符合 <code>.sdc</code>，回傳 <code>{ deny }</code>，沒有呼叫 <code>next</code>。權限提示不會出現，檔案沒被改。</span></li>
+      <li><span class="t">turn.step</span><span>模型收到的工具結果就是你的 deny 文字，於是改成在回答裡告訴你該怎麼改。</span></li>
+      <li><span class="t">tool.call (Edit)</span><span>模型改 <code>README.md</code>，regex 不符合，hook 呼叫 <code>next(e)</code>，接著才是一般權限流程與實際編輯。</span></li>
+      <li><span class="t">turn.complete</span><span>這一輪結束。</span></li>
+    </ol></div>
+    <p>所以這個 hook 的「上一層」就是：<strong>模型已經決定要改檔、Claude Code 正準備執行 Edit 工具、但還沒問你權限的那一瞬間。</strong></p>
+
+    <h3>範例二：改寫 Bash 指令並在狀態列顯示失敗</h3>
+<pre><code>on(<span class="s">'tool.call'</span>, { tool: <span class="s">'Bash'</span> }, <span class="k">async</span> ($, e, next) =&gt; {
+  <span class="k">const</span> ran = <span class="k">await</span> next({ ...e, command: e.command.trim() })   <span class="c">// ① 改寫後交出去，並等待</span>
+  <span class="k">const</span> hasFailed = ran.deny === <span class="k">undefined</span> &amp;&amp; ran.isError === <span class="k">true</span>   <span class="c">// ② 工具已執行完</span>
+  $.ui.status(hasFailed ? <span class="s">`failed: ${e.command.slice(0, 40)}`</span> : <span class="k">undefined</span>)
+  <span class="k">return</span> ran                                                    <span class="c">// ③ 結果交還給模型</span>
+})</code></pre>
+    <p>情境：模型要跑 <code>make sim</code>，而模擬失敗。</p>
+    <div class="trace"><ol>
+      <li class="hit"><span class="t">tool.call 進入</span><span>hook 被呼叫，<code>e.command</code> 是 <code>"  make sim "</code>。</span></li>
+      <li><span class="t">① next(...)</span><span>hook 把去掉空白的 <code>"make sim"</code> 交給下一層，然後<strong>在 <code>await</code> 停住</strong>。</span></li>
+      <li><span class="t">（引擎內部）</span><span>PreToolUse hooks、權限檢查、你按下允許、Bash 實際執行 <code>make sim</code>，結束碼非 0。</span></li>
+      <li class="hit"><span class="t">② await 返回</span><span><code>ran.isError</code> 是 <code>true</code>，hook 把 <code>failed: make sim</code> 寫到狀態列。</span></li>
+      <li><span class="t">③ return ran</span><span>結果原封不動交回，模型照常看到錯誤訊息。</span></li>
+    </ol></div>
+    <p>同一個函式在時間軸上跨了兩個點：<code>await next()</code> 之前的程式碼在工具<em>執行前</em>跑，之後的程式碼在工具<em>執行後</em>跑。這就是「洋蔥」的意思。</p>
+
+    <h3>範例三：在輸入框上方顯示每輪耗時</h3>
+    <p>這個 mod 需要多個事件合作，因為「一輪花多久」這件事橫跨整條時間線：</p>
+    <div class="table-box">
+      <table>
+        <thead><tr><th>事件</th><th>時間點</th><th>這個 hook 做什麼</th></tr></thead>
+        <tbody>
+          <tr><td><code>prompt.submit</code></td><td>你按 Enter</td><td>記下開始時間，工具計數歸零，然後 <code>next(e)</code> 放行</td></tr>
+          <tr><td><code>tool.call</code></td><td>每次工具執行前</td><td>計數 +1，<code>next(e)</code> 放行</td></tr>
+          <tr><td><code>turn.complete</code></td><td>一輪結束</td><td>算出秒數，用 <code>update()</code> 寫進 <code>$.state</code>；超過 120 秒就跳 toast</td></tr>
+          <tr><td><code>ui.render</code>（<code>AbovePrompt</code>）</td><td>每次要畫輸入框上方那一列</td><td>讀 <code>$.state</code>，畫出「Last turn: 42s, 7 tool calls [Hide]」</td></tr>
+          <tr><td><code>ui.press</code>（自動處理）</td><td>你按下 Hide 按鈕</td><td>按鈕的 <code>onPress</code> 把 <code>isHidden</code> 設為 true，畫面重繪後消失</td></tr>
+        </tbody>
+      </table>
+    </div>
+<pre><code><span class="k">import</span> { atom, read, update } <span class="k">from</span> <span class="s">'claude-code'</span>
+<span class="k">import type</span> { Register } <span class="k">from</span> <span class="s">'claude-code'</span>
+
+<span class="k">const</span> last = atom({ plugin: <span class="s">'turn-band'</span>, key: <span class="s">'last'</span> } <span class="k">as const</span>, <span class="k">null</span>)
+<span class="k">const</span> isHidden = atom({ plugin: <span class="s">'turn-band'</span>, key: <span class="s">'isHidden'</span> } <span class="k">as const</span>, <span class="k">false</span>)
+
+<span class="k">export const</span> register: Register = on =&gt; {
+  <span class="k">let</span> startedAt = 0
+  <span class="k">let</span> tools = 0
+
+  on(<span class="s">'prompt.submit'</span>, <span class="k">async</span> ($, e, next) =&gt; {
+    startedAt = <span class="k">await</span> $.clock.now()
+    tools = 0
+    <span class="k">return</span> next(e)
+  })
+
+  on(<span class="s">'tool.call'</span>, ($, e, next) =&gt; {
+    tools += 1
+    <span class="k">return</span> next(e)
+  })
+
+  on(<span class="s">'turn.complete'</span>, <span class="k">async</span> ($, e, next) =&gt; {
+    <span class="k">const</span> seconds = Math.round(((<span class="k">await</span> $.clock.now()) - startedAt) / 1000)
+    <span class="k">await</span> update($, last, () =&gt; ({ seconds, tools }))   <span class="c">// 寫入後，讀它的畫面自動重繪</span>
+    <span class="k">if</span> (seconds &gt; 120) $.ui.toast(<span class="s">`That turn took ${seconds}s`</span>)
+    <span class="k">return</span> next(e)
+  })
+
+  on(<span class="s">'ui.render'</span>, { component: <span class="s">'AbovePrompt'</span> }, <span class="k">async</span> ($, e, next) =&gt; {
+    <span class="k">const</span> turn = <span class="k">await</span> read($, last)
+    <span class="k">if</span> (e.props.hasSurvey || turn === <span class="k">null</span> || (<span class="k">await</span> read($, isHidden))) <span class="k">return</span> next(e)
+    <span class="k">const</span> { Box, Button, Text } = $.ui.resolve(e)
+    <span class="k">return</span> (
+      &lt;Box&gt;
+        &lt;Text dimColor&gt;Last turn: {turn.seconds}s, {turn.tools} tool calls &lt;/Text&gt;
+        &lt;Button key=<span class="s">"hide"</span> label=<span class="s">"Hide"</span> onPress={() =&gt; update($, isHidden, () =&gt; <span class="k">true</span>)} /&gt;
+      &lt;/Box&gt;
+    )
+  })
+}</code></pre>
+    <p>這裡 <code>ui.render</code> 和其他三個事件<strong>不在同一條時間線上</strong>：前三個跟著對話流程走，<code>ui.render</code> 則是每當 Claude Code 要重畫那一塊時觸發。兩者之間靠 <code>$.state</code> 傳遞資料，<code>update()</code> 寫入時會通知畫面重繪。範例三需要的型別宣告檔 <code>types/index.d.ts</code> 見第 06 節。</p>
+  </section>
+
+  <section id="events">
+    <h2><span class="n">04</span>完整事件清單</h2>
+    <p>以下整理自 Claude Code 2.1.289 隨附的型別定義檔（<code>EngineEventOf</code>），依用途分組。每個事件的輸入欄位與可回傳的結果，請看官方 <a href="https://code.claude.com/docs/en/plugins/mods/reference#events" target="_blank" rel="noopener">Mods reference · Events</a>。</p>
+    <div class="table-box">
+      <table>
+        <thead><tr><th>分組</th><th>事件</th><th>何時觸發／能做什麼</th></tr></thead>
+        <tbody>
+          <tr><td class="grp" rowspan="3">工具</td><td><code>tool.call</code></td><td>工具即將執行。可擋下（<code>deny</code>）、改參數、自己回答（<code>result</code>）、執行後檢查結果、重試</td></tr>
+          <tr><td><code>tool.check</code></td><td>權限判定時。<code>next(e)</code> 得到規則的決定，你可改成 allow / ask / deny</td></tr>
+          <tr><td><code>tool.describe</code></td><td>工具說明第一次送給模型時。可改寫說明文字</td></tr>
+          <tr><td class="grp" rowspan="8">提示</td><td><code>prompt.submit</code></td><td>你按下 Enter、這一輪開始前。改寫文字、加 context、或 <code>{ drop }</code> 擋下</td></tr>
+          <tr><td><code>prompt.edit</code></td><td>你在輸入框打字或貼上時</td></tr>
+          <tr><td><code>prompt.fill</code></td><td>有文字要被填入輸入框時（如其他 mod 呼叫 <code>$.prompt.fill</code>）</td></tr>
+          <tr><td><code>prompt.suggest</code></td><td>輸入框要顯示灰色建議文字（按 Tab 採用）時</td></tr>
+          <tr><td><code>prompt.compose</code></td><td>組合系統提示時。可新增、取代或刪除段落</td></tr>
+          <tr><td><code>prompt.section</code></td><td>系統提示的每一個具名段落</td></tr>
+          <tr><td><code>prompt.context</code></td><td>每段對話一次，計算第一則訊息附帶的 context 區塊</td></tr>
+          <tr><td><code>prompt.attachment</code></td><td>Claude Code 自動插入給模型的訊息（提醒、模式切換、被提及的檔案）</td></tr>
+          <tr><td class="grp" rowspan="3">一輪對話</td><td><code>turn.start</code></td><td>一輪開始、第一次呼叫模型前。只能觀察</td></tr>
+          <tr><td><code>turn.step</code></td><td>每次送請求給模型（主對話或子代理）。串流事件，用 async generator 寫；可換模型、讀 token 用量</td></tr>
+          <tr><td><code>turn.complete</code></td><td>一輪結束（含被中斷）。可在回答下方加一行文字</td></tr>
+          <tr><td class="grp" rowspan="8">工作階段</td><td><code>session.start</code></td><td>Mod 載入後、第一個提示前。註冊指令、工具的地方</td></tr>
+          <tr><td><code>session.end</code></td><td>結束、<code>/clear</code>、resume、登出等</td></tr>
+          <tr><td><code>session.append</code></td><td>對話中每一列（提示、回應、工具結果）被儲存前</td></tr>
+          <tr><td><code>session.compact</code></td><td>對話即將被壓縮時</td></tr>
+          <tr><td><code>session.receive</code></td><td>外部訊息送達（其他 session、Remote Control）</td></tr>
+          <tr><td><code>session.send</code></td><td>訊息要送往其他代理或 session 時</td></tr>
+          <tr><td><code>session.attach</code> / <code>session.detach</code></td><td>遠端客戶端（如手機）加入或離開</td></tr>
+          <tr><td><code>session.measure</code></td><td>每輪結束後用量有變化時</td></tr>
+          <tr><td class="grp" rowspan="8">介面</td><td><code>ui.render</code></td><td>要畫某個元件時（<code>Pane</code>、<code>AbovePrompt</code>、<code>Spinner</code>…）。回傳你的畫面或修改原本的</td></tr>
+          <tr><td><code>ui.resolve</code></td><td>載入時，每個介面（terminal / desktop…）取得元件表</td></tr>
+          <tr><td><code>ui.press</code></td><td>你畫的 <code>Button</code> 被按下</td></tr>
+          <tr><td><code>ui.input</code></td><td>你畫的 <code>Input</code> 內容改變或送出</td></tr>
+          <tr><td><code>ui.select</code></td><td>你畫的 <code>Select</code> 被選取</td></tr>
+          <tr><td><code>ui.scroll</code> / <code>ui.focus</code></td><td>面板捲動、焦點移動前</td></tr>
+          <tr><td><code>ui.message</code></td><td>你畫的 <code>Client</code> 元件從介面端傳回資料</td></tr>
+          <tr><td><code>ui.fault</code></td><td>你畫的 <code>Client</code> 元件出錯</td></tr>
+          <tr><td class="grp" rowspan="2">指令與設定</td><td><code>command.run</code> / <code>command.describe</code></td><td>斜線指令執行時；在 <code>/help</code> 和自動補全中列出時</td></tr>
+          <tr><td><code>config.set</code> / <code>config.describe</code></td><td><code>/config</code> 設定值改變時；設定選單列出時</td></tr>
+          <tr><td class="grp" rowspan="2">子代理</td><td><code>agent.offer</code></td><td>把某種子代理類型提供給模型時。可隱藏它</td></tr>
+          <tr><td><code>agent.spawn</code></td><td>Agent 工具要啟動子代理時。可換模型或拒絕</td></tr>
+          <tr><td class="grp" rowspan="2">其他</td><td><code>skill.prompt</code> / <code>attribution.text</code></td><td>技能內容展開給模型時；產生 git commit / PR 署名文字時</td></tr>
+          <tr><td><code>telemetry.log</code> / <code>telemetry.mark</code></td><td>遙測記錄送出前</td></tr>
+          <tr><td class="grp">載入</td><td><code>plugin.register</code> / <code>engine.create</code></td><td>Mod 加入鏈結時；建立 <code>$</code> 時（可擴充新的 noun 給其他 mod 用）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Settings hook 事件（<code>classic.*</code>）</h3>
+    <p>原本寫在 <code>settings.json</code> 的 hooks，其事件在 Mod 裡都能以 <code>classic.</code> 開頭攔截，<code>e</code> 就是那些 hook 從 stdin 收到的 JSON。共 33 個：</p>
+    <p style="font-family:var(--mono);font-size:13px;line-height:1.9">SessionStart · Setup · UserPromptSubmit · UserPromptExpansion · PreToolUse · PermissionRequest · PermissionDenied · PostToolUse · PostToolUseFailure · PostToolBatch · Notification · MessageDisplay · SubagentStart · SubagentStop · TaskCreated · TaskCompleted · Stop · StopFailure · TeammateIdle · InstructionsLoaded · ConfigChange · CwdChanged · DirectoryAdded · FileChanged · WorktreeCreate · WorktreeRemove · PreCompact · PostCompact · PreModelSwitch · PostModelSwitch · Elicitation · ElicitationResult · SessionEnd</p>
+    <p>說明見官方 <a href="https://code.claude.com/docs/en/hooks" target="_blank" rel="noopener">Hooks reference</a>。</p>
+
+    <h3><code>$</code> 的每個呼叫本身也是事件</h3>
+    <p>另外一層：<code>$.fs.read()</code>、<code>$.process.run()</code>、<code>$.http.fetch()</code> 等每一個 <code>$</code> 呼叫，本身也是可被攔截的事件（如 <code>on('http.fetch', …)</code>）。這讓一個 mod 可以監管其他 mod 的行為，例如企業可以寫一個 mod 禁止其他 mod 連到特定網域。<code>on('*', …)</code> 則匹配所有事件。</p>
+
+    <h3>篩選條件（matcher）</h3>
+<pre><code>on(<span class="s">'tool.call'</span>, { tool: <span class="s">'Bash'</span> }, hook)              <span class="c">// 單一值</span>
+on(<span class="s">'tool.call'</span>, { tool: [<span class="s">'Edit'</span>, <span class="s">'Write'</span>] }, hook)    <span class="c">// 陣列：任一符合</span>
+on(<span class="s">'tool.call'</span>, { tool: <span class="s">/^mcp__github__/</span> }, hook)    <span class="c">// 正規表示式</span>
+on(<span class="s">'ui.render'</span>, { component: <span class="s">'Spinner'</span> }, hook)     <span class="c">// 只畫 spinner 時</span>
+on(<span class="s">'classic.*'</span>, hook)                               <span class="c">// 所有 settings hook 事件</span></code></pre>
+  </section>
+
+  <section id="api">
+    <h2><span class="n">05</span>引擎介面 <code>$</code> 的完整清單</h2>
+    <p>Mod 執行的環境沒有 Node、沒有 DOM，不能直接讀檔或連網。所有對外的事都要透過 <code>$</code>。這也是為什麼 <code>claude plugin validate</code> 能在安裝前列出一個 mod 會做哪些事。2.1.289 版共有 19 個 noun：</p>
+    <div class="table-box">
+      <table>
+        <thead><tr><th>Noun</th><th>用途</th><th>常用方法</th></tr></thead>
+        <tbody>
+          <tr><td><code>$.ui</code></td><td>畫面：通知、狀態列、記錄行、面板、詢問使用者</td><td><code>toast</code> <code>status</code> <code>log</code> <code>notice</code> <code>ask</code> <code>open</code> <code>close</code> <code>invalidate</code> <code>resolve</code> <code>copy</code></td></tr>
+          <tr><td><code>$.state</code></td><td>這個 session 的共享值，熱重載後保留；寫入會觸發重繪</td><td><code>get</code> <code>set</code>（多半透過 <code>atom</code> / <code>read</code> / <code>update</code>）</td></tr>
+          <tr><td><code>$.store</code></td><td>這個 mod 自己的鍵值儲存，跨 session 保留（JSON 檔）</td><td><code>get</code> <code>set</code> <code>delete</code> <code>keys</code></td></tr>
+          <tr><td><code>$.session</code></td><td>目前工作階段的資料：ID、工作目錄、git repo、對話內容、用量；也可壓縮、傳訊息給其他 session</td><td><code>id</code> <code>cwd</code> <code>repo</code> <code>messages</code> <code>usage</code> <code>model</code></td></tr>
+          <tr><td><code>$.turn</code></td><td>目前這一輪</td><td><code>abort</code></td></tr>
+          <tr><td><code>$.prompt</code></td><td>以使用者身分送出提示；讀寫輸入框</td><td><code>read</code> <code>fill</code> <code>suggest</code></td></tr>
+          <tr><td><code>$.tool</code></td><td>列出、執行工具；註冊模型可呼叫的新工具</td><td><code>list</code> <code>register</code></td></tr>
+          <tr><td><code>$.command</code></td><td>註冊與執行斜線指令</td><td><code>list</code> <code>register</code></td></tr>
+          <tr><td><code>$.agent</code></td><td>子代理類型</td><td><code>list</code> <code>register</code></td></tr>
+          <tr><td><code>$.model</code></td><td>用這個 session 的帳號額度呼叫模型</td><td><code>complete</code> <code>classify</code> <code>fork</code></td></tr>
+          <tr><td><code>$.mcp</code></td><td>呼叫已連線 MCP 伺服器的工具；連線 mod 自帶的伺服器</td><td><code>call</code> <code>connect</code></td></tr>
+          <tr><td><code>$.fs</code></td><td>檔案系統（相對路徑以工作目錄為準，UTF-8）</td><td><code>read</code> <code>write</code> <code>list</code> <code>exists</code> <code>stat</code> <code>ancestors</code></td></tr>
+          <tr><td><code>$.process</code></td><td>在本機執行指令（僅 CLI）</td><td><code>run</code> <code>spawn</code></td></tr>
+          <tr><td><code>$.http</code></td><td>網路請求</td><td><code>fetch</code></td></tr>
+          <tr><td><code>$.clock</code></td><td>時間與計時器</td><td><code>now</code> <code>sleep</code> <code>after</code> <code>every</code></td></tr>
+          <tr><td><code>$.audio</code></td><td>播放音效、語音</td><td><code>play</code> <code>speak</code></td></tr>
+          <tr><td><code>$.config</code></td><td><code>/config</code> 選單的每一列，包含 mod 自己的設定</td><td><code>list</code> <code>set</code></td></tr>
+          <tr><td><code>$.settings</code> / <code>$.env</code></td><td>唯讀設定檔內容；環境變數</td><td><code>read</code>；<code>get</code> <code>set</code></td></tr>
+          <tr><td><code>$.plugin</code> / <code>$.telemetry</code></td><td>這個 mod 的名稱與目錄；遙測記錄</td><td><code>name</code>；<code>log</code> <code>mark</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>每個方法的參數與範例，請看官方 <a href="https://code.claude.com/docs/en/plugins/mods/api" target="_blank" rel="noopener">Use the mods API</a>，或你本機 mod 資料夾裡自動產生的 <code>.claude-plugin/types/claude-code/index.d.ts</code>。</p>
+    <div class="note"><strong>安全提醒：</strong>Mod 不在沙箱裡，以你的權限執行，可以讀寫檔案、執行程式、連網、讀取環境變數裡的 API key，甚至在你被詢問前就核准工具呼叫。只安裝信任來源的 mod，安裝前先用 <code>claude plugin validate</code> 看它的 <code>hooks:</code> 和 <code>calls:</code>。</div>
+  </section>
+
+  <section id="files">
+    <h2><span class="n">06</span>檔案結構與載入</h2>
+    <pre class="tree">turn-band/
+├── .claude-plugin/
+│   └── plugin.json      <span class="c"># { "name", "version", "description", "types" }</span>
+├── hooks/
+│   ├── hooks.json       <span class="c"># { "modules": ["./register.tsx"] }</span>
+│   └── register.tsx     <span class="c"># export const register = (on, options) =&gt; { … }</span>
+└── types/
+    └── index.d.ts       <span class="c"># 有用 $.state 時才需要</span></pre>
+    <div class="fname">types/index.d.ts（範例三）</div>
+<pre><code><span class="k">export type</span> Turn = { seconds: number; tools: number }
+
+<span class="k">declare module</span> <span class="s">'claude-code'</span> {
+  <span class="k">interface</span> PluginState {
+    <span class="s">'turn-band'</span>: { last: Turn | <span class="k">null</span>; isHidden: boolean }
+  }
+}</code></pre>
+    <ul>
+      <li><strong>版本需求：</strong>Claude Code v2.1.287 以上，預設開啟。</li>
+      <li><strong>請 Claude 寫：</strong>在對話中描述你要的功能，Claude 會寫好並詢問是否啟用熱重載；之後每輪結束自動重新載入。</li>
+      <li><strong>從資料夾載入：</strong><code>claude --plugin-dir ./turn-band</code>。</li>
+      <li><strong>從 marketplace 安裝：</strong><code>/plugin install 名稱@marketplace</code>。</li>
+      <li><strong>檢查：</strong><code>claude plugin validate</code>、<code>claude plugin test</code>、<code>claude --debug</code>；<code>/plugin</code> 會顯示已載入幾個 mod。</li>
+      <li><strong>全部關閉：</strong><code>--safe-mode</code>（單次），或 settings 中 <code>"disableAllHooks": true</code>。</li>
+    </ul>
+    <div class="note">各介面支援度不同：hook 在終端機、桌面版、VS Code、<code>claude -p</code>、雲端 session 都會執行，但 mod 畫的面板和資訊列只出現在終端機與桌面版的 Code 分頁。</div>
+  </section>
+
+  <section id="refs">
+    <h2><span class="n">07</span>參考連結</h2>
+    <p>官方文件（Claude Code Docs）：</p>
+    <ul class="refs">
+      <li><a href="https://code.claude.com/docs/en/plugins/mods/overview" target="_blank" rel="noopener">Mods overview</a>：mod 是什麼、怎麼安裝、和 settings hook / skill / MCP 的比較</li>
+      <li><a href="https://code.claude.com/docs/en/plugins/mods/events" target="_blank" rel="noopener">React to events</a>：observe / rewrite / answer、matcher、多個 mod 的執行順序、hook 失敗時的處理</li>
+      <li><a href="https://code.claude.com/docs/en/plugins/mods/reference" target="_blank" rel="noopener">Mods reference</a>：所有事件、方法、元件與限制</li>
+      <li><a href="https://code.claude.com/docs/en/plugins/mods/api" target="_blank" rel="noopener">Use the mods API</a>：指令、工具、模型呼叫、計時器、檔案</li>
+      <li><a href="https://code.claude.com/docs/en/plugins/mods/interface" target="_blank" rel="noopener">Draw in the interface</a>：面板、輸入框上方資訊列、按鈕、state</li>
+      <li><a href="https://code.claude.com/docs/en/plugins/mods/create" target="_blank" rel="noopener">Create a mod</a>：從零做一個 mod，以及編輯與重新載入的流程</li>
+      <li><a href="https://code.claude.com/docs/en/hooks" target="_blank" rel="noopener">Hooks reference</a>：settings hook 事件（對應 <code>classic.*</code>）</li>
+    </ul>
+    <p>原始碼範例：</p>
+    <ul class="refs">
+      <li><a href="https://github.com/anthropics/claude-code/tree/main/mods" target="_blank" rel="noopener">anthropics/claude-code · mods</a>：內建 mod 的原始碼（<code>/diff</code> 面板、<code>agents-md</code>、<code>sec-default</code>）</li>
+      <li><a href="https://github.com/anthropics/claude-code-playground/tree/main/claude-code/mods" target="_blank" rel="noopener">anthropics/claude-code-playground · mods</a>：範例 mod，如 <code>blast-radius</code>（危險指令執行前先顯示影響範圍）、<code>token-weather</code>（context 用量預報）</li>
+    </ul>
+  </section>
+
+  <footer>事件與 <code>$</code> 清單整理自 Claude Code 2.1.289 的型別定義檔；連結內容於 2026-10-04 查閱。Mod API 會隨版本變動，以你所用版本的型別檔與官方文件為準。</footer>
+</div>
+
+</body></html>

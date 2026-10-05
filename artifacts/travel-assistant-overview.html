@@ -1,0 +1,483 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>旅遊助手總覽</title>
+<style>
+:root{
+  --bg:#f7f6f2; --surface:#ffffff; --ink:#1f2328; --muted:#5b6470; --line:#e3e0d8;
+  --accent:#0f6e6e; --accent-soft:#e3f1f0; --warn:#a15c00; --warn-soft:#fbf0de;
+  --bad:#b42318; --bad-soft:#fde8e6; --ok:#1a7f37; --ok-soft:#e6f4ea;
+  --code:#f1efe9; --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15181c; --surface:#1d2126; --ink:#e7e9ec; --muted:#9aa4b0; --line:#2e343b;
+    --accent:#4fc1bd; --accent-soft:#16312f; --warn:#e3a54a; --warn-soft:#33281a;
+    --bad:#f07a6e; --bad-soft:#3a1f1c; --ok:#5fcf7f; --ok-soft:#18301f; --code:#262b31;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15181c; --surface:#1d2126; --ink:#e7e9ec; --muted:#9aa4b0; --line:#2e343b;
+  --accent:#4fc1bd; --accent-soft:#16312f; --warn:#e3a54a; --warn-soft:#33281a;
+  --bad:#f07a6e; --bad-soft:#3a1f1c; --ok:#5fcf7f; --ok-soft:#18301f; --code:#262b31;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.7 "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
+.wrap{max-width:960px;margin:0 auto;padding:24px 16px 80px}
+header.hero{padding:28px 0 12px}
+header.hero h1{font-size:30px;line-height:1.25;margin:0 0 8px}
+header.hero p{color:var(--muted);margin:0}
+nav.toc{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);
+  margin:16px -16px 0;padding:8px 16px;display:flex;gap:6px;overflow-x:auto;white-space:nowrap}
+nav.toc a{color:var(--muted);text-decoration:none;font-size:14px;padding:4px 10px;border-radius:999px;border:1px solid var(--line)}
+nav.toc a:hover{color:var(--accent);border-color:var(--accent)}
+section{margin-top:40px}
+h2{font-size:22px;margin:0 0 4px;scroll-margin-top:56px}
+h2 + .lede{color:var(--muted);margin:0 0 16px}
+h3{font-size:17px;margin:24px 0 8px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin:12px 0}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.pill{display:inline-block;font-size:12px;padding:1px 8px;border-radius:999px;margin-right:4px;vertical-align:2px}
+.ok{background:var(--ok-soft);color:var(--ok)} .warn{background:var(--warn-soft);color:var(--warn)}
+.bad{background:var(--bad-soft);color:var(--bad)} .acc{background:var(--accent-soft);color:var(--accent)}
+.tablewrap{overflow-x:auto;margin:8px 0;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:none}
+code,pre{font-family:ui-monospace,"Cascadia Code",Consolas,monospace;font-size:13.5px}
+code{background:var(--code);padding:1px 5px;border-radius:5px}
+pre{background:var(--code);padding:12px 14px;border-radius:10px;overflow-x:auto;line-height:1.55;margin:8px 0}
+.timeline{list-style:none;padding:0;margin:0}
+.timeline li{display:grid;grid-template-columns:112px 1fr;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.timeline li:last-child{border-bottom:none}
+.timeline .t{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.timeline .sub{color:var(--muted);font-size:14px}
+.callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:10px 14px;border-radius:0 10px 10px 0;margin:12px 0}
+.callout.w{border-color:var(--warn);background:var(--warn-soft)}
+.steps{counter-reset:s;list-style:none;padding:0;margin:8px 0}
+.steps li{counter-increment:s;position:relative;padding:6px 0 6px 40px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:6px;width:28px;height:28px;border-radius:50%;
+  background:var(--accent);color:var(--surface);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+svg text{font-family:inherit}
+.diagram{width:100%;height:auto;display:block}
+details{margin:8px 0}
+summary{cursor:pointer;color:var(--accent);font-weight:600}
+footer{margin-top:56px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
+@media (max-width:560px){
+  header.hero h1{font-size:24px}
+  .timeline li{grid-template-columns:84px 1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>旅遊助手總覽</h1>
+  <p>家庭專用的旅遊草稿＋查證助手。2026-10-04 版｜資料夾：<code>D:\DATA_google_dirve\0_Travel</code></p>
+</header>
+
+<nav class="toc">
+  <a href="#today">今天的行程</a>
+  <a href="#what">這是什麼</a>
+  <a href="#arch">架構</a>
+  <a href="#mcp-quota">MCP與用量</a>
+  <a href="#features">功能與用法</a>
+  <a href="#data">資料與格式</a>
+  <a href="#record">記錄旅程</a>
+  <a href="#maintain">維護與擴充</a>
+  <a href="#limits">限制與下一步</a>
+</nav>
+
+<!-- ───────────────────────── 今天 ───────────────────────── -->
+<section id="today">
+  <h2>今天的行程：10/4（日）八德下午</h2>
+  <p class="lede">玩具圖書館免費放電，再回出發的商場吃壽司郎。車程都在 5 分鐘內，總長約 3 小時。</p>
+
+  <div class="card">
+    <ul class="timeline">
+      <li><span class="t">15:20</span><div>從廣豐（置地生活廣場一帶）出發<div class="sub">車程約 5 分</div></div></li>
+      <li><span class="t">15:30–16:45</span><div><b>兒童玩具圖書館</b>（大湳森林公園內，八德區重慶街 36 號）
+        <div class="sub">室內、免費。入館脫鞋，<b>大人小孩都要穿襪子</b>。今天營業 08:30–17:00 <span class="pill ok">✅ Google Places</span></div></div></li>
+      <li><span class="t">16:30</span><div><b>在館內先用 App 幫壽司郎抽號／預約</b><div class="sub">週日 17:30–18:30 是排隊尖峰，17:00 前入座最穩</div></div></li>
+      <li><span class="t">16:45–17:00</span><div>開回置地生活廣場停車</div></li>
+      <li><span class="t">17:00–18:15</span><div><b>壽司郎 八德置地店</b>（介壽路一段 728 號 1 樓）
+        <div class="sub">不辣選擇：茶碗蒸、玉子燒、毛豆、烏龍麵；每盤 NT$40 起。
+        存在與地址 <span class="pill ok">✅ 多則開幕新聞</span> 今天營業 11:00–22:00 <span class="pill ok">✅ Google Places</span></div></div></li>
+      <li><span class="t">18:15</span><div>回家。同一個商場，不用再移車</div></li>
+    </ul>
+  </div>
+
+  <div class="grid">
+    <div class="card"><b>備案</b>
+      <ul>
+        <li>壽司郎排太久 → <b>藏壽司 八德興豐路店</b> <span class="pill ok">✅ 存在</span><span class="pill bad">❌ 時間未查證</span></li>
+        <li>天氣好、小孩還有電 → 大湳森林公園走走（戶外）</li>
+        <li>想換室內遊戲區 → 八德親子館／興豐親子館 <span class="pill bad">❌ agy 單方</span>，去之前先上桃園育兒資源網確認週日場次</li>
+      </ul>
+    </div>
+    <div class="card"><b>本次排除</b>
+      <ul>
+        <li><b>兒童美術館（置地 5–6F）</b>：已遷到青埔，八德展區 2024-12 結束 <span class="pill ok">✅</span> → 知識庫該筆過期</li>
+        <li>軌道願景館：16:30 閉館，到了只剩 1 小時</li>
+        <li>NU PASTA 金和店：agy 推薦，但<b>找不到任何來源</b></li>
+      </ul>
+    </div>
+  </div>
+  <p class="sub" style="color:var(--muted);font-size:14px">完整草稿：<code>trips/2026-10-04_八德晚餐親子/plan.md</code>｜閘門報告：同夾 <code>gate-report.md</code>（約束 0 違規；營業時間因離線無法查證）</p>
+</section>
+
+<!-- ───────────────────────── 這是什麼 ───────────────────────── -->
+<section id="what">
+  <h2>這個助手是什麼</h2>
+  <p class="lede">目的：<b>下一次找旅遊資訊時，幾分鐘內拿到一份可信的草稿。</b></p>
+  <div class="grid">
+    <div class="card"><span class="pill acc">記得你們</span><br>家庭成員的約束（4 歲、午睡、不吃辣、怕人多、室內優先）存成資料，每次規劃自動套用，不用重講。</div>
+    <div class="card"><span class="pill acc">不亂編</span><br>每個營業時間、地址、班次都標 ✅／🟡／❌。AI 搜尋助手（agy）的數字<b>一律複驗</b>——今天就擋下了一家查無來源的餐廳。</div>
+    <div class="card"><span class="pill acc">越用越準</span><br>去過的地方、踩過的坑、實際車程都存進知識庫。回來後匯出 Google 地圖時間軸，就能自動對照「計畫 vs 實際」。</div>
+  </div>
+  <div class="callout">為什麼強調查證：學術研究（TravelPlanner, ICML 2024）中 GPT-4 在帶限制的真實旅遊規劃只有 0.6% 完全正確。本專案的台南行程也實際出現過「班車根本不停那站」的錯誤。</div>
+</section>
+
+<!-- ───────────────────────── 架構 ───────────────────────── -->
+<section id="arch">
+  <h2>架構</h2>
+  <p class="lede">三個角色、三層資料、一道閘門、一條回饋迴路。</p>
+
+  <div class="card">
+  <svg class="diagram" viewBox="0 0 900 640" role="img" aria-label="架構圖：角色、記憶層、工具、MCP 與外部資料源">
+    <defs>
+      <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker>
+    </defs>
+    <!-- 角色 -->
+    <rect x="20" y="20" width="170" height="56" rx="10" fill="var(--accent-soft)" stroke="var(--accent)"/>
+    <text x="105" y="44" text-anchor="middle" fill="var(--ink)" font-size="15" font-weight="700">你</text>
+    <text x="105" y="64" text-anchor="middle" fill="var(--muted)" font-size="12">「今天下午帶小孩去…」</text>
+    <rect x="300" y="20" width="300" height="56" rx="10" fill="var(--surface)" stroke="var(--accent)" stroke-width="2"/>
+    <text x="450" y="44" text-anchor="middle" fill="var(--ink)" font-size="15" font-weight="700">Claude Code（總指揮）</text>
+    <text x="450" y="64" text-anchor="middle" fill="var(--muted)" font-size="12">讀記憶 → 派工 → 複驗 → 寫草稿</text>
+    <rect x="710" y="20" width="170" height="56" rx="10" fill="var(--warn-soft)" stroke="var(--warn)"/>
+    <text x="795" y="44" text-anchor="middle" fill="var(--ink)" font-size="15" font-weight="700">agy「tscout」</text>
+    <text x="795" y="64" text-anchor="middle" fill="var(--muted)" font-size="12">Google 搜尋、聽 YouTube</text>
+    <line x1="190" y1="48" x2="298" y2="48" stroke="var(--muted)" marker-end="url(#ar)"/>
+    <line x1="600" y1="40" x2="708" y2="40" stroke="var(--muted)" marker-end="url(#ar)"/>
+    <line x1="708" y1="58" x2="602" y2="58" stroke="var(--muted)" marker-end="url(#ar)"/>
+    <text x="654" y="32" text-anchor="middle" fill="var(--muted)" font-size="11">herdr 派工</text>
+
+    <!-- 記憶層 -->
+    <rect x="20" y="110" width="860" height="120" rx="12" fill="none" stroke="var(--line)" stroke-dasharray="5 4"/>
+    <text x="36" y="132" fill="var(--muted)" font-size="12" font-weight="700">記憶層（純文字，Google Drive 同步；三個 agent 共用）</text>
+    <g font-size="13">
+      <rect x="36" y="144" width="160" height="72" rx="8" fill="var(--surface)" stroke="var(--line)"/>
+      <text x="116" y="172" text-anchor="middle" fill="var(--ink)" font-weight="700">members/</text>
+      <text x="116" y="194" text-anchor="middle" fill="var(--muted)" font-size="12">約束是資料</text>
+      <rect x="206" y="144" width="160" height="72" rx="8" fill="var(--surface)" stroke="var(--line)"/>
+      <text x="286" y="172" text-anchor="middle" fill="var(--ink)" font-weight="700">knowledge/</text>
+      <text x="286" y="194" text-anchor="middle" fill="var(--muted)" font-size="12">地點、路段、陷阱</text>
+      <rect x="376" y="144" width="160" height="72" rx="8" fill="var(--surface)" stroke="var(--ok)"/>
+      <text x="456" y="172" text-anchor="middle" fill="var(--ink)" font-weight="700">knowledge/food/</text>
+      <text x="456" y="194" text-anchor="middle" fill="var(--muted)" font-size="12">在地美食 145 家</text>
+      <rect x="546" y="144" width="160" height="72" rx="8" fill="var(--surface)" stroke="var(--line)"/>
+      <text x="626" y="172" text-anchor="middle" fill="var(--ink)" font-weight="700">trips/</text>
+      <text x="626" y="194" text-anchor="middle" fill="var(--muted)" font-size="12">計畫＋實際＋時間軸</text>
+      <rect x="716" y="144" width="148" height="72" rx="8" fill="var(--surface)" stroke="var(--line)"/>
+      <text x="790" y="172" text-anchor="middle" fill="var(--ink)" font-weight="700">RULES.md</text>
+      <text x="790" y="194" text-anchor="middle" fill="var(--muted)" font-size="12">共同守則</text>
+    </g>
+    <line x1="450" y1="76" x2="450" y2="108" stroke="var(--muted)" marker-end="url(#ar)"/>
+
+    <!-- 工具層 -->
+    <text x="36" y="266" fill="var(--muted)" font-size="12" font-weight="700">工具層（tools/，Python）</text>
+    <g font-size="13">
+      <rect x="36" y="276" width="200" height="64" rx="10" fill="var(--surface)" stroke="var(--bad)"/>
+      <text x="136" y="302" text-anchor="middle" fill="var(--ink)" font-weight="700">閘門 travel_validator</text>
+      <text x="136" y="322" text-anchor="middle" fill="var(--muted)" font-size="12">出發前擋錯</text>
+      <rect x="250" y="276" width="190" height="64" rx="10" fill="var(--surface)" stroke="var(--ok)"/>
+      <text x="345" y="302" text-anchor="middle" fill="var(--ink)" font-weight="700">回填 ingest</text>
+      <text x="345" y="322" text-anchor="middle" fill="var(--muted)" font-size="12">時間軸 → 實際</text>
+      <rect x="454" y="276" width="190" height="64" rx="10" fill="var(--surface)" stroke="var(--ok)"/>
+      <text x="549" y="302" text-anchor="middle" fill="var(--ink)" font-weight="700">美食驗證 food_verify</text>
+      <text x="549" y="322" text-anchor="middle" fill="var(--muted)" font-size="12">線索 → Google 查核</text>
+    </g>
+
+    <!-- MCP -->
+    <rect x="660" y="262" width="220" height="96" rx="10" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/>
+    <text x="770" y="284" text-anchor="middle" fill="var(--ink)" font-size="14" font-weight="700">places MCP（自建 stdio）</text>
+    <text x="770" y="304" text-anchor="middle" fill="var(--muted)" font-size="11.5">places_search｜places_details</text>
+    <text x="770" y="320" text-anchor="middle" fill="var(--muted)" font-size="11.5">places_check_hours</text>
+    <text x="770" y="342" text-anchor="middle" fill="var(--accent)" font-size="11.5" font-weight="700">Claude Code ＋ agy 共用</text>
+    <line x1="795" y1="76" x2="795" y2="260" stroke="var(--accent)" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+    <line x1="600" y1="66" x2="700" y2="260" stroke="var(--accent)" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+    <line x1="400" y1="230" x2="160" y2="274" stroke="var(--muted)" marker-end="url(#ar)"/>
+    <line x1="560" y1="274" x2="460" y2="232" stroke="var(--muted)" marker-end="url(#ar)"/>
+    <line x1="345" y1="274" x2="600" y2="232" stroke="var(--muted)" marker-end="url(#ar)"/>
+
+    <!-- 共用 Places 核心 -->
+    <rect x="250" y="384" width="630" height="44" rx="10" fill="var(--surface)" stroke="var(--line)"/>
+    <text x="565" y="404" text-anchor="middle" fill="var(--ink)" font-size="13" font-weight="700">validator/places.py — 共用 client、快取、店家 ID 對照（registry.yaml）</text>
+    <text x="565" y="421" text-anchor="middle" fill="var(--muted)" font-size="11.5">閘門、美食驗證、MCP 三方查到的結果一致；金鑰只放 D 槽 ClaudeData/secrets（不同步雲端）</text>
+    <line x1="136" y1="340" x2="300" y2="382" stroke="var(--muted)" marker-end="url(#ar)"/>
+    <line x1="549" y1="340" x2="549" y2="382" stroke="var(--muted)" marker-end="url(#ar)"/>
+    <line x1="770" y1="358" x2="770" y2="382" stroke="var(--muted)" marker-end="url(#ar)"/>
+
+    <!-- 外部資料源與用量 -->
+    <text x="36" y="466" fill="var(--muted)" font-size="12" font-weight="700">外部資料源與用量上限</text>
+    <g font-size="12">
+      <rect x="36" y="476" width="200" height="140" rx="10" fill="var(--bg)" stroke="var(--line)"/>
+      <text x="136" y="498" text-anchor="middle" fill="var(--ink)" font-weight="700">TDX 台鐵時刻</text>
+      <text x="136" y="522" text-anchor="middle" fill="var(--muted)">基礎會員 3,000 次／月</text>
+      <text x="136" y="542" text-anchor="middle" fill="var(--muted)">每 IP 每秒 50 次</text>
+      <text x="136" y="572" text-anchor="middle" fill="var(--muted)" font-size="11">使用者：閘門</text>
+
+      <rect x="250" y="476" width="390" height="140" rx="10" fill="var(--bg)" stroke="var(--accent)"/>
+      <text x="445" y="498" text-anchor="middle" fill="var(--ink)" font-weight="700">Google Places API (New)</text>
+      <text x="262" y="522" fill="var(--muted)">店名找店 Text Search Pro　　5,000／月免費</text>
+      <text x="262" y="541" fill="var(--muted)">美食批次 Text Search Ent.　　1,000／月免費</text>
+      <text x="262" y="560" fill="var(--muted)">營業時間 Place Details Ent.　1,000／月免費</text>
+      <text x="262" y="579" fill="var(--muted)">評論 Details Ent.+Atmosphere　1,000／月免費</text>
+      <text x="262" y="602" fill="var(--bad)" font-weight="700">每日：SearchText 有日上限（10/4 成功 113 次後被擋）</text>
+
+      <rect x="654" y="476" width="226" height="140" rx="10" fill="var(--bg)" stroke="var(--line)"/>
+      <text x="767" y="498" text-anchor="middle" fill="var(--ink)" font-weight="700">其他</text>
+      <text x="666" y="522" fill="var(--muted)">OSM Nominatim 反查地名</text>
+      <text x="666" y="540" fill="var(--muted)">　免金鑰、每秒 1 次</text>
+      <text x="666" y="562" fill="var(--muted)">Google 地圖時間軸</text>
+      <text x="666" y="580" fill="var(--muted)">　手機匯出，無上限</text>
+      <text x="666" y="602" fill="var(--muted)">YouTube：yt-dlp 抓音訊</text>
+    </g>
+    <line x1="136" y1="340" x2="136" y2="474" stroke="var(--muted)" marker-end="url(#ar)"/>
+    <line x1="445" y1="428" x2="445" y2="474" stroke="var(--muted)" marker-end="url(#ar)"/>
+    <line x1="345" y1="340" x2="720" y2="474" stroke="var(--muted)" stroke-dasharray="3 3" marker-end="url(#ar)"/>
+  </svg>
+  </div>
+
+
+  <h3 id="mcp-quota">MCP 與每日／每月用量</h3>
+  <div class="tablewrap"><table>
+    <tr><th>MCP／服務</th><th>誰在用</th><th>提供什麼</th><th>用量上限</th></tr>
+    <tr><td><b>places MCP</b><br><span style="color:var(--muted);font-size:13px">自建 stdio，<code>tools/places_mcp.py</code></span></td>
+        <td>Claude Code（專案 <code>.mcp.json</code>）<br>agy（<code>agy mcp add places</code>）</td>
+        <td><code>places_search</code> 找店<br><code>places_details</code> 營業時間、評分、歇業<br><code>places_check_hours</code> 驗證某時段有沒有開</td>
+        <td>走 Google Places 額度（見下）</td></tr>
+    <tr><td><b>Google Places API (New)</b></td><td>閘門、美食驗證、places MCP</td>
+        <td>店家存在、地址、營業時間、評分、歇業</td>
+        <td>每月免費：Text Search Pro 5,000｜Text Search Enterprise 1,000｜Place Details Enterprise 1,000｜含評論 1,000<br>
+            <b style="color:var(--bad)">每日：SearchText 有日上限</b>——10/4 成功 113 次後回 429。確切數字在 Cloud Console →「Places API (New)」→「配額」→ SearchTextRequest per day</td></tr>
+    <tr><td><b>TDX 運輸資料</b></td><td>閘門</td><td>台鐵班次、停靠站</td><td>基礎會員 3,000 次／月；每 IP 每秒 50 次</td></tr>
+    <tr><td><b>OSM Nominatim</b></td><td>時間軸回填</td><td>座標反查地名</td><td>免金鑰；使用政策每秒 1 次（程式已自動節流）</td></tr>
+    <tr><td><b>agy（Gemini）</b></td><td>Claude 派工</td><td>Google 搜尋、聽 YouTube 音訊</td><td>依 Google AI Pro 方案，本專案未量測</td></tr>
+  </table></div>
+  <div class="callout">省額度的設計：查過的店記住 Google 店家 ID（<code>registry.yaml</code>），之後不再搜尋；查詢結果快取（營業時間 7 天、評分 1 天、搜尋 30 天）；評論只有在要查評分時才抓。被日上限擋下的查詢記為 <code>error</code>，<b>隔天重跑會自動補查</b>，不會亂填。</div>
+
+  <h3>一趟旅程的完整生命週期</h3>
+  <ol class="steps">
+    <li><b>說需求</b>：「今天下午從廣豐出發，2–3 小時，找晚餐和小孩玩的地方」</li>
+    <li><b>Claude 讀記憶</b>：成員約束、在地陷阱、已知地點（今天就直接用到了玩具圖書館）</li>
+    <li><b>派 agy 搜尋</b>：廣度找候選，Claude 只複驗會放進行程的那幾個</li>
+    <li><b>寫草稿</b> <code>trips/&lt;日期_名稱&gt;/plan.md</code>，每個關鍵事實附 ✅／🟡／❌</li>
+    <li><b>過閘門</b>：約束有沒有違反、事實有沒有沒查的</li>
+    <li><b>出發</b>：手機的 Google 地圖時間軸開著就好，什麼都不用記</li>
+    <li><b>回來</b>：匯出時間軸 → <code>ingest.py</code> → 自動產生「計畫 vs 實際」</li>
+    <li><b>學到的寫回知識庫</b>：實際車程、停留時間、新地點、新陷阱（<b>你同意才寫入</b>）</li>
+  </ol>
+</section>
+
+<!-- ───────────────────────── 功能 ───────────────────────── -->
+<section id="features">
+  <h2>功能與用法</h2>
+  <p class="lede">日常只需要跟 Claude 說話；下面的指令是給想自己跑或除錯時用的。</p>
+
+  <div class="tablewrap"><table>
+    <tr><th>功能</th><th>狀態</th><th>怎麼用</th></tr>
+    <tr><td><b>規劃草稿</b></td><td><span class="pill ok">可用</span></td><td>直接跟 Claude 說需求（時間、出發地、想要什麼）。今天的行程就是這樣產生的</td></tr>
+    <tr><td><b>家庭記憶</b></td><td><span class="pill ok">可用</span></td><td>改 <code>members/member*.md</code>；行程寫 <code>participants: family1</code> 自動套用</td></tr>
+    <tr><td><b>在地陷阱庫</b></td><td><span class="pill ok">可用</span></td><td><code>knowledge/traps.md</code>：「API 查得到但要懂得問」的坑</td></tr>
+    <tr><td><b>地點庫</b></td><td><span class="pill ok">18 家</span></td><td><code>knowledge/venues/&lt;id&gt;.md</code>，一店一檔；未查證的放 <code>_candidates.md</code></td></tr>
+    <tr><td><b>閘門：約束檢查</b></td><td><span class="pill ok">可用</span></td><td>午睡、單段車程上限、黑名單、誰能開車、身高門檻</td></tr>
+    <tr><td><b>閘門：台鐵班次與停靠站</b></td><td><span class="pill ok">可用</span></td><td>TDX 官方資料；需要 TDX 金鑰（環境變數）</td></tr>
+    <tr><td><b>閘門：營業時間／評分／歇業</b></td><td><span class="pill ok">可用｜2026-10-04 接上</span></td><td>Google Places API (New)；金鑰在 <code>D:\ClaudeData\secrets\travel.env</code>（不同步雲端）。查過的店 ID 存 <code>knowledge/venues/registry.yaml</code></td></tr>
+    <tr><td><b>places MCP（Claude + agy 共用）</b></td><td><span class="pill ok">可用</span></td><td><code>places_search</code>／<code>places_details</code>／<code>places_check_hours</code>；與閘門同一套判定與快取。agy 推薦店家前必須呼叫</td></tr>
+    <tr><td><b>在地美食資料庫</b></td><td><span class="pill ok">新｜6 縣市 145 家</span></td><td>來源（博主整理檔、YouTube 連結——agy 下載音訊直接聆聽）放 <code>knowledge/food/sources/</code> → 結構化成 <code>knowledge/food/&lt;城市&gt;.yaml</code> → <code>python tools/food_verify.py</code> 用 Google 驗證（42 家通過、2 家已歇業）</td></tr>
+    <tr><td><b>時間軸回填</b></td><td><span class="pill ok">新｜5 趟已回填</span></td><td>手機匯出時間軸 → 放 <code>trips/_timeline/</code> → 跑 <code>ingest.py</code></td></tr>
+    <tr><td><b>寫回知識庫</b></td><td><span class="pill warn">待你核准</span></td><td>建議清單在 <code>trips/_timeline/backfill-proposals_2026-10-04.md</code></td></tr>
+  </table></div>
+
+  <h3>指令速查（在專案資料夾執行）</h3>
+<pre># 閘門：檢查一份行程（--no-net 只看約束與未申報，不連網）
+python tools/travel_validator.py trips/2026-10-04_八德晚餐親子/plan.md --no-net
+
+# 回填：從時間軸切出某趟的實際軌跡（多天行程加 --to）
+python tools/ingest.py trips/2026-09-25_台南探親 --to 2026-09-27
+
+# 跑全部測試（目前 138 項）
+
+# 在地美食：用 Google 驗證某城市的店家線索
+python tools/food_verify.py knowledge/food/taoyuan.yaml
+python -m pytest tools/tests -q</pre>
+
+  <h3>跟 Claude 說話的範本</h3>
+  <div class="grid">
+    <div class="card"><b>規劃</b><br>「下週六上午從廣豐出發，帶小孩去台北，中午前到，想看博物館，午餐要好停車」</div>
+    <div class="card"><b>回填</b><br>「時間軸放好了，幫我回填 10/4 那趟」</div>
+    <div class="card"><b>補記</b><br>「玩具圖書館小孩玩了很開心，人不多；壽司郎排了 20 分」→ Claude 寫進地點庫</div>
+  </div>
+</section>
+
+<!-- ───────────────────────── 資料 ───────────────────────── -->
+<section id="data">
+  <h2>資料存在哪、長什麼樣</h2>
+  <p class="lede">全部是純文字 Markdown，放在 Google Drive 同步資料夾。frontmatter（檔頭 <code>---</code> 之間）是給程式讀的資料，下面的正文是給人讀的筆記。</p>
+
+<pre>0_Travel/
+├─ RULES.md                 共同守則（三個 AI 共用，單一真源）
+├─ CLAUDE.md / AGENTS.md / GEMINI.md   各 AI 的入口，都指向 RULES.md
+├─ members/                 人
+│   ├─ member1.md  member2.md  member3.md   個人約束
+│   ├─ family1.md          群組：出發地、偏好、預算
+│   └─ _index.md           多人同行時約束怎麼合併
+├─ knowledge/              跨行程資產（越用越值錢）
+│   ├─ traps.md            在地陷阱
+│   ├─ routes.md           路段時間（實測優先於估計）
+│   ├─ venues/&lt;id&gt;.md     一店一檔（去過的）；_candidates.md 放未查證線索
+│   └─ food/               在地美食資料庫：sources/ 原始來源＋&lt;城市&gt;.yaml（Google 驗證過）
+├─ trips/
+│   ├─ _index.md           行程登記簿
+│   ├─ _timeline/          Google 地圖時間軸匯出（跨行程共用）
+│   └─ YYYY-MM-DD_名稱/
+│       ├─ plan.md         行程草稿（附 claim 標記）
+│       ├─ gate-report.md  閘門輸出
+│       ├─ bookings.md     訂單、票券、保險
+│       ├─ timeline-extract.md + log.jsonl   ingest 產出（勿手改）
+│       ├─ actual.md       計畫 vs 實際
+│       └─ ingest-proposals.md   建議寫回知識庫的變更
+├─ tools/                  閘門、回填程式與測試
+└─ docs/                   設計文件（本頁在這裡）</pre>
+
+  <h3>三個你一定會看到的格式</h3>
+  <div class="grid">
+    <div class="card"><b>① 信心標記</b>
+      <ul style="margin:6px 0 0;padding-left:18px">
+        <li>✅ 兩個以上獨立來源吻合</li>
+        <li>🟡 單一來源（附網址）</li>
+        <li>❌ 查不到——照實寫，不猜</li>
+      </ul></div>
+    <div class="card"><b>② 三態值</b>（成員、地點欄位）
+      <ul style="margin:6px 0 0;padding-left:18px">
+        <li><code>有值</code> 已登錄</li>
+        <li><code>null</code> <b>未知</b> → 閘門判 ❌，不當作「沒限制」</li>
+        <li><code>false</code> / <code>[]</code> 確認不需要</li>
+      </ul></div>
+    <div class="card"><b>③ claim 標記</b>（行程裡）
+      <pre style="margin:6px 0 0">&lt;!-- claim:hours name="壽司郎 八德置地店"
+  addr="…728號1樓" open=11:00 close=22:00 --&gt;</pre>
+      寫在事實的下一行，告訴閘門要查什麼。</div>
+  </div>
+
+  <h3>地點檔範例（<code>knowledge/venues/ertong-toy-library.md</code>）</h3>
+<pre>---
+id: ertong-toy-library
+name: 兒童玩具圖書館
+address: 桃園市八德區重慶街36號
+hours:
+  sun: "13:00-17:00"
+tickets: { full: 0 }
+kid: { suitable: true, typical_minutes: 90 }
+crowd: low
+status: ok              # ok / watch / avoid（黑名單）
+verified:
+  logistics: 2026-09-13 # 地址、時間何時查證
+  quality: null         # 好不好玩、好不好吃——要你去過才填
+---
+筆記：入館需脫鞋…</pre>
+</section>
+
+<!-- ───────────────────────── 記錄 ───────────────────────── -->
+<section id="record">
+  <h2>以後怎麼記錄旅程</h2>
+  <p class="lede">原則：<b>旅途中什麼都不用記。</b>位置與時間交給手機，回來後一句話回填。</p>
+
+  <h3>出發前（一次性設定）</h3>
+  <div class="card">確認手機 Google 地圖時間軸是開的：<b>設定 → 位置 → 定位服務 → 時間軸</b>。</div>
+
+  <h3>回來後</h3>
+  <ol class="steps">
+    <li>同一個畫面點 <b>匯出時間軸資料</b>，存到雲端硬碟 <code>我的雲端硬碟 / 0_Travel / trips / _timeline /</code>，檔名用 <code>時間軸_YYYY-MM-DD.json</code>（匯出日）</li>
+    <li>跟 Claude 說「時間軸放好了，回填 &lt;哪一趟&gt;」</li>
+    <li>Claude 跑 <code>ingest.py</code>：切出那幾天、反查地名、比對地點庫，寫出 <code>actual.md</code></li>
+    <li>Claude 列出建議（實際車程、停留時間、新地點），<b>你說「套用」才寫進知識庫</b></li>
+    <li>有空再口頭補一句「好不好玩、人多不多、好不好吃」——這是唯一機器查不到的東西</li>
+  </ol>
+
+  <div class="callout w"><b>隱私規則（程式強制）</b>：家、常去地點、過夜地點的座標<b>不送外部服務、不寫進檔案</b>。時間軸檔含完整位置歷史，只放在本資料夾，不外傳。</div>
+
+  <h3>時間軸做得到／做不到</h3>
+  <div class="tablewrap"><table>
+    <tr><th>做得到</th><th>做不到</th></tr>
+    <tr><td>每段車程實際幾分鐘、幾公里</td><td><b>為什麼</b>停那麼久（逛街？排隊？）——不會自行推測</td></tr>
+    <tr><td>每個地點停留多久、在哪裡</td><td>加油這類幾分鐘的短停留可能偵測不到</td></tr>
+    <tr><td>計畫中的時刻準不準</td><td>小孩什麼時候開始鬧（未來可加「小孩狀態」一鍵表單）</td></tr>
+  </table></div>
+</section>
+
+<!-- ───────────────────────── 維護 ───────────────────────── -->
+<section id="maintain">
+  <h2>維護與增加功能</h2>
+  <p class="lede">日常維護都可以直接叫 Claude 做；這裡說明規則，讓你知道它該怎麼做。</p>
+
+  <div class="tablewrap"><table>
+    <tr><th>想做什麼</th><th>改哪裡</th><th>規則</th></tr>
+    <tr><td>小孩長高、多了忌口</td><td><code>members/member3.md</code></td><td>不知道就填 <code>null</code>，不要填 <code>false</code></td></tr>
+    <tr><td>新增查證過的地點</td><td><code>knowledge/venues/&lt;id&gt;.md</code>（複製現有檔）</td><td>檔名＝id；未查證的先放 <code>_candidates.md</code></td></tr>
+    <tr><td>某家店變差／倒了</td><td>該檔 <code>status: avoid</code> + <code>status_reason</code></td><td>閘門會自動擋下</td></tr>
+    <tr><td>踩到新坑</td><td><code>knowledge/traps.md</code></td><td>格式：陷阱／為什麼會中／正確做法／發現日／可信度</td></tr>
+    <tr><td>實測車程</td><td><code>knowledge/routes.md</code> 的 <code>actual_minutes</code></td><td>實測值優先於任何估計</td></tr>
+    <tr><td>改規則</td><td><code>RULES.md</code></td><td>只改這一份，三個 AI 都會讀到</td></tr>
+  </table></div>
+
+  <h3>增加新的程式功能（開發者）</h3>
+  <ul>
+    <li><b>新的查證類型</b>（例如接 Google Places 查營業時間）：在 <code>tools/validator/</code> 加 verifier，對應 <code>RULES.md</code> 的 claim 類型表；規格見 <code>docs/閘門規格_v1.md</code></li>
+    <li><b>新的回填來源</b>（例如照片 EXIF 時間）：在 <code>tools/timeline.py</code> 旁加解析器，輸出同樣的 <code>log.jsonl</code> 事件格式</li>
+    <li><b>先寫測試</b>：<code>tools/tests/</code> 用固定的假資料，不讀真實 members/knowledge；改完跑 <code>pytest</code> 必須全綠</li>
+    <li><b>相依套件</b>：只用 Python 3.13 + <code>pyyaml</code>、<code>requests</code>；所有檔案讀寫顯式 UTF-8</li>
+  </ul>
+</section>
+
+<!-- ───────────────────────── 限制 ───────────────────────── -->
+<section id="limits">
+  <h2>已知限制與下一步</h2>
+  <div class="grid">
+    <div class="card"><span class="pill ok">已解決</span><br><b>Google Places 已接上</b>（閘門＋MCP）。今天兩個店家的營業時間都由 Google 實查確認；agy 原報壽司郎 21:30 打烊是錯的。每月免費額度遠高於家庭用量。</div>
+    <div class="card"><span class="pill ok">已修正</span><br><b>閘門誤報</b>：行程表自己的時段不再被當成未申報事實（今天的行程 31 筆 → 1 筆真的）。<b>含交通字眼的行不豁免</b>——台南原始行程的錯誤班次仍全部擋下。</div>
+    <div class="card"><span class="pill warn">設計上的 BLOCKED</span><br><code>member3.max_leg_minutes</code>（小孩單段車程上限）是 <code>null</code>＝未知，閘門依「預設拒絕」永遠判無法查證。填一個值（例如 30）就會解除。</div>
+    <div class="card"><span class="pill warn">agy 會編</span><br>今天推薦的 NU PASTA 金和店查無任何來源；多數來源只給首頁網址。維持「只複驗要放進行程的」策略。</div>
+    <div class="card"><span class="pill acc">待核准</span><br>4 個地點的查證座標、8 條實測路段、兒美館遷址等更新，在 <code>trips/_timeline/backfill-proposals_2026-10-04.md</code>，說「套用」即寫入。</div>
+  </div>
+
+  <details>
+    <summary>過去行程的未解疑點（不急，不影響規劃）</summary>
+    <ul>
+      <li>時間軸的「家」在藝文特區一帶，廣豐路是常去地點——兩個起點怎麼用</li>
+      <li>9/13 是哪位大人帶小孩</li>
+      <li>7/18 礁溪小孩是否同行（出發日行程寫有）</li>
+      <li>8/23 祥儀停留 5.6 小時是否含午餐</li>
+    </ul>
+  </details>
+</section>
+
+<footer>
+  旅遊助手 · 2026-10-04 · 由 Claude Code 依專案檔案產生。設計細節見 <code>docs/架構總覽_v2.md</code>、<code>docs/閘門規格_v1.md</code>、<code>RULES.md</code>。
+</footer>
+
+</div>
+</body>
+</html>
+
+</body></html>

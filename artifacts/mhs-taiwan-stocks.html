@@ -1,0 +1,243 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>MHS 台股探勘：假設被推翻</title>
+<style>
+:root {
+  --bg-page: #f6f8fa;
+  --bg-card: #ffffff;
+  --bg-subtle: #eef2f5;
+  --text-main: #16202b;
+  --text-muted: #56646f;
+  --border-color: #dce3e9;
+  --accent: #12697a;
+  --ok-fg: #1c6b3a;
+  --ok-bg: #e4f2e9;
+  --warn-fg: #8a5200;
+  --warn-bg: #faefdc;
+  --risk-fg: #8c2f39;
+  --risk-bg: #f7e7e8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-page: #0d1318;
+    --bg-card: #151d24;
+    --bg-subtle: #1c262f;
+    --text-main: #e3eaef;
+    --text-muted: #95a3b0;
+    --border-color: #263039;
+    --accent: #57b8c8;
+    --ok-fg: #84c99b;
+    --ok-bg: #12301f;
+    --warn-fg: #e0b070;
+    --warn-bg: #33250f;
+    --risk-fg: #de8189;
+    --risk-bg: #3a1b1f;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg-page: #0d1318;
+  --bg-card: #151d24;
+  --bg-subtle: #1c262f;
+  --text-main: #e3eaef;
+  --text-muted: #95a3b0;
+  --border-color: #263039;
+  --accent: #57b8c8;
+  --ok-fg: #84c99b;
+  --ok-bg: #12301f;
+  --warn-fg: #e0b070;
+  --warn-bg: #33250f;
+  --risk-fg: #de8189;
+  --risk-bg: #3a1b1f;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-page);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  line-height: 1.75;
+}
+.wrap { max-width: 900px; margin: 0 auto; padding: 32px 20px 96px; }
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.card h3 { margin: 8px 0 6px; }
+.card-meta { color: var(--text-muted); font-size: 14px; }
+.card-meta > * + * { margin-left: 14px; }
+.summary { margin: 10px 0 0; }
+.delta-impact {
+  margin-top: 12px; padding: 12px 14px;
+  background: var(--bg-subtle); border-left: 3px solid var(--accent);
+}
+.delta-impact strong { display: block; color: var(--accent); font-size: 13px; }
+.verification { font-size: 12px; padding: 2px 8px; border-radius: 2px; }
+.v-corroborated .verification { color: var(--ok-fg); background: var(--ok-bg); }
+.v-unverified_claim .verification { color: var(--warn-fg); background: var(--warn-bg); }
+.v-marketing .verification { color: var(--risk-fg); background: var(--risk-bg); }
+.importance {
+  font-size: 12px; padding: 2px 8px; margin-right: 8px;
+  color: var(--text-muted); background: var(--bg-subtle);
+}
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border-color); }
+thead th { color: var(--text-muted); background: var(--bg-subtle); }
+.num { font-variant-numeric: tabular-nums; }
+.scroller { overflow-x: auto; }
+.impact-block { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+.impact-col { flex: 1 1 220px; }
+.impact-col.fav h4 { color: var(--ok-fg); }
+.impact-col.unfav h4 { color: var(--risk-fg); }
+.speculation {
+  margin-top: 12px; padding: 12px 14px; font-style: italic;
+  color: var(--warn-fg); background: var(--warn-bg);
+}
+details { margin-top: 12px; }
+summary { cursor: pointer; color: var(--accent); font-size: 14px; }
+.details-body > * + * { margin-top: 14px; }
+.hero { border-bottom: 2px solid var(--text-main); padding-bottom: 18px; margin-bottom: 24px; }
+.dashboard {
+  display: flex; flex-wrap: wrap; gap: 10px 20px;
+  padding: 14px 16px; margin-bottom: 24px;
+  background: var(--bg-subtle); font-size: 14px;
+}
+.issue-nav { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border-color); font-size: 14px; }
+a { color: var(--accent); }
+.status-hero {
+  padding: 18px 20px; margin-bottom: 24px;
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-left: 4px solid var(--accent);
+}
+.status-hero h2 { margin-top: 0; }
+.status-hero.partial { border-left-color: var(--warn-fg); }
+
+/* docsrender 專屬樣式擴充 */
+.doc-masthead {
+  border-bottom: 2px solid var(--text-main);
+  padding-bottom: 16px;
+  margin-bottom: 28px;
+}
+.doc-masthead h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  line-height: 1.35;
+}
+h2 {
+  font-size: 22px;
+  margin-top: 36px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+h3 {
+  font-size: 17px;
+  margin-top: 24px;
+  margin-bottom: 10px;
+}
+p {
+  margin: 12px 0;
+  line-height: 1.75;
+}
+.callout {
+  margin: 18px 0;
+  padding: 12px 18px;
+  background: var(--bg-subtle);
+  border-left: 4px solid var(--accent);
+  border-radius: 2px;
+}
+.callout p {
+  margin: 6px 0;
+}
+.section-divider {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 36px 0;
+}
+pre {
+  margin: 14px 0;
+  padding: 14px 16px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.9em;
+}
+p code, li code, td code, th code {
+  background: var(--bg-subtle);
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--border-color);
+}
+ul, ol {
+  padding-left: 26px;
+  margin: 14px 0;
+}
+li {
+  margin-bottom: 6px;
+}
+.scroller {
+  overflow-x: auto;
+  margin: 16px 0;
+}
+</style>
+<div class="wrap doc-body">
+<header class="doc-masthead"><h1>MHS 台股探勘：假設被推翻</h1></header>
+<p>2026-09-26 · 來源案例 MHS 協議 · anvil 架構 v2 的第一次檢驗</p>
+<p>台股方向跑完了，結論是我押的假設<strong>錯了</strong>，而且是有機制的推翻，不是「查無資料」。 更重要的是，agy 在推翻它的過程中撈出一個比我的框架更好的問題。</p>
+<hr class="section-divider">
+<h2>一、我的假設與它為什麼錯</h2>
+<h3>原始假設：整合商的雙面刃</h3>
+<p>MHS 的價值主張是「設備整合工時由數週降至數小時」。我判斷這對供應鏈兩端方向相反 —— 對元件與硬體廠是利多，對<strong>靠整合工時計價的系統整合商是利空</strong>。 台股在自動化題材上整合商佔比偏高（盟立、均豪、帆宣、京鼎）， 所以「自動化受惠」這個直覺在台股可能是反的。</p>
+<h3>判決：推翻</h3>
+<p>三個理由，每一個都足以單獨否證：</p>
+<p><strong>1. 營收模式根本不是軟體工時計價。</strong> 台股這批整合商的核心營收是<strong>半導體潔淨室廠務統包工程 (Turnkey MEP)</strong>、 高純度化學與氣體管路建置、自動化物料搬運系統 (AMHS) 的軌道與車體硬體、 以及製程腔體與檢測設備代工。計價基礎是大型資本支出採購、鋼構管線發包與零組件成本加成， <strong>不是按軟體協議適配工時計費的 IT 顧問模式</strong>。MHS 省下軟體介接時間， 對他們的硬體統包營收幾乎沒有侵蝕效應。</p>
+<p><strong>2. 垂直領域完全錯配。</strong> MHS 目前鎖定生化濕實驗室（qPCR、液體分注機、光學顯微鏡）與輕型協作手臂工作站。 台股這批整合廠 100% 圍繞台積電、美光、日月光的晶圓廠與先進封裝。 而半導體製造現場早已有實施逾 30 年、且由晶圓龍頭強制規範的 <strong>SECS/GEM (SEMI E30/E37)</strong> 通訊協定。MHS 根本沒進入這個範疇。</p>
+<p><strong>3. 他們現在的瓶頸是物理交付，不是軟體工時被剝奪。</strong> 帆宣截至 2026 年 9 月在手訂單 1,351 億元創歷史新高，盟立在手訂單亦破百億。 實際瓶頸是「海外建廠缺工」與「機台組裝交期」。 <strong>沒有任何法人或管理階層提及 AI Agent 或 MHS 衝擊其收費模式。</strong></p>
+<h3>我錯在哪裡</h3>
+<p>我把「整合」這個詞的兩種意思混為一談。MHS 省的是<strong>軟體協議適配</strong>的工， 台股整合商賣的是<strong>廠務與機電統包</strong>的工。同一個中文詞，兩個不同的生意。</p>
+<p>這是領域知識不足導致的假設錯誤，不是推理錯誤 —— 推理鏈本身成立，只是套錯了對象。</p>
+<hr class="section-divider">
+<h2>二、真正的發現：台廠的機器人堆疊綁在 NVIDIA，不是 Anthropic</h2>
+<p>A 組（協作機器人與機構件）<strong>三家全部 0 命中</strong>，但零命中本身是情報：</p>
+<div class="scroller"><table><thead><tr><th>標的</th><th>查詢結果</th><th>實際技術棧</th></tr></thead><tbody><tr><td>達明機器人 (4585 / 廣達 2382)</td><td>0 命中</td><td>自研 TM AI+ 引擎、<strong>TM ROS/ROS2 驅動</strong>、全面綁定 <strong>NVIDIA Omniverse / Isaac Sim</strong></td></tr><tr><td>上銀 (2049)</td><td>0 命中</td><td>GitHub 維護開源 <code>hiwin_ros</code> / <code>hiwin_ros2</code>，未涉足 MHS 介面層</td></tr><tr><td>所羅門 (2359)</td><td>0 命中</td><td>3D 視覺 Solvision / AccuPick，軟體生態深度依附 <strong>NVIDIA Isaac / Metropolis</strong></td></tr></tbody></table></div>
+<blockquote class="callout"><p>台廠協作機器人龍頭目前全力擁抱 NVIDIA 實體 AI 體系， 對 Anthropic MHS 處於完全未跟進狀態。</p></blockquote>
+<p>這比我原本的問題有意義得多。問題不是「台廠誰受惠於 MHS」，而是 <strong>MHS 會不會被 NVIDIA 的專有生態擋在工業製造大門之外</strong>。</p>
+<h3>我漏掉的：MHS 面對的是三個既存標準，不是一個</h3>
+<p>首期我只點出實驗室領域的 SiLA 2 與 OPC UA LADS。實際上 MHS 在三個領域各有一個既存對手：</p>
+<div class="scroller"><table><thead><tr><th>領域</th><th>既存標準</th><th>狀態</th></tr></thead><tbody><tr><td>生化實驗室</td><td>SiLA 2、OPC UA LADS (IEC 63339)</td><td>查無 MHS 表態</td></tr><tr><td>機器人</td><td><strong>ROS 2</strong></td><td>台廠全面採用，且與 NVIDIA Isaac 深度綁定</td></tr><tr><td>半導體晶圓廠</td><td><strong>SECS/GEM (SEMI E30/E37)</strong></td><td>實施逾 30 年，晶圓龍頭強制規範，MHS 未進入</td></tr></tbody></table></div>
+<p>三個領域的護城河高度不同。MHS 選擇從生化實驗室切入， 現在看來不是偶然 —— <strong>那是三者中唯一沒有被強制標準鎖死的領域</strong>。</p>
+<hr class="section-divider">
+<h2>三、本輪只有 2 條，但都不在我指定的方向上</h2>
+<div class="scroller"><table><thead><tr><th>類別</th><th>標的</th><th>內容</th></tr></thead><tbody><tr><td><code>vendor_doc</code></td><td><strong>研華 (2395)</strong></td><td>WEDA 邊緣架構與 WISE-STACK 原生內建 <strong>MCP Server</strong>，定位為「工業 AI 萬能插頭」。注意：是 MCP，不是 MHS —— 屬鄰近布局，不是採用證據</td></tr><tr><td><code>media</code></td><td><strong>工研院</strong></td><td>第 15 屆院士會議明確倡議推動「模型硬體標準 (MHS)」與 AI 硬體介接規範，訴求切入歐美非紅供應鏈。來源為 <code>cens.com</code> 媒體轉述，<strong>待一手查證</strong></td></tr></tbody></table></div>
+<p>工研院那條若成立，是層級最高的訊號 —— 國家級研究機構把 MHS 寫進政策建言。 但目前只有媒體轉述，依規則標為 <code>media</code> 並列為下期查證項。</p>
+<hr class="section-divider">
+<h2>四、agy 自己提的三個方向，與我的裁決</h2>
+<p>架構 v2 §6 的提案權分離第一次實作。agy 有提案權，決定權在我。</p>
+<h3>方向 1：生化與醫療檢測設備台廠 —— 採納</h3>
+<p>理由成立且直指我的錯誤根源。MHS 誕生於生化濕實驗室， 台股真正可能被滲透的是自動化核酸萃取與檢測儀器廠，不是半導體統包商。 建議標的金萬林 (6645)、普生 (4117)、泰博 (4736)。</p>
+<p><strong>我的補充</strong>：這組的規模都不大，且多為國內市場導向， 對「該買誰」的實際幫助可能有限 —— 但作為「MHS 是否真的在滲透」的偵測點很有價值。 列為偵測用，不是布局用。</p>
+<h3>方向 2：嵌入式 MCU 與開源驅動移植 —— 暫緩</h3>
+<p>邏輯成立（MHS 要控制致動器就需要輕量 MCU，第三方適配常先出現在開源社群）， 但目前 MHS 規格尚未公開，移植到 ESP32 / STM32 的前提不存在。</p>
+<p><strong>裁決</strong>：等規格開源後再跑。列為觸發式方向 —— 以「MHS 規格公開」為觸發條件，屆時自動啟動。</p>
+<h3>方向 3：NVIDIA Isaac 排擠效應 —— 採納，並升為主線</h3>
+<p>這是本輪最有價值的提案，比我原本的四組切入都好。</p>
+<blockquote class="callout"><p>關鍵的二級市場變數不是「台廠是否採用 MHS」， 而是 <strong>Anthropic MHS 會與 NVIDIA Isaac 達成橋接，還是被其專有生態徹底排擠</strong>。</p></blockquote>
+<p><strong>裁決</strong>：升為下期主線問題，並改寫 <code>brief.core_question</code>。 理由是它把一個「查無」轉化成一個可被持續追蹤的二元命題 —— 而二元命題比開放式監控更適合週期性偵測。</p>
+<hr class="section-divider">
+<h2>五、對架構 v2 的回饋</h2>
+<p>本輪是架構 v2 的第一次實跑檢驗，三點確認、一點待補：</p>
+<p><strong>確認：零命中是一等公民輸出。</strong> A 組與 B 組全數 0 命中， 但那正是本輪最有價值的產出（台廠綁 NVIDIA）。若照 v0.2 靜默丟棄，這輪等於白跑。</p>
+<p><strong>確認：提案權分離有效。</strong> agy 的方向 3 是我推理不出來的 —— 它跑過那些查詢，看到三家台廠的技術棧全指向 NVIDIA，才形成這個判斷。 那是實地經驗，不是推理能取得的。</p>
+<p><strong>確認：<code>evidence_type</code> 的 <code>mops</code> 等級可用。</strong> B 組四家全查公開資訊觀測站， 零命中且可追溯（附逐字查詢式），比任何財經媒體的「業界傳聞」都可靠。</p>
+<p><strong>待補：架構缺「假設被推翻」的處置。</strong> v2 有方向迴圈（證據硬度不足時換類別），但沒有處理 <strong>「假設本身被證否」</strong>的情況 —— 那不是換證據類別就能解決的， 需要回到 ① Frame 改寫 <code>core_question</code>。本輪是靠我人工判斷接上的。 應補為第三個迴圈：<strong>假設迴圈 (hypothesis loop)</strong>。</p>
+</div>
+</body></html>

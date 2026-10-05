@@ -1,0 +1,255 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>主題檔案 (profiles)：五類，含一個反轉架構的發現</title>
+<style>
+:root {
+  --bg-page: #f6f8fa;
+  --bg-card: #ffffff;
+  --bg-subtle: #eef2f5;
+  --text-main: #16202b;
+  --text-muted: #56646f;
+  --border-color: #dce3e9;
+  --accent: #12697a;
+  --ok-fg: #1c6b3a;
+  --ok-bg: #e4f2e9;
+  --warn-fg: #8a5200;
+  --warn-bg: #faefdc;
+  --risk-fg: #8c2f39;
+  --risk-bg: #f7e7e8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-page: #0d1318;
+    --bg-card: #151d24;
+    --bg-subtle: #1c262f;
+    --text-main: #e3eaef;
+    --text-muted: #95a3b0;
+    --border-color: #263039;
+    --accent: #57b8c8;
+    --ok-fg: #84c99b;
+    --ok-bg: #12301f;
+    --warn-fg: #e0b070;
+    --warn-bg: #33250f;
+    --risk-fg: #de8189;
+    --risk-bg: #3a1b1f;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg-page: #0d1318;
+  --bg-card: #151d24;
+  --bg-subtle: #1c262f;
+  --text-main: #e3eaef;
+  --text-muted: #95a3b0;
+  --border-color: #263039;
+  --accent: #57b8c8;
+  --ok-fg: #84c99b;
+  --ok-bg: #12301f;
+  --warn-fg: #e0b070;
+  --warn-bg: #33250f;
+  --risk-fg: #de8189;
+  --risk-bg: #3a1b1f;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-page);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  line-height: 1.75;
+}
+.wrap { max-width: 900px; margin: 0 auto; padding: 32px 20px 96px; }
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.card h3 { margin: 8px 0 6px; }
+.card-meta { color: var(--text-muted); font-size: 14px; }
+.card-meta > * + * { margin-left: 14px; }
+.summary { margin: 10px 0 0; }
+.delta-impact {
+  margin-top: 12px; padding: 12px 14px;
+  background: var(--bg-subtle); border-left: 3px solid var(--accent);
+}
+.delta-impact strong { display: block; color: var(--accent); font-size: 13px; }
+.verification { font-size: 12px; padding: 2px 8px; border-radius: 2px; }
+.v-corroborated .verification { color: var(--ok-fg); background: var(--ok-bg); }
+.v-unverified_claim .verification { color: var(--warn-fg); background: var(--warn-bg); }
+.v-marketing .verification { color: var(--risk-fg); background: var(--risk-bg); }
+.importance {
+  font-size: 12px; padding: 2px 8px; margin-right: 8px;
+  color: var(--text-muted); background: var(--bg-subtle);
+}
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border-color); }
+thead th { color: var(--text-muted); background: var(--bg-subtle); }
+.num { font-variant-numeric: tabular-nums; }
+.scroller { overflow-x: auto; }
+.impact-block { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+.impact-col { flex: 1 1 220px; }
+.impact-col.fav h4 { color: var(--ok-fg); }
+.impact-col.unfav h4 { color: var(--risk-fg); }
+.speculation {
+  margin-top: 12px; padding: 12px 14px; font-style: italic;
+  color: var(--warn-fg); background: var(--warn-bg);
+}
+details { margin-top: 12px; }
+summary { cursor: pointer; color: var(--accent); font-size: 14px; }
+.details-body > * + * { margin-top: 14px; }
+.hero { border-bottom: 2px solid var(--text-main); padding-bottom: 18px; margin-bottom: 24px; }
+.dashboard {
+  display: flex; flex-wrap: wrap; gap: 10px 20px;
+  padding: 14px 16px; margin-bottom: 24px;
+  background: var(--bg-subtle); font-size: 14px;
+}
+.issue-nav { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border-color); font-size: 14px; }
+a { color: var(--accent); }
+.status-hero {
+  padding: 18px 20px; margin-bottom: 24px;
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-left: 4px solid var(--accent);
+}
+.status-hero h2 { margin-top: 0; }
+.status-hero.partial { border-left-color: var(--warn-fg); }
+
+/* docsrender 專屬樣式擴充 */
+.doc-masthead {
+  border-bottom: 2px solid var(--text-main);
+  padding-bottom: 16px;
+  margin-bottom: 28px;
+}
+.doc-masthead h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  line-height: 1.35;
+}
+h2 {
+  font-size: 22px;
+  margin-top: 36px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+h3 {
+  font-size: 17px;
+  margin-top: 24px;
+  margin-bottom: 10px;
+}
+p {
+  margin: 12px 0;
+  line-height: 1.75;
+}
+.callout {
+  margin: 18px 0;
+  padding: 12px 18px;
+  background: var(--bg-subtle);
+  border-left: 4px solid var(--accent);
+  border-radius: 2px;
+}
+.callout p {
+  margin: 6px 0;
+}
+.section-divider {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 36px 0;
+}
+pre {
+  margin: 14px 0;
+  padding: 14px 16px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.9em;
+}
+p code, li code, td code, th code {
+  background: var(--bg-subtle);
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--border-color);
+}
+ul, ol {
+  padding-left: 26px;
+  margin: 14px 0;
+}
+li {
+  margin-bottom: 6px;
+}
+.scroller {
+  overflow-x: auto;
+  margin: 16px 0;
+}
+</style>
+<div class="wrap doc-body">
+<header class="doc-masthead"><h1>主題檔案 (profiles)：五類，含一個反轉架構的發現</h1></header>
+<p>2026-09-26 · 交互層 S1 的本體 · 設計文件，未實作</p>
+<p>專案擁有者指定三個新方向，使 profile 從三類擴為五類。 其中一類（<code>vendor_watch</code>）反轉了架構 v2 的目標函數，需回寫 v2。</p>
+<hr class="section-divider">
+<h2>〇、最重要的發現：目標函數是 profile 屬性，不是普遍真理</h2>
+<p>架構 v2 §M.4 定調：<strong>「News 的意義在於檢測，得到最珍貴的一手消息。」</strong></p>
+<p>這對 MHS 與 EUV 成立 —— 訊號稀少、藏得深、要靠假設驅動去挖。 但對 <code>vendor_watch</code>（追 OpenAI／Anthropic／Cursor／Qwen 等官方 blog）<strong>完全不成立</strong>：</p>
+<blockquote class="callout"><p>偵測成本是零 —— 你早就知道網址。稀缺的是<strong>讀完它們並判斷哪些重要</strong>。</p></blockquote>
+<p>所以這個 profile 的工作是<strong>壓縮與翻譯</strong>，不是偵測。</p>
+<p><strong>回寫 v2</strong>：<code>goal</code> 成為 profile 的欄位，有兩個值：</p>
+<div class="scroller"><table><thead><tr><th><code>goal</code></th><th>稀缺的是什麼</th><th>主要風險</th><th>適用 profile</th></tr></thead><tbody><tr><td><code>detect</code></td><td>找到訊號</td><td>漏掉真訊號、收進虛構內容</td><td><code>standard_adoption</code>、<code>deep_tech_process</code>、<code>regulatory</code></td></tr><tr><td><code>compress</code></td><td>讀完並排序</td><td>摘要失真、被公關語言帶走</td><td><code>vendor_watch</code>、<code>research_frontier</code></td></tr></tbody></table></div>
+<p>兩者的整個管線行為不同，不只是參數不同。<code>compress</code> 型不需要 ② Hypothesize 與方向迴圈（來源固定），但需要一個 <code>detect</code> 型不需要的階段：<strong>忠實度查核</strong>。</p>
+<hr class="section-divider">
+<h2>一、<code>vendor_watch</code> · AI 實驗室與產品動態</h2>
+<p><strong>一個主題，九個錨點 —— 不是九個主題。</strong> 否則 dashboard 會有九列講同一件事，你也會收到九封信。</p>
+<h3>錨點（固定，不需 ② Discover）</h3>
+<div class="scroller"><table><thead><tr><th>來源</th><th>運算式</th></tr></thead><tbody><tr><td>OpenAI</td><td><code>site:openai.com/index</code></td></tr><tr><td>Anthropic</td><td><code>site:anthropic.com/news</code></td></tr><tr><td>Cursor</td><td><code>site:cursor.com/blog</code></td></tr><tr><td>xAI / Grok</td><td><code>site:x.ai</code></td></tr><tr><td>GitHub Copilot</td><td><code>site:github.blog</code> + <code>site:docs.github.com/copilot</code></td></tr><tr><td>Kimi (Moonshot)</td><td><code>site:moonshot.cn</code> / <code>site:kimi.com</code></td></tr><tr><td>DeepSeek</td><td><code>site:api-docs.deepseek.com</code> + <code>site:deepseek.com</code></td></tr><tr><td>MiniMax</td><td><code>site:minimax.io</code> / <code>site:minimaxi.com</code></td></tr><tr><td>Qwen</td><td><code>site:qwenlm.github.io</code> + <code>site:github.com/QwenLM</code></td></tr></tbody></table></div>
+<p>錨點清單本身是要維護的資產 —— 網域會變（Qwen 的 blog 就在 GitHub Pages 上）。 每期記錄各錨點命中數，連續兩期 0 命中觸發錨點複查（可能是網域搬了，不是沒發文）。</p>
+<h3>兩個必須反轉的預設</h3>
+<p><strong>1. <code>hard_filters.pr_wire</code> 必須關掉。</strong> 官方發布公告在定義上就是產品發布通知。在這個 profile 裡， <strong>你要讀的東西正好是其他 profile 要濾掉的東西</strong>。 開著它會把整個主題濾成空的。</p>
+<p><strong>2. Auth 階梯會塌掉，需要換判準。</strong> 九個來源全是 <code>vendor_doc</code>，全給 95 分等於沒有區分度。 在這個 profile 內，Auth 改由<strong>可驗證性</strong>決定：</p>
+<div class="scroller"><table><thead><tr><th>子級</th><th>判準</th><th>Auth</th></tr></thead><tbody><tr><td><code>verifiable</code></td><td>附可重現的基準、具體數字、或可取用的模型／API</td><td>95</td></tr><tr><td><code>demonstrated</code></td><td>有示範或案例，但無可重現方法</td><td>70</td></tr><tr><td><code>announced</code></td><td>只有能力敘述，無數字無示範</td><td>45</td></tr><tr><td><code>marketing</code></td><td>形容詞堆疊，無任何可檢查內容</td><td>20</td></tr></tbody></table></div>
+<p><code>marketing</code> 在其他 profile 是邊緣狀況，在這裡是<strong>常態工作量</strong>。</p>
+<h3>翻譯的品質防線（新增，<code>compress</code> 型專屬）</h3>
+<p>中文摘要會靜默引入錯誤，而錯誤的翻譯與幻覺對讀者的傷害相同。</p>
+<blockquote class="callout"><p><strong>防線 5 · 可回溯翻譯</strong>：任何能力宣稱或數字，中文摘要旁必須保留<strong>原文句</strong>。</p></blockquote>
+<p>不是保留連結 —— 連結要點開才知道。是<strong>把原句放在卡片裡</strong>， 讓「翻譯是否失真」可以當場被檢查，不必離開頁面。</p>
+<p>這條與防線 1（無出處即拒收）互補：防線 1 管數字從哪來，防線 5 管數字有沒有被譯歪。</p>
+<h3>其他預設</h3>
+<ul><li><code>goal</code>: <code>compress</code></li><li><code>regime</code>: 豐沛（九個來源，每週多篇）→ 入選線 75、強化冗餘懲罰</li><li><code>cadence</code>: weekly</li><li>必問題：<strong>你要的是「全部掃過」還是「只看有實質進展的」？</strong> —— 這決定入選線，是這個 profile 最重要的單一參數</li></ul>
+<hr class="section-divider">
+<h2>二、<code>research_frontier</code> · 研究前沿（首個實例：RSI）</h2>
+<p>追 Recursive Self-Improvement (RSI) 的最新發展。</p>
+<h3>錨點</h3>
+<div class="scroller"><table><thead><tr><th>來源</th><th>運算式</th><th>類型</th></tr></thead><tbody><tr><td>arXiv</td><td><code>site:arxiv.org</code> + <code>cs.LG</code> / <code>cs.AI</code> / <code>cs.CL</code></td><td>primary</td></tr><tr><td>OpenReview</td><td><code>site:openreview.net</code></td><td>primary</td></tr><tr><td>Semantic Scholar</td><td><code>site:semanticscholar.org</code></td><td>primary</td></tr><tr><td>主要會議</td><td>NeurIPS / ICML / ICLR proceedings</td><td>primary</td></tr><tr><td>實驗室研究頁</td><td>各 lab 的 research 而非 news 區</td><td>primary</td></tr><tr><td>立場文章</td><td>部落格、論壇</td><td><code>position</code></td></tr></tbody></table></div>
+<h3>硬規則：arXiv ID 必須驗證存在且標題相符</h3>
+<p>這是本專案已發生過一次的失敗換了外衣。<code>harnessrouter.ai</code> 那篇被撤回的文章， 之所以差點被採用，是因為它<strong>看起來完全合理</strong>。</p>
+<p><strong>一個編造的 arXiv ID 更危險</strong> —— 它的格式天生可信（<code>arXiv:2402.14207</code> 這種形狀）， 而讀者幾乎不會去點。</p>
+<blockquote class="callout"><p>每一篇被引用的論文，必須驗證 <strong>ID 真實存在、且該 ID 的標題與所述相符</strong>。 兩者其一不符即撤回該條，不降級。</p></blockquote>
+<p>（本專案首期引用的 STORM <code>arXiv:2402.14207</code>、HyDE <code>2212.10496</code>、 Dense X <code>2309.02427</code> 均屬此類，當時未逐一驗證 —— 補做。）</p>
+<h3>主張階梯（取代 <code>verification</code> 的新聞版三級）</h3>
+<p>新聞的 <code>corroborated / unverified_claim / marketing</code> 不適用於研究。研究要分的是<strong>證據層級</strong>：</p>
+<div class="scroller"><table><thead><tr><th>值</th><th>意義</th></tr></thead><tbody><tr><td><code>reproduced</code></td><td>有獨立複現</td></tr><tr><td><code>single_paper</code></td><td>單篇論文結果，未見複現</td></tr><tr><td><code>theoretical</code></td><td>理論分析或形式論證，無實驗</td></tr><tr><td><code>position</code></td><td>立場文章、觀點，無新證據</td></tr></tbody></table></div>
+<p>RSI 這個題目<strong>特別容易被立場文章淹沒</strong> —— 它牽涉 AGI 時程與安全立場， 討論量遠大於實證量。<code>position</code> 類必須明確標記且不得與 <code>single_paper</code> 混排。</p>
+<h3>其他預設</h3>
+<ul><li><code>goal</code>: <code>compress</code>（論文位置已知，難的是判斷哪篇真的推進了）</li><li><code>level</code>: 預設 L5（研究前沿）</li><li>推測允許但<strong>必須標記證據強度</strong></li><li>必問題：<strong>你關心的是能力進展、安全論證、還是時程判斷？</strong> —— RSI 這三條線的來源與判準完全不同</li></ul>
+<hr class="section-divider">
+<h2>三、<code>career_lens</code> · 不是 profile，是新的 purpose</h2>
+<p>「Science AI 與職涯研究的視角」—— 這裡的「視角」不是主題，是<strong>用途</strong>。</p>
+<p>現有三種 purpose（<code>decision</code> / <code>learning</code> / <code>monitoring</code>）都不對： 它不是要做投資決定，不是補理解，也不只是盯著看。它問的是 <strong>「我該往哪裡移動」</strong>。</p>
+<p><strong>新增第四種 purpose：<code>positioning</code>。</strong></p>
+<div class="scroller"><table><thead><tr><th>purpose</th><th>核心問題</th><th>卡片必備欄位</th></tr></thead><tbody><tr><td><code>decision</code></td><td>什麼變化會推翻我的判斷</td><td><code>delta_impact</code></td></tr><tr><td><code>monitoring</code></td><td>有沒有漏掉重要動態</td><td>—</td></tr><tr><td><code>learning</code></td><td>我還不懂什麼</td><td>術語解釋</td></tr><tr><td><strong><code>positioning</code></strong></td><td><strong>我該往哪裡移動</strong></td><td><strong><code>skill_delta</code></strong></td></tr></tbody></table></div>
+<p><code>skill_delta</code> 欄位回答三件事：</p>
+<ul><li>哪些能力正在<strong>升值</strong>（需求出現、工具還不成熟）</li><li>哪些正在<strong>貶值</strong>（被自動化、被抽象掉）</li><li>哪些<strong>研究方向在開或在關</strong>（新問題出現、舊問題被解掉）</li></ul>
+<p><strong>時間尺度不同</strong>：<code>positioning</code> 關心的是季度趨勢，不是週變化。 所以 cadence 仍為 weekly（不漏訊號），但卡片的 <code>skill_delta</code> 必須 <strong>引用跨期累積的證據</strong>，不能只憑本週一則。 這是第一個需要<strong>跨期合成</strong>的 purpose —— <code>state.json</code> 從去重用途升級為趨勢證據來源。</p>
+<hr class="section-divider">
+<h2>四、五類 profile 總表</h2>
+<div class="scroller"><table><thead><tr><th>profile</th><th>goal</th><th>regime</th><th>需要 ② Discover</th><th>特殊防線</th></tr></thead><tbody><tr><td><code>standard_adoption</code></td><td>detect</td><td>稀缺</td><td>是</td><td>既有標準必問</td></tr><tr><td><code>deep_tech_process</code></td><td>detect</td><td>稀缺</td><td>是</td><td>量測條件強制（防線 2）</td></tr><tr><td><code>regulatory</code></td><td>detect</td><td>中等</td><td>是</td><td>一手公報優先</td></tr><tr><td><code>vendor_watch</code></td><td><strong>compress</strong></td><td><strong>豐沛</strong></td><td><strong>否（錨點固定）</strong></td><td><strong>可回溯翻譯（防線 5）</strong></td></tr><tr><td><code>research_frontier</code></td><td>compress</td><td>中等</td><td>部分</td><td><strong>arXiv ID 驗證</strong>、主張階梯</td></tr></tbody></table></div>
+<hr class="section-divider">
+<h2>五、待裁決</h2>
+<ol><li><strong><code>vendor_watch</code> 的入選線</strong>：要「全部掃過」（線壓到 40，每期 20+ 條） 還是「只看有實質進展的」（線拉到 75，每期 5–8 條）？ 這是這個 profile 最重要的單一參數，我需要你定。</li><li><strong>RSI 的三條線</strong>（能力進展／安全論證／時程判斷）要全收還是選一？ 全收的話卡片會混雜三種很不同的東西。</li><li><strong>Science AI 是獨立主題，還是 <code>vendor_watch</code> 的一個切面？</strong> 我傾向獨立 —— 它的來源是期刊與研究機構，不是 AI 產品 blog， 而且 <code>positioning</code> 的跨期合成需求跟 <code>vendor_watch</code> 的週掃描節奏衝突。</li></ol>
+</div>
+</body></html>

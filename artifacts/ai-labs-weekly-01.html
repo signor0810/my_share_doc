@@ -1,0 +1,120 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>AI 實驗室與產品動態 情報週報 #01</title>
+<style>
+:root {
+  --bg-page: #f6f8fa;
+  --bg-card: #ffffff;
+  --bg-subtle: #eef2f5;
+  --text-main: #16202b;
+  --text-muted: #56646f;
+  --border-color: #dce3e9;
+  --accent: #12697a;
+  --ok-fg: #1c6b3a;
+  --ok-bg: #e4f2e9;
+  --warn-fg: #8a5200;
+  --warn-bg: #faefdc;
+  --risk-fg: #8c2f39;
+  --risk-bg: #f7e7e8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-page: #0d1318;
+    --bg-card: #151d24;
+    --bg-subtle: #1c262f;
+    --text-main: #e3eaef;
+    --text-muted: #95a3b0;
+    --border-color: #263039;
+    --accent: #57b8c8;
+    --ok-fg: #84c99b;
+    --ok-bg: #12301f;
+    --warn-fg: #e0b070;
+    --warn-bg: #33250f;
+    --risk-fg: #de8189;
+    --risk-bg: #3a1b1f;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg-page: #0d1318;
+  --bg-card: #151d24;
+  --bg-subtle: #1c262f;
+  --text-main: #e3eaef;
+  --text-muted: #95a3b0;
+  --border-color: #263039;
+  --accent: #57b8c8;
+  --ok-fg: #84c99b;
+  --ok-bg: #12301f;
+  --warn-fg: #e0b070;
+  --warn-bg: #33250f;
+  --risk-fg: #de8189;
+  --risk-bg: #3a1b1f;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-page);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  line-height: 1.75;
+}
+.wrap { max-width: 900px; margin: 0 auto; padding: 32px 20px 96px; }
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.card h3 { margin: 8px 0 6px; }
+.card-meta { color: var(--text-muted); font-size: 14px; }
+.card-meta > * + * { margin-left: 14px; }
+.summary { margin: 10px 0 0; }
+.delta-impact {
+  margin-top: 12px; padding: 12px 14px;
+  background: var(--bg-subtle); border-left: 3px solid var(--accent);
+}
+.delta-impact strong { display: block; color: var(--accent); font-size: 13px; }
+.verification { font-size: 12px; padding: 2px 8px; border-radius: 2px; }
+.v-corroborated .verification { color: var(--ok-fg); background: var(--ok-bg); }
+.v-unverified_claim .verification { color: var(--warn-fg); background: var(--warn-bg); }
+.v-marketing .verification { color: var(--risk-fg); background: var(--risk-bg); }
+.importance {
+  font-size: 12px; padding: 2px 8px; margin-right: 8px;
+  color: var(--text-muted); background: var(--bg-subtle);
+}
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border-color); }
+thead th { color: var(--text-muted); background: var(--bg-subtle); }
+.num { font-variant-numeric: tabular-nums; }
+.scroller { overflow-x: auto; }
+.impact-block { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+.impact-col { flex: 1 1 220px; }
+.impact-col.fav h4 { color: var(--ok-fg); }
+.impact-col.unfav h4 { color: var(--risk-fg); }
+.speculation {
+  margin-top: 12px; padding: 12px 14px; font-style: italic;
+  color: var(--warn-fg); background: var(--warn-bg);
+}
+details { margin-top: 12px; }
+summary { cursor: pointer; color: var(--accent); font-size: 14px; }
+.details-body > * + * { margin-top: 14px; }
+.hero { border-bottom: 2px solid var(--text-main); padding-bottom: 18px; margin-bottom: 24px; }
+.dashboard {
+  display: flex; flex-wrap: wrap; gap: 10px 20px;
+  padding: 14px 16px; margin-bottom: 24px;
+  background: var(--bg-subtle); font-size: 14px;
+}
+.issue-nav { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border-color); font-size: 14px; }
+a { color: var(--accent); }
+.status-hero {
+  padding: 18px 20px; margin-bottom: 24px;
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-left: 4px solid var(--accent);
+}
+.status-hero h2 { margin-top: 0; }
+.status-hero.partial { border-left-color: var(--warn-fg); }
+</style>
+<div class="wrap"><header class="hero"><h1>AI 實驗室與產品動態 情報週報 #01</h1><p class="card-meta">2026-09-26 · 程度 L3 · 狀態 normal</p><p class="core-question">核心問題：九家前沿實驗室與工具商本期出貨了什麼可驗證的東西？</p></header><div class="dashboard"><span>有效卡片 4</span><span>已證實 2</span><span>未證實 2</span><span>公關口徑 0</span></div><article class="card v-corroborated"><header class="card-head"><span class="importance i4">4</span><span class="verification">✓ 已多源證實</span><h3>GitHub Copilot：agentic autofix 接上 Copilot Memory，修復模式會被記住並跨功能共用</h3><div class="card-meta"><a href="https://github.blog/changelog/2026-09-25-agentic-autofix-now-uses-copilot-memory/">GitHub Changelog</a><time>2026-09-25</time><span class="section">工具與代理</span></div></header><p class="summary">GitHub 讓已啟用 Copilot Memory 的客戶在使用 agentic autofix（自動修補安全警示）時，先檢索儲存庫既有記憶取得安全上下文；成功產生修復後，把該修復模式寫回記憶，供 Copilot code review 與雲端代理共用。值得注意的不是自動修 bug，而是**修復經驗被持久化並跨功能流通** —— 這是代理系統從「每次從零開始」走向「累積組織知識」的具體一步。可檢查性等級 verifiable：changelog 網址帶日期 (2026-09-25)，屬永久連結，日後仍可查核。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>autofix 先讀既有記憶取得上下文，修復後把模式寫回記憶供其他功能共用</td><td>GitHub Changelog 原句：Agentic autofix now uses Copilot Memory for customers who&#x27;ve enabled it. When you use agentic autofix, it reviews existing memories for context that can help resolve security alerts. When it creates a fix, it stores the fix pattern...</td></tr></tbody></table></div></details></article><article class="card v-corroborated"><header class="card-head"><span class="importance i4">4</span><span class="verification">✓ 已多源證實</span><h3>Anthropic 推出網頁版 Claude Code</h3><div class="card-meta"><a href="https://www.anthropic.com/news/claude-code-on-the-web">Anthropic 官方公告</a><time>2026-09-23</time><span class="section">工具與代理</span></div></header><p class="summary">Anthropic 推出網頁版 Claude Code，開發者可直接在瀏覽器指派與委派程式任務，支援雲端持久化環境與背景執行。方向上是把 CLI 代理搬進託管環境 —— 代價是本機檔案存取，換到的是跨裝置與背景執行。可檢查性等級 verifiable：官方公告頁，帶固定路徑。注意本卡片只記錄公告內容本身；實際能力邊界（能不能存取私有 repo、背景任務時限、與 CLI 版的差異）公告未細述，本期查無。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>推出網頁版 Claude Code，可從瀏覽器委派程式任務</td><td>Anthropic 官方原句：Today, we&#x27;re introducing Claude Code on the web, a new way to delegate coding tasks directly from your browser.</td></tr></tbody></table></div></details></article><article class="card v-unverified_claim"><header class="card-head"><span class="importance i3">3</span><span class="verification">⚠ 單一來源宣稱 · 待獨立驗證</span><h3>xAI Grok 4.7 公開預覽：500k token 上下文（來源為活文件，無永久連結）</h3><div class="card-meta"><a href="https://docs.x.ai/developers/release-notes">xAI Developer Release Notes</a><time>2026-09-17</time><span class="section">模型與能力</span></div></header><p class="summary">xAI 發布 Grok 4.7 公開預覽，配備 50 萬 token 上下文視窗、整合推理能力，並宣稱在軟體工程基準上有明顯提升。本卡片刻意降級為 demonstrated 而非 verifiable，原因**不是內容可疑，而是來源無法被永久查核** —— `docs.x.ai/developers/release-notes` 是滾動更新的開發者活文件，下一版發布後今天引用的段落就會被覆蓋，第三方日後無從驗證。已查證 xAI 官方無對應的帶日期獨立公告頁（`site:x.ai/blog` 查無）。所引原句保留於出處欄，那是這條日後唯一還留得住的證據。基準測試的具體數字公告未給，僅有 enhanced performance 這類措辭。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>Grok 4.7 公開預覽，500,000 token 上下文，整合推理與 agentic coding</td><td>docs.x.ai release notes 原句（活文件，擷取日 2026-09-26）：Grok 4.7 is now available in public preview, featuring 500,000 token context window, integrated reasoning capabilities, and enhanced performance across software engineering benchmarks.</td></tr></tbody></table><table class="key-metrics"><thead><tr><th>指標</th><th>數值</th><th>量測條件</th><th>出處</th></tr></thead><tbody><tr><td>上下文視窗</td><td class="num">500,000 tokens</td><td>公開預覽版；官方未提供基準測試具體數字，僅稱 enhanced performance</td><td>docs.x.ai developer release notes（滾動活文件，無永久連結）</td></tr></tbody></table></div></details></article><article class="card v-unverified_claim"><header class="card-head"><span class="importance i2">2</span><span class="verification">⚠ 單一來源宣稱 · 待獨立驗證</span><h3>Moonshot Kimi Work 3.2.14：側邊聊天可繼承原會話上下文（來源為活文件）</h3><div class="card-meta"><a href="https://www.kimi.com/work/changelog">Kimi Work Changelog</a><time>2026-09-24</time><span class="section">工具與代理</span></div></header><p class="summary">月之暗面發布 Kimi Work 3.2.14 桌面客戶端：新增「側邊聊天」（可開獨立側聊視窗並繼承原會話上下文）、對話選取文字引用、Office 文檔歷史版本溯源、行動端附件上傳。側邊聊天繼承上下文這點在產品設計上有意義 —— 它讓分支探索不必重建脈絡。與 Grok 那條同樣降級為 demonstrated：`kimi.com/work/changelog` 為單頁滾動更新日誌，官方無單獨發布文章或版本 tag 頁，日後無法回查。原句為簡體中文，逐字保留於出處欄。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>新增側邊聊天，可開獨立視窗並繼承原會話上下文</td><td>Kimi Work changelog 原句（活文件，擷取日 2026-09-26）：在「+」面板新增「侧边聊天」功能，可在会话中开启独立的侧聊窗口，并继承原会话的上下文。</td></tr></tbody></table></div></details></article></div>
+
+</body></html>

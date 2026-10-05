@@ -1,0 +1,120 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>EUV 微影與半導體先進製程 情報週報 #01</title>
+<style>
+:root {
+  --bg-page: #f6f8fa;
+  --bg-card: #ffffff;
+  --bg-subtle: #eef2f5;
+  --text-main: #16202b;
+  --text-muted: #56646f;
+  --border-color: #dce3e9;
+  --accent: #12697a;
+  --ok-fg: #1c6b3a;
+  --ok-bg: #e4f2e9;
+  --warn-fg: #8a5200;
+  --warn-bg: #faefdc;
+  --risk-fg: #8c2f39;
+  --risk-bg: #f7e7e8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-page: #0d1318;
+    --bg-card: #151d24;
+    --bg-subtle: #1c262f;
+    --text-main: #e3eaef;
+    --text-muted: #95a3b0;
+    --border-color: #263039;
+    --accent: #57b8c8;
+    --ok-fg: #84c99b;
+    --ok-bg: #12301f;
+    --warn-fg: #e0b070;
+    --warn-bg: #33250f;
+    --risk-fg: #de8189;
+    --risk-bg: #3a1b1f;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg-page: #0d1318;
+  --bg-card: #151d24;
+  --bg-subtle: #1c262f;
+  --text-main: #e3eaef;
+  --text-muted: #95a3b0;
+  --border-color: #263039;
+  --accent: #57b8c8;
+  --ok-fg: #84c99b;
+  --ok-bg: #12301f;
+  --warn-fg: #e0b070;
+  --warn-bg: #33250f;
+  --risk-fg: #de8189;
+  --risk-bg: #3a1b1f;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-page);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  line-height: 1.75;
+}
+.wrap { max-width: 900px; margin: 0 auto; padding: 32px 20px 96px; }
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.card h3 { margin: 8px 0 6px; }
+.card-meta { color: var(--text-muted); font-size: 14px; }
+.card-meta > * + * { margin-left: 14px; }
+.summary { margin: 10px 0 0; }
+.delta-impact {
+  margin-top: 12px; padding: 12px 14px;
+  background: var(--bg-subtle); border-left: 3px solid var(--accent);
+}
+.delta-impact strong { display: block; color: var(--accent); font-size: 13px; }
+.verification { font-size: 12px; padding: 2px 8px; border-radius: 2px; }
+.v-corroborated .verification { color: var(--ok-fg); background: var(--ok-bg); }
+.v-unverified_claim .verification { color: var(--warn-fg); background: var(--warn-bg); }
+.v-marketing .verification { color: var(--risk-fg); background: var(--risk-bg); }
+.importance {
+  font-size: 12px; padding: 2px 8px; margin-right: 8px;
+  color: var(--text-muted); background: var(--bg-subtle);
+}
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border-color); }
+thead th { color: var(--text-muted); background: var(--bg-subtle); }
+.num { font-variant-numeric: tabular-nums; }
+.scroller { overflow-x: auto; }
+.impact-block { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+.impact-col { flex: 1 1 220px; }
+.impact-col.fav h4 { color: var(--ok-fg); }
+.impact-col.unfav h4 { color: var(--risk-fg); }
+.speculation {
+  margin-top: 12px; padding: 12px 14px; font-style: italic;
+  color: var(--warn-fg); background: var(--warn-bg);
+}
+details { margin-top: 12px; }
+summary { cursor: pointer; color: var(--accent); font-size: 14px; }
+.details-body > * + * { margin-top: 14px; }
+.hero { border-bottom: 2px solid var(--text-main); padding-bottom: 18px; margin-bottom: 24px; }
+.dashboard {
+  display: flex; flex-wrap: wrap; gap: 10px 20px;
+  padding: 14px 16px; margin-bottom: 24px;
+  background: var(--bg-subtle); font-size: 14px;
+}
+.issue-nav { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border-color); font-size: 14px; }
+a { color: var(--accent); }
+.status-hero {
+  padding: 18px 20px; margin-bottom: 24px;
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-left: 4px solid var(--accent);
+}
+.status-hero h2 { margin-top: 0; }
+.status-hero.partial { border-left-color: var(--warn-fg); }
+</style>
+<div class="wrap"><header class="hero"><h1>EUV 微影與半導體先進製程 情報週報 #01</h1><p class="card-meta">2026-09-26 · 程度 L4 · 狀態 normal</p><p class="core-question">核心問題：High-NA 是否已進入可規劃量產的階段，以及隨機缺陷與光罩尺寸哪一個先成為瓶頸？</p></header><div class="dashboard"><span>有效卡片 5</span><span>已證實 4</span><span>未證實 1</span><span>公關口徑 0</span></div><article class="card v-corroborated"><header class="card-head"><span class="importance i5">5</span><span class="verification">✓ 已多源證實</span><h3>ASML 與台積電官宣轉向 12 吋大型光罩，2031 試產、2033 量產</h3><div class="card-meta"><a href="https://www.asml.com/en/news/press-releases/2026/tsmc-and-asml-announce-industry-transition-to-large-format-photomasks-for-high-na-euv">ASML 官方新聞稿</a><time>2026-09-08</time><span class="section">設備與物理</span></div></header><p class="summary">ASML 與台積電在 SPIE BACUS 會前成立產業聯盟，推動光罩尺寸自傳統 6 吋轉向 12 吋 (large-format photomask)。動機是 High-NA (0.55 NA) 的變形光學 (anamorphic optics) 造成半場曝光，單一曝光場從 26×33mm 縮為 26×16.5mm，大尺寸晶片必須做縫合 (stitching)。放大光罩尺寸是繞過縫合而非改善縫合的路線。可檢查性等級 verifiable —— 一手官方文字，且時程年份逐字可查。時程本身是最重要的情報：2031 試產線、2033 才具量產能力，意味著在那之前 High-NA 的大晶片設計仍必須吃縫合的代價。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>ASML 與 TSMC 成立聯盟推動 12 吋光罩</td><td>ASML 新聞稿原句：On September 7, in advance of the SPIE Bacus Conference, ASML and TSMC formed a collaborative industry initiative to drive the transition to 12-inch photomasks, maximizing the value of High NA EUV lithography.</td></tr><tr><td>2031 試產線、2033 量產就緒</td><td>同新聞稿原句：The initiative aims to establish a 12-inch mask pilot line by 2031, with the goal of supporting full lithography system readiness for advanced node production by 2033.</td></tr></tbody></table><table class="key-metrics"><thead><tr><th>指標</th><th>數值</th><th>量測條件</th><th>出處</th></tr></thead><tbody><tr><td>光罩尺寸</td><td class="num">6 吋 → 12 吋</td><td>產業聯盟目標，非現行規格；2031 試產、2033 量產</td><td>ASML 官方新聞稿</td></tr></tbody></table><div class="impact-block"><div class="impact-col fav"><h4>正面</h4><ul><li>光罩基板與寫入設備商：規格換代帶來全新設備需求</li><li>大晶片設計者：2033 後可免除縫合設計約束</li></ul></div><div class="impact-col unfav"><h4>風險</h4><ul><li>2031 前無實質變化，近期設計仍須吃半場縫合代價</li><li>整條光罩供應鏈（基板、寫入、檢測、pellicle）需同步換代，任一環落後即拖延整體</li></ul></div></div></div></details></article><article class="card v-corroborated"><header class="card-head"><span class="importance i5">5</span><span class="verification">✓ 已多源證實</span><h3>Intel Foundry 累計逾 100 萬片 High-NA 晶圓，Panther Lake 特定層已量產</h3><div class="card-meta"><a href="https://www.intel.com/content/www/us/en/newsroom/news/intel-foundry-asml-accelerate-industry-readiness-for-high-na-euv.html">Intel Newsroom</a><time>2026-09-07</time><span class="section">製程整合</span></div></header><p class="summary">Intel Foundry 宣布其 High-NA EUV 機台累計處理超過 100 萬片晶圓，涵蓋早期機台認證、研發，以及 Panther Lake (Core Ultra Series 3) 部分層的量產。可檢查性等級 verifiable。這條回答了本主題核心問題的前半 —— High-NA 已不在「可行性驗證」階段，而是在有限層別的實際量產中。但要讀清楚官方措辭的限定：「volume production on select layers for a subset of processors」。這不是全層 High-NA，是挑層用；良率與成本數據仍未公開，那才是判斷擴用速度的關鍵，本期查無。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>累計處理逾 100 萬片晶圓，含 Panther Lake 特定層量產</td><td>Intel 官方原句：with more than one million wafers processed to date across early tool certification and testing, research and development efforts, and volume production on select layers for a subset of Intel Core Ultra Series 3 processors, code-named Panther Lake.</td></tr></tbody></table><table class="key-metrics"><thead><tr><th>指標</th><th>數值</th><th>量測條件</th><th>出處</th></tr></thead><tbody><tr><td>累計處理晶圓數</td><td class="num">&gt; 1,000,000 片</td><td>含機台認證、研發與量產三者合計，非純量產數；量產僅限特定層與部分處理器</td><td>Intel Newsroom 官方新聞稿</td></tr></tbody></table><div class="impact-block"><div class="impact-col fav"><h4>正面</h4><ul><li>High-NA 已越過可行性門檻，進入有限量產</li><li>ASML EXE 系列的後續訂單能見度提升</li></ul></div><div class="impact-col unfav"><h4>風險</h4><ul><li>良率與單位成本未公開，擴用速度無法判斷</li><li>「特定層」意味經濟性仍不足以全面取代 0.33 NA 多重曝光</li></ul></div></div></div></details></article><article class="card v-unverified_claim"><header class="card-head"><span class="importance i4">4</span><span class="verification">⚠ 單一來源宣稱 · 待獨立驗證</span><h3>IBM Albany：High-NA 單次曝光做出 21nm 金屬間距，取代 SALELE 多重曝光</h3><div class="card-meta"><a href="https://semiengineering.com/cfets-forge-better-connections/">Semiconductor Engineering</a><time>2026-08-25</time><span class="section">製程整合</span></div></header><p class="summary">IBM 於 Albany NanoTech 展示以 High-NA EUV 單次曝光完成 21nm 金屬線間距圖形化，取代第一代 EUV 所需的 SALELE (self-aligned litho-etch litho-etch) 多重曝光，且電氣結果更好。這是 High-NA 經濟性論證的核心機制：用單次曝光換掉多道曝光與蝕刻，省的是製程步驟數與良率損失，不只是解析度。可檢查性等級 demonstrated —— 引句逐字查證在該頁內文第 22 段，但來源為產業媒體轉述、無可重現方法與完整數據，故不列為 verifiable。註：該文主題為 CFET 互連，IBM 這段是文中的解法段落，非拼接誤引（已查證）。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>High-NA 單次曝光實現 21nm 金屬間距，取代 SALELE 多重曝光且電氣結果更好</td><td>Semiconductor Engineering 該頁內文原句（逐字查證在位）：Importantly, IBM also demonstrated high-NA EUV patterning of 21nm metal lines using single exposure, replacing the more complex first-gen NA EUV with self-aligned litho-etch litho-etch multi-patterning, achieving even better electrical results.</td></tr></tbody></table></div></details></article><article class="card v-corroborated"><header class="card-head"><span class="importance i3">3</span><span class="verification">✓ 已多源證實</span><h3>arXiv 提案：雙鏡全反射投影系統，數值孔徑逼近 1.0（理論與模擬，非實測）</h3><div class="card-meta"><a href="https://arxiv.org/abs/2609.11299">arXiv:2609.11299</a><time>2026-09-10</time><span class="section">設備與物理</span></div></header><p class="summary">論文正式標題為 A Two-Mirror Faceted Projection System for EUV Lithography（作者 Es&#x27;kin、Ivanov、Martynova）。提出雙反射鏡全反射投影系統，運作於 13.5nm (Mo/Si) 與 11.2nm (Ru/Be)，4x 縮小倍率，NA_max ≈ 0.993。**必須讀清楚性質：這是理論提案與數值模擬設計，不是實體機台實測** —— 論文提供的是模擬的空間像 (simulated aerial images) 與 sub-10nm 特徵。以現行 High-NA 為 0.55 NA 的基準，0.993 是極端數字，之所以可能是因為鏡片數從多鏡系統降到兩片，光學穿透率大幅提升。值得追蹤而非用於判斷時程。可檢查性等級 verifiable（ID 解析、數字逐字在摘要），但證據層級僅為模擬。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>NA_max ≈ 0.993，13.5nm 與 11.2nm 雙波長，4x 縮小</td><td>arXiv:2609.11299 摘要逐字含 (NA_max ≈ 0.993)；ID 已解析確認 HTTP 200，官方標題與作者已核對</td></tr><tr><td>性質為理論提案與數值模擬，非實測</td><td>同摘要：demonstrate simulated aerial images of sub-10-nm features</td></tr></tbody></table><div class="speculation"><strong>【前瞻推測】</strong>若雙鏡架構可工程化，對光源功率需求的意義可能大於對解析度的意義 —— 鏡片數減少直接改善穿透率。但從模擬到機台之間隔著鏡面精度與熱變形兩道極難的工程問題，本文未觸及。</div></div></details></article><article class="card v-corroborated"><header class="card-head"><span class="importance i3">3</span><span class="verification">✓ 已多源證實</span><h3>arXiv：氟化增強 EUV 吸收，但不提升光酸產生效率</h3><div class="card-meta"><a href="https://arxiv.org/abs/2609.09958">arXiv:2609.09958</a><time>2026-09-09</time><span class="section">製程整合</span></div></header><p class="summary">論文正式標題為 More is not always better: Dissociative photoionization limits the EUV absorbing photoacid generator pentafluorophenyl triflate in photolithography。結論是一個負面但有用的結果：提高氟化程度確實增加 EUV 吸收率，但**不會**因此提升光酸產生 (photoacid generation) 效率 —— 受限於解離性光離子化與二次電子的動能與捕捉截面。對隨機缺陷 (stochastics) 的意義直接：既然吸收與光酸產生解耦，單靠提高吸收來壓低劑量與 LCDU 的路線有物理上限，配方優化方向必須轉向二次電子的利用效率。可檢查性等級 verifiable —— ID 已解析、原句逐字比對通過。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>氟化增加 EUV 吸收但不必然提升光酸產生效率</td><td>arXiv:2609.09958 摘要逐字：Although increased fluorination enhances EUV absorption, this study demonstrates that such an approach does not necessarily improve photoacid generation efficiency.</td></tr></tbody></table></div></details></article></div>
+
+</body></html>

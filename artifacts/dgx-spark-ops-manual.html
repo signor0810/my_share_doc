@@ -1,0 +1,337 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>DGX Spark 維運手冊</title>
+<style>
+/* Layout: single reading column, wide tables/diagram scroll in place; runbook-style numbered steps only where order matters */
+:root{
+  --bg:#f6f7f5; --panel:#ffffff; --fg:#1d2420; --muted:#5b665f; --line:#d9dfda;
+  --accent:#2f7a55; --accent-soft:#e3f0e8; --warn:#9a5b00; --warn-soft:#fbf0dc; --bad:#a3322a; --bad-soft:#f8e3e0; --code:#eef1ee;
+  --f-display:"IBM Plex Sans","Noto Sans TC",system-ui,sans-serif;
+  --f-body:"Noto Sans TC","IBM Plex Sans",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141917; --panel:#1b211e; --fg:#e3e8e4; --muted:#9aa69f; --line:#2e3833;
+  --accent:#6cc79a; --accent-soft:#1f3329; --warn:#e3b05c; --warn-soft:#352a17; --bad:#ef8a80; --bad-soft:#3a1f1c; --code:#222a26; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141917; --panel:#1b211e; --fg:#e3e8e4; --muted:#9aa69f; --line:#2e3833;
+  --accent:#6cc79a; --accent-soft:#1f3329; --warn:#e3b05c; --warn-soft:#352a17; --bad:#ef8a80; --bad-soft:#3a1f1c; --code:#222a26; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.7}
+.wrap{max-width:900px;margin:0 auto;padding-inline:20px;padding-block:32px 64px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.3}
+h1{font-size:1.9rem;margin:0 0 .3rem}
+h2{font-size:1.35rem;margin:2.6rem 0 .8rem;padding-top:1rem;border-top:1px solid var(--line)}
+h3{font-size:1.05rem;margin:1.6rem 0 .5rem}
+p,li{max-width:68ch}
+.sub{color:var(--muted);margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+code,pre{font-family:var(--f-mono);font-size:.85em}
+code{background:var(--code);padding:.1em .35em;border-radius:4px}
+pre{background:var(--code);padding:12px 14px;border-radius:6px;overflow-x:auto;line-height:1.5}
+pre code{background:none;padding:0}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem;font-variant-numeric:tabular-nums}
+th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{font-family:var(--f-display);color:var(--muted);font-weight:600;font-size:.8rem;letter-spacing:.03em}
+.pill{display:inline-block;font-family:var(--f-mono);font-size:.72rem;padding:1px 8px;border-radius:999px;white-space:nowrap}
+.ok{background:var(--accent-soft);color:var(--accent)}
+.wn{background:var(--warn-soft);color:var(--warn)}
+.bd{background:var(--bad-soft);color:var(--bad)}
+.note{border-left:3px solid var(--warn);background:var(--warn-soft);padding:10px 14px;border-radius:0 6px 6px 0;margin:1rem 0}
+.rule{border-left:3px solid var(--bad);background:var(--bad-soft);padding:10px 14px;border-radius:0 6px 6px 0;margin:1rem 0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px;min-width:0}
+.card h3{margin-top:0}
+ol.steps li{margin-bottom:.4rem}
+a{color:var(--accent)}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@500;600;700&family=Noto+Sans+TC:wght@400;600&display=swap">
+
+<div class="wrap">
+<div class="eyebrow">spark-66b8 · GB10 · 128 GB unified memory</div>
+<h1>DGX Spark 維運手冊</h1>
+<p class="sub">兩個管理 agent 如何照顧 DGX 上的模型服務與 Hermes Agent，以及 Windows 端的連線。最後更新 2026-10-03。</p>
+
+<h2>1. 整體架構</h2>
+<div class="scroll">
+<pre class="mermaid">
+flowchart LR
+  subgraph WIN["Windows 桌機 (win-agent)"]
+    HD["Hermes Desktop<br/>(Electron, 本地 build)"]
+    CLI["其他本地工具<br/>呼叫 Qwen API"]
+  end
+  subgraph DGX["DGX Spark spark-66b8 (dgx-agent)"]
+    V["vLLM 容器 vllm-hermes<br/>:8000 · Qwen3.8-27B NVFP4<br/>~53 GB, api-key"]
+    G["hermes-gateway-qwen38fp4<br/>(systemd --user)<br/>Discord + cron"]
+    D["hermes-dashboard<br/>:9119 (Tailscale IP only)<br/>basic auth"]
+    O["ollama :11434<br/>open-webui 用, 上限 40 GB"]
+    S["earlyoom + freeze-sampler<br/>(防護與證據)"]
+  end
+  HD -- "Tailscale 100.77.199.82:9119" --> D
+  CLI -- ":8000 /v1 + Bearer key" --> V
+  G --> V
+  D --> G
+</pre>
+</div>
+
+<div class="scroll"><table>
+<tr><th>元件</th><th>位置</th><th>介面</th><th>怎麼管</th></tr>
+<tr><td>vLLM（主模型）</td><td>DGX, docker <code>vllm-hermes</code></td><td><code>:8000/v1</code>，需 API key</td><td><code>--restart unless-stopped</code>；別名 <code>qwen38fp4-local</code>、<code>qwen-local</code></td></tr>
+<tr><td>Hermes gateway</td><td>DGX</td><td>Discord、cron 排程</td><td><code>systemctl --user … hermes-gateway-qwen38fp4</code></td></tr>
+<tr><td>Hermes dashboard</td><td>DGX</td><td><code>100.77.199.82:9119</code>（只綁 Tailscale）</td><td><code>systemctl --user … hermes-dashboard</code>；Windows Desktop 的遠端後端</td></tr>
+<tr><td>ollama</td><td>DGX</td><td><code>:11434</code></td><td>平時應為空；單一模型不可超過 40 GB</td></tr>
+<tr><td>earlyoom / freeze-sampler</td><td>DGX</td><td><code>/var/log/freeze-sampler.log</code></td><td>每 20 秒記錄記憶體、GPU、溫度</td></tr>
+<tr><td>Hermes Desktop</td><td>Windows</td><td>以 remote 模式連 dashboard</td><td><code>scripts\hermes_update_desktop.ps1 -Tag &lt;同 DGX 的 tag&gt;</code></td></tr>
+</table></div>
+
+<h3>記憶體預算（121 GiB 可用）</h3>
+<p>vLLM 固定佔約 53 GB（<code>--gpu-memory-utilization 0.45</code>），系統與服務約 11 GB，平時剩 55–60 GB 給其他同事使用。規則：<strong>新模型 + 53 GB + 11 GB &lt; 110 GB</strong>。不要拉超過 40 GB 的 ollama 模型。</p>
+
+<h2>2. 兩個管理 agent</h2>
+<div class="grid2">
+<div class="card">
+<h3>dgx-agent（Linux，跑在 DGX 上）</h3>
+<ul>
+<li>模型換版：相容性檢查、swap、驗收、回退</li>
+<li>Hermes 升級：pin 到 release tag</li>
+<li>健康檢查：<code>ops/dgx_health.sh</code></li>
+<li>當機後的鑑識與 SOP 維護</li>
+<li>cron 任務是否成功</li>
+</ul>
+<p class="sub">工作目錄 <code>~/wchien/HermesAgent_Setup/</code>，角色寫在 <code>ops/CLAUDE.md</code>。</p>
+</div>
+<div class="card">
+<h3>win-agent（Windows，orchestrator）</h3>
+<ul>
+<li>重建 Hermes Desktop，版本與 DGX 相同</li>
+<li>驗證 Windows → :8000 與 :9119 的連線</li>
+<li>指派 agy 做網路研究、整理檔案</li>
+<li>維護這份文件</li>
+</ul>
+<p class="sub">工作目錄 <code>D:\DATA_google_dirve\0_DGX_Spark</code>，規則寫在 <code>CLAUDE.md</code>，結構見第 8 節。</p>
+</div>
+</div>
+<div class="rule"><strong>鐵則：</strong>遠端時絕對不重開、不關機。需要重開的修正一律寫進現場 SOP，由現場同事執行。檔案只歸檔不刪除：可刪的放 <code>archive_to_delete/</code>，值得參考的放 <code>archive/</code>，由人確認後再刪。</div>
+
+<h2>3. 檢查更新（每次更新前先跑）</h2>
+<p>在 Windows 的 <code>0_DGX_Spark</code> 資料夾開 Claude，說「根據 DGX_Agent_Architecture.html 檢查 Hermes Agent 和本地模型的更新」。它會照 <code>CLAUDE.md</code> 的清單跑下面七步。前六步都只讀不改；第 7 步交出報告，你一次決定完之後才動手。</p>
+<div class="scroll"><table>
+<tr><th>步驟</th><th>檢查什麼</th><th>怎麼查</th></tr>
+<tr><td>1. 前置</td><td>dgx-agent 在線、ssh 通</td><td><code>ListAgents</code> 看得到 dgx-agent；不在線就在 DGX 開 Claude，執行 <code>/remote-control dgx-agent</code></td></tr>
+<tr><td>2. 現況</td><td>兩端版本、模型、驅動、健康</td><td>DGX：<code>hermes --version</code>、vLLM 模型 root、<code>nvidia-smi</code>、<code>/etc/dgx-release</code>、<code>ops/dgx_health.sh</code>。Windows：Desktop 的 tag、Node ≥ 22.22</td></tr>
+<tr><td>3. Hermes</td><td>有沒有新的 release tag</td><td><code>git ls-remote --tags origin 'v20*'</code>，比對目前 tag，讀 release notes 裡設定、gateway、desktop、cron 的變更</td></tr>
+<tr><td>4. 驅動與容器</td><td>驅動到 610 以上了嗎</td><td>到了就能用 NGC 26.06+ 容器，也就能換官方 <code>nvidia/Qwen3.8-27B-NVFP4</code></td></tr>
+<tr><td>5. 模型</td><td>有沒有新的 Qwen 或官方量化版</td><td>Hugging Face API；逐一檢查權重大小（vLLM ≤ 約 53 GB）、model card 要求的 vLLM 版本、<code>lm_head</code> 是否量化</td></tr>
+<tr><td>6. 排程</td><td>定期任務都成功嗎</td><td><code>hermes cron list</code>，每個 last run 都要是 ok</td></tr>
+<tr><td>7. 報告</td><td>一張表：現況、可用版本、相容與否、建議</td><td>需要你決定的事一次問完；之後 DGX 端交給 dgx-agent，Windows 端跑 <code>scripts\hermes_update_desktop.ps1 -Tag &lt;tag&gt;</code>，最後更新本手冊</td></tr>
+</table></div>
+<div class="note"><strong>你要在場的時刻：</strong>回答第 7 步的決策；DGX 端真正升級前，在 dgx-agent 那邊核准一次；Windows Desktop 重建完後開一次確認連得上。</div>
+
+<h2>4. 下一次模型更新</h2>
+<p>先查相容性鏈，四環都通過才動手。2026-10-03 換官方 NVFP4 失敗，就是卡在第 3 環。</p>
+<div class="scroll"><table>
+<tr><th>環節</th><th>怎麼查</th><th>目前（2026-10-03）</th></tr>
+<tr><td>1. 主機驅動</td><td><code>nvidia-smi</code>、<code>/etc/dgx-release</code></td><td>580.178.04（OTA 7.6.0）。<strong>只能透過 DGX OTA 升級</strong>，不要裝 Ubuntu 的 nvidia-driver-6xx。</td></tr>
+<tr><td>2. NGC vLLM 容器</td><td>NGC tag 要求的最低驅動</td><td>26.04 / 26.05 可用；26.06 以後需要 ≥610</td></tr>
+<tr><td>3. vLLM 版本</td><td>model card 寫的 vLLM 版本</td><td>0.19（26.04）</td></tr>
+<tr><td>4. 量化格式</td><td><code>hf_quant_config.json</code>，是否量化 <code>lm_head</code></td><td>官方 <code>nvidia/Qwen3.8-27B-NVFP4</code> 需要 nightly vLLM <span class="pill bd">不相容</span></td></tr>
+</table></div>
+<ol class="steps">
+<li>確認權重大小，並符合記憶體預算規則。</li>
+<li>先下載權重（不影響服務），再寫 swap 腳本。舊容器一律改名保留，不要刪除。</li>
+<li>啟動參數一定要帶 <code>--api-key</code>，因為 :8000 也綁在公網 IP 上。保留 <code>--reasoning-parser qwen3</code> 和 <code>--tool-call-parser qwen3_xml</code>。</li>
+<li>跑 <code>verify_backend.sh</code>（需設 <code>VLLM_API_KEY</code>），檢查別名、算術、<code>&lt;/think&gt;</code> 洩漏、tool call JSON、prefix cache、MTP。</li>
+<li>驗收 FAIL 就跑 <code>rollback.sh</code>。冷啟動需要 3–6 分鐘，這段時間 Hermes 會改走 fallback。</li>
+<li>從 Windows 端驗證 <code>/v1/models</code> 與一次 chat completion。</li>
+<li>穩定一週後，再把舊權重移到「可回收清單」。</li>
+</ol>
+<div class="note"><strong>現行決策：</strong>維持社群版 <code>sakamakismile/Qwen3.8-27B-MTP-NVFP4</code>。等 DGX OTA 帶來 ≥610 的驅動後，改用 26.06 以上的容器，再換官方 NVFP4。換模型的腳本已修補為會沿用 api-key。</div>
+
+<h2>5. 下一次 Hermes Agent 更新</h2>
+<p>兩端一律 pin 在<strong>同一個 release tag</strong>。<code>main</code> 是開發分支，已比 v0.21.5 多出六千多個 commit，不要直接 <code>hermes update</code>。</p>
+<ol class="steps">
+<li>查最新 release：<code>git fetch --tags; git tag --sort=-creatordate | grep '^v20' | head</code>。tag 為日期格式，例如 <code>v2026.9.24</code> = v0.21.5。</li>
+<li>DGX 端備份（playbook §0②），記下 HEAD；<code>hermes update --backup</code> 另外會做 zip。</li>
+<li>DGX 端 checkout tag，依該 tag 的安裝流程重裝依賴、build web UI、<code>hermes config migrate</code>。</li>
+<li><code>systemctl --user restart hermes-gateway-qwen38fp4 hermes-dashboard</code>。</li>
+<li>驗收：<code>hermes --version</code>、<code>hermes cron list</code>、Discord、dashboard <code>/api/status</code> 回報 <code>auth_required: true</code>。</li>
+<li>Windows 端：<code>powershell -ExecutionPolicy Bypass -File scripts\hermes_update_desktop.ps1 -Tag v2026.9.24</code>（log 在 <code>logs\</code>）。需要 Node ≥ 22.22，舊 build 會保留為 <code>win-unpacked.bak</code>。</li>
+<li>開啟 Desktop。若出現「Remote gateway sign-in required」，用 <code>hermes</code> 帳號登入，profile 選 <code>qwen38fp4</code>。</li>
+</ol>
+<p>回退：DGX 端 <code>git checkout &lt;舊 HEAD&gt;</code> 加 <code>hermes import &lt;pre-update zip&gt;</code>；Windows 端把 <code>win-unpacked.bak</code> 改回原名。</p>
+
+<h2>6. 當機（整機凍結）</h2>
+<div class="scroll"><table>
+<tr><th>時間</th><th>當下狀態</th><th>判讀</th></tr>
+<tr><td>2026-09-26 03:56:27</td><td>avail 60 GB（49%）、GPU 53.6 GB、ollama 空、閒置</td><td><span class="pill wn">非記憶體</span></td></tr>
+<tr><td>2026-09-29 09:12:46</td><td>avail 57.7 GB（47%）、GPU 52.6 GB、開機後 29 分鐘</td><td><span class="pill wn">非記憶體</span></td></tr>
+<tr><td>9/29 19:37、9/30、10/2</td><td>journal 中有 systemd-shutdown</td><td><span class="pill ok">正常關機</span></td></tr>
+</table></div>
+<p>9/10 的「ollama 吃光記憶體」推論無法解釋這兩次：當時記憶體還有一半空著，也沒有 OOM、Xid、thermal 或 panic。剩下的候選原因是韌體或驅動層（10/2 的 OTA 已更新）、電源控制器。外部報告提到 GB10 電源 PD 控制器保護，但多數發生在高負載時，與我們的閒置凍結不完全吻合，<strong>尚未證實</strong>。</p>
+<h3>現場同事可以做的（需要人在現場）</h3>
+<ol class="steps">
+<li>凍結當下：拍螢幕、電源燈、風扇是否在轉；先從別台電腦試 ssh。</li>
+<li>依序按 <code>Alt+SysRq+S</code>、<code>U</code>、<code>B</code>，不行才長按電源鍵。</li>
+<li>拔電源 60 秒（cold drain）再開機，讓電源控制器重置。</li>
+<li>開機後跑 <code>bash ~/wchien/HermesAgent_Setup/scripts/postmortem_freeze.sh</code>，它讀的是上一個 boot。</li>
+<li>維護時段（有人在場）再開：kdump（<code>crashkernel</code>）、<code>kernel.softlockup_panic=1</code>、硬體 watchdog <code>RuntimeWatchdogSec</code>、<code>fwupdmgr</code> 韌體更新、<code>partnerdiag --field</code> PowerStress。</li>
+</ol>
+<p class="sub">完整版：<code>~/wchien/HermesAgent_Setup/runbooks/handoff_freeze_oncall.md</code>（現場濃縮版）、<code>runbooks/sop_dgx_freeze.md</code>（完整版）。證據收集設定：<code>scripts/setup_freeze_evidence.sh</code>（需 sudo）。</p>
+
+<h2>7. 每日健康檢查（30 秒）</h2>
+<pre><code># DGX
+bash ~/wchien/HermesAgent_Setup/ops/dgx_health.sh
+# Windows（PowerShell）
+curl.exe -s -o NUL -w "%{http_code}" -H "Authorization: Bearer $env:QWEN_KEY" http://100.77.199.82:8000/v1/models   # 200
+curl.exe -s -o NUL -w "%{http_code}" http://100.77.199.82:9119/                                                       # 302</code></pre>
+
+<h3>Hermes 定期任務</h3>
+<div class="scroll"><table>
+<tr><th>任務</th><th>排程</th><th>2026-10-03 狀態</th></tr>
+<tr><td>每日 ETF 盤後分析報告</td><td>每天 03:00</td><td><span class="pill ok">ok</span></td></tr>
+<tr><td>GPU 每日使用率圖表報告</td><td>每天 08:00</td><td><span class="pill wn">待確認</span></td></tr>
+<tr><td>克拉拉優惠巡禮 agy 版</td><td>每天 09:00</td><td><span class="pill ok">ok</span></td></tr>
+<tr><td>Hermes 技術週報 v2</td><td>週一 00:05</td><td><span class="pill bd">9/29 失敗</span>：開機補跑時 vLLM 尚未就緒，正在加上就緒等待</td></tr>
+</table></div>
+
+<h2>8. 資料夾結構</h2>
+<p>兩台機器各有一個「維護專用」的地方，只放跟相容性有關的東西。計畫與應用一律放到另外的資料夾，維護資料夾才會一直保持乾淨。</p>
+<div class="grid2">
+<div class="card">
+<h3>Windows：<code>D:\DATA_google_dirve\0_DGX_Spark</code></h3>
+<pre><code>README.md                    結構與放檔規則
+CLAUDE.md                    給 win-agent 的規則
+DGX_Agent_Architecture.html  本手冊
+runbooks/    現行手冊（只放最新版）
+scripts/     現行腳本
+logs/        腳本 log（可隨時清）
+research/    YYYYMMDD_主題.md
+prompts/     YYYYMMDD_主題.md
+archive/             舊版，留作參考
+archive_to_delete/   確認後整個刪掉</code></pre>
+</div>
+<div class="card">
+<h3>DGX：<code>~/wchien/HermesAgent_Setup</code></h3>
+<pre><code>README.md            結構與放檔規則
+CLAUDE.md            指向 ops/CLAUDE.md
+ops/                 dgx-agent 的工具
+  CLAUDE.md          角色與鐵則
+  dgx_health.sh      一鍵健康檢查
+  model_update_playbook.md
+  hermes_update_playbook.md
+runbooks/   現行手冊（當機 SOP、Desktop handoff）
+scripts/    freeze 系列、start_vllm_apikey.sh
+  qwen38_eval/       換模型、驗收、回退
+  docker/vllm-hermes/  vLLM 映像的 Dockerfile
+runrecords/ 每次升級或換模的執行記錄
+status/     dgx-agent 的回報 STATUS_YYYYMMDD.md
+research/  prompts/  logs/  backups/
+models/     權重（不動）
+archive/  archive_to_delete/</code></pre>
+<p class="sub">根目錄只放 README.md、CLAUDE.md 和上面這些資料夾，沒有 symlink。舊的根目錄路徑（例如 <code>~/wchien/HermesAgent_Setup/postmortem_freeze.sh</code>）已經不存在，一律用新路徑。</p>
+</div>
+</div>
+<div class="scroll"><table>
+<tr><th>新東西是…</th><th>放哪裡</th></tr>
+<tr><td>新版手冊</td><td><code>runbooks/</code>，舊版移到 <code>archive/</code></td></tr>
+<tr><td>新腳本</td><td><code>scripts/</code>，log 寫到 <code>logs/</code></td></tr>
+<tr><td>一次性診斷檔、dump</td><td>用完移到 <code>archive_to_delete/</code></td></tr>
+<tr><td>研究、查證報告</td><td><code>research/YYYYMMDD_主題.md</code></td></tr>
+<tr><td>計畫、應用、點子（不是兩機相容性）</td><td>Windows：<code>D:\DATA_google_dirve\0_DGX_Spark_Projects\&lt;計畫名&gt;\</code><br>DGX：<code>~/wchien/HermesAgent_Projects/&lt;計畫名&gt;/</code></td></tr>
+</table></div>
+<p class="sub">已搬出去的計畫：KB_Photo_Knowledge_Base、v5_File_Trigger_Workflow（含 Syncthing workspace 手冊）、NotebookLM_Auto_Video、Hermes_Google_Integration、Hermes_Architecture_Ideas、Model_Experiments。DGX 端：cron_enhancement_plans、youtube_report、minicpm_vllm。兩邊的清單都在各自 Projects 資料夾的 README.md。</p>
+<p class="sub"><code>~/wchien</code> 底下其他資料夾（ComfyUI、BlueMagpie-TTS 等）不屬於維護範圍，不在這裡管理。<code>~/wchien</code> 頂層刻意保留兩個含密鑰的檔案：<code>discord.env</code> 和 <code>environment_set</code>（Claude proxy 的設定，手動 source）。兩個權限都是 600，只有本人能讀，不要搬進資料夾，也不要放寬權限。</p>
+
+<h2>9. 2026-10-03 執行紀錄</h2>
+<ul>
+<li>備份：Windows <code>_backup_0_DGX_Spark_20261003_2133</code>；DGX <code>backups/20261003_2150/</code>。</li>
+<li>換官方 NVFP4：失敗（vLLM 0.19 不支援量化的 <code>lm_head</code>），已回退；:8000 中斷約 20 分鐘。</li>
+<li>Hermes v0.20.1 → v0.21.5（tag <code>v2026.9.24</code>，DGX 分支 <code>pin-v0.21.5</code>，config v46）：<span class="pill ok">完成</span>。舊 HEAD 為 <code>165c889e5b</code>，本地改動存在 stash「pre-v0.21.5」。</li>
+<li>Windows Desktop 重建到 <code>v2026.9.24</code>（分支 <code>desktop-v2026.9.24</code>）：<span class="pill ok">完成</span>，pack exit 0，三個產物都是當天新產生的。</li>
+<li>從 Windows 驗證：dashboard 版本 0.21.5、Discord connected；:8000 帶 key 回 200，不帶 key 回 401。</li>
+<li>cron：gateway 加上 drop-in <code>wait-vllm.conf</code>，啟動前先等 :8000 就緒；升級時的重啟已經生效。</li>
+<li>freeze-sampler v2（多記 thermal、NVMe 溫度、dmesg 尾段）已寫好但尚未安裝，需要 sudo 密碼，指令在 SOP 裡。</li>
+<li>DGX 管理 agent：<code>~/wchien/HermesAgent_Setup/ops/</code>（CLAUDE.md、dgx_health.sh、兩份 playbook）；dgx_health.sh 目前 ALL OK。</li>
+<li>Windows 資料夾整理：舊檔移到 <code>archive/</code> 與 <code>archive_to_delete/</code>；計畫移到 <code>0_DGX_Spark_Projects</code>；根目錄只剩維護用檔案。</li>
+<li>DGX 資料夾整理（dgx-agent）：<code>HermesAgent_Setup</code> 改成相同結構，計畫移到 <code>~/wchien/HermesAgent_Projects</code>。搬之前確認沒有服務、排程或容器引用這些路徑；根目錄不留 symlink，SOP 都改成新路徑；health ALL OK、7 個 cron 正常。</li>
+<li><code>~/wchien</code> 頂層：<code>discord.env</code>、<code>environment_set</code> 權限從 664 改成 600（確認沒有其他讀取者，Discord 仍是 connected）；Dockerfile 移到 <code>scripts/docker/</code>，舊 Modelfile 移到 <code>archive/</code>，舊 log 和空的 temp 移到 <code>archive_to_delete/</code>。</li>
+</ul>
+</div>
+
+<!--claude-mermaid-runtime-begin:3477-->
+<style>.mermaid-diagram{margin-block:4px}.mermaid-diagram svg{display:block;margin:0 auto;max-width:100%;height:auto}</style>
+<script src="/_runtime/mermaid-11.16.1.min.js"></script>
+<script>(function(){
+var CFG={"palettes":{"light":{"surface":"#f4efe4","text":"#42392e","line":"#8a7f6d","border":"#7a6c52","bg":"#fffdf8"},"dark":{"surface":"#262b34","text":"#f2f3f5","line":"#a8adb8","border":"#9aa4b8","bg":"#1f232b"}}};
+if(typeof mermaid==='undefined')return;
+var pres=Array.prototype.slice.call(document.querySelectorAll('pre.mermaid')).filter(function(p){if(p.hasAttribute('data-claude-mermaid-claimed'))return false;p.setAttribute('data-claude-mermaid-claimed','1');return true;});
+if(!pres.length)return;
+var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+var root=document.documentElement;
+var items=pres.map(function(pre){
+var mount=document.createElement('div');mount.className='mermaid-diagram';
+return {pre:pre,mount:mount,src:pre.textContent||''};
+});
+var seq=0;
+var renderGen=0;
+var lastKey='';
+function pageBg(fallback){
+var els=[document.body,document.documentElement];
+for(var i=0;i<els.length;i++){
+var c=els[i]&&getComputedStyle(els[i]).backgroundColor;
+if(c&&c!=='transparent'&&c!=='rgba(0, 0, 0, 0)')return c;
+}
+return fallback;
+}
+function render(){
+var theme=root.getAttribute('data-theme');
+var dark=theme==='dark'||(!!(mq&&mq.matches)&&theme!=='light');
+var pal=dark?CFG.palettes.dark:CFG.palettes.light;
+var bg=pageBg(pal.bg);
+var key=(dark?'d':'l')+'|'+bg;
+if(key===lastKey)return;
+lastKey=key;
+var gen=++renderGen;
+var font=getComputedStyle(document.body).fontFamily||'sans-serif';
+var nat={useMaxWidth:false};
+mermaid.initialize({
+startOnLoad:false,securityLevel:'strict',theme:'base',
+flowchart:nat,sequence:nat,er:nat,state:nat,class:nat,pie:nat,
+gantt:nat,journey:nat,timeline:nat,gitGraph:nat,mindmap:nat,xyChart:nat,
+quadrantChart:nat,sankey:nat,c4:nat,requirement:nat,block:nat,
+packet:nat,kanban:nat,architecture:nat,radar:nat,
+themeVariables:{background:bg,mainBkg:pal.surface,primaryColor:pal.surface,
+primaryTextColor:pal.text,lineColor:pal.line,primaryBorderColor:pal.border,
+nodeBorder:pal.border,clusterBorder:pal.border,edgeLabelBackground:bg,
+clusterBkg:'rgba(127,127,127,0.07)',titleColor:pal.text,
+darkMode:dark,rowOdd:bg,rowEven:'rgba(127,127,127,0.07)',
+attributeBackgroundColorOdd:bg,attributeBackgroundColorEven:'rgba(127,127,127,0.07)',
+fontSize:'16px',fontFamily:font},
+themeCSS:'.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke-width: 2px; }'
+});
+items.forEach(function(it){
+var id='claude-mermaid-'+seq++;
+mermaid.render(id,it.src).then(function(r){
+if(gen!==renderGen)return;
+var prev=it.pre.previousElementSibling;
+if(prev&&prev.className==='mermaid-diagram'&&prev!==it.mount)return;
+it.mount.innerHTML=r.svg;
+if(!it.mount.parentNode)it.pre.parentNode.insertBefore(it.mount,it.pre);
+it.pre.style.display='none';
+},function(){
+var scratch=document.getElementById(id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+scratch=document.getElementById('d'+id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+if(gen!==renderGen)return;
+if(it.mount.parentNode)it.mount.parentNode.removeChild(it.mount);
+it.pre.style.display='';
+});
+});
+}
+render();
+if(mq&&mq.addEventListener)mq.addEventListener('change',render);
+if(typeof MutationObserver!=='undefined')new MutationObserver(render).observe(root,{attributes:true,attributeFilter:['data-theme']});
+})();</script>
+<!--claude-mermaid-runtime-end-->
+
+</body></html>

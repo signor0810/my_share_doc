@@ -1,0 +1,634 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CI/CD 深度導讀</title>
+<style>
+:root{
+  --bg:#f7f6f2; --panel:#ffffff; --ink:#1d1f23; --muted:#5f6670; --line:#dedbd2;
+  --accent:#2f5bd3; --accent-soft:#e6ecfb; --good:#1f8a5b; --good-soft:#e2f3ea;
+  --warn:#b7650c; --warn-soft:#fbefdf; --bad:#b4322e; --bad-soft:#f9e3e2;
+  --human:#8a3fb8; --human-soft:#f1e6f8; --code:#f0eee8;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15171b; --panel:#1d2026; --ink:#e7e8ea; --muted:#9aa1ab; --line:#2f333b;
+    --accent:#7c9cf5; --accent-soft:#232c45; --good:#4fc28d; --good-soft:#1c3329;
+    --warn:#e3a050; --warn-soft:#3a2c1a; --bad:#ec7a75; --bad-soft:#3d2121;
+    --human:#c59be6; --human-soft:#33243f; --code:#262a31;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15171b; --panel:#1d2026; --ink:#e7e8ea; --muted:#9aa1ab; --line:#2f333b;
+  --accent:#7c9cf5; --accent-soft:#232c45; --good:#4fc28d; --good-soft:#1c3329;
+  --warn:#e3a050; --warn-soft:#3a2c1a; --bad:#ec7a75; --bad-soft:#3d2121;
+  --human:#c59be6; --human-soft:#33243f; --code:#262a31;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 "Noto Sans TC","Microsoft JhengHei","PingFang TC",system-ui,sans-serif}
+a{color:var(--accent)}
+code,kbd{font-family:Consolas,"JetBrains Mono",monospace;background:var(--code);padding:1px 6px;border-radius:4px;font-size:.9em}
+.wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:40px;max-width:1240px;margin:0 auto;padding:32px 24px 80px}
+nav.toc{position:sticky;top:20px;align-self:start;font-size:14px;max-height:calc(100vh - 40px);overflow:auto}
+nav.toc a{display:block;color:var(--muted);text-decoration:none;padding:4px 10px;border-left:2px solid transparent}
+nav.toc a:hover,nav.toc a.on{color:var(--ink);border-left-color:var(--accent)}
+nav.toc .ttl{font-weight:700;margin-bottom:8px;color:var(--ink)}
+main{min-width:0}
+header.hero{margin-bottom:28px}
+header.hero h1{font-size:34px;line-height:1.25;margin:0 0 8px}
+header.hero p{color:var(--muted);margin:0;max-width:760px}
+section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:28px 30px;margin:0 0 26px}
+section h2{margin:0 0 6px;font-size:24px}
+section h2 .n{color:var(--accent);margin-right:8px;font-variant-numeric:tabular-nums}
+section h3{margin:22px 0 6px;font-size:18px}
+.lead{color:var(--muted);margin-top:0}
+.callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0}
+.callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+.callout.good{border-color:var(--good);background:var(--good-soft)}
+.callout.human{border-color:var(--human);background:var(--human-soft)}
+.callout b:first-child{display:block;margin-bottom:2px}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:12px 0}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--code);font-weight:600}
+.tblwrap{overflow-x:auto}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--bg)}
+.card h4{margin:0 0 6px;font-size:16px}
+.card p{margin:0;font-size:14.5px;color:var(--muted)}
+.tag{display:inline-block;font-size:12px;padding:1px 8px;border-radius:999px;margin-right:4px;border:1px solid var(--line);color:var(--muted)}
+.tag.h{background:var(--human-soft);color:var(--human);border-color:transparent}
+.tag.a{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.tag.g{background:var(--good-soft);color:var(--good);border-color:transparent}
+.tag.w{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+svg{max-width:100%;height:auto;display:block;margin:12px auto}
+svg text{fill:var(--ink);font-family:inherit}
+svg .muted{fill:var(--muted)}
+svg .box{fill:var(--panel);stroke:var(--line);stroke-width:1.5}
+svg .boxA{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+svg .boxG{fill:var(--good-soft);stroke:var(--good);stroke-width:1.5}
+svg .boxW{fill:var(--warn-soft);stroke:var(--warn);stroke-width:1.5}
+svg .boxH{fill:var(--human-soft);stroke:var(--human);stroke-width:1.5}
+svg .boxB{fill:var(--bad-soft);stroke:var(--bad);stroke-width:1.5}
+svg .arr{stroke:var(--muted);stroke-width:1.6;fill:none;marker-end:url(#ah)}
+svg .arrB{stroke:var(--bad);stroke-width:1.6;fill:none;stroke-dasharray:5 4;marker-end:url(#ahb)}
+/* tabs */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.tabs button{border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:6px 14px;border-radius:999px;cursor:pointer;font:inherit;font-size:14px}
+.tabs button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.pane{display:none}.pane.on{display:block}
+/* stepper */
+.stepper{display:grid;grid-template-columns:260px minmax(0,1fr);gap:18px;margin-top:14px}
+.steps{list-style:none;margin:0;padding:0;border-left:2px solid var(--line)}
+.steps li{padding:7px 12px;cursor:pointer;font-size:14px;color:var(--muted);margin-left:-2px;border-left:2px solid transparent}
+.steps li.on{color:var(--ink);border-left-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.steps li .who{font-size:11px;margin-left:4px}
+.detail{border:1px solid var(--line);border-radius:10px;padding:16px 18px;background:var(--bg);min-height:320px}
+.detail h4{margin:0 0 4px;font-size:18px}
+.detail .meta{font-size:13px;color:var(--muted);margin-bottom:10px}
+.detail pre{background:var(--code);padding:10px 12px;border-radius:6px;overflow-x:auto;font-size:13px;line-height:1.5}
+.navbtns{display:flex;gap:8px;margin-top:12px}
+.navbtns button{border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:6px 14px;border-radius:8px;cursor:pointer;font:inherit;font-size:14px}
+/* heat */
+.heat{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:14px 0}
+.heat div{border-radius:8px;padding:10px;font-size:13.5px;line-height:1.45}
+.heat b{display:block;font-size:14px}
+.h5{background:var(--human);color:#fff}.h4{background:color-mix(in srgb,var(--human) 70%,var(--panel));color:#fff}
+.h3{background:color-mix(in srgb,var(--human) 40%,var(--panel))}.h2{background:color-mix(in srgb,var(--human) 18%,var(--panel))}
+.h1{background:var(--code)}
+/* quiz */
+details{border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:8px 0;background:var(--bg)}
+details summary{cursor:pointer;font-weight:600}
+details[open] summary{margin-bottom:6px}
+/* sim */
+.sim{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+.sim .eng{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--bg)}
+.bar{height:10px;border-radius:5px;background:var(--accent);transition:width .3s}
+.barrow{display:grid;grid-template-columns:110px 1fr 46px;gap:8px;align-items:center;font-size:13px;margin:5px 0}
+.links li{margin:6px 0}
+.links .src{font-size:12px;color:var(--muted)}
+footer{color:var(--muted);font-size:13px;text-align:center;margin-top:30px}
+.theme{position:fixed;right:16px;bottom:16px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer;font:inherit;font-size:13px}
+@media (max-width:900px){
+  .wrap{grid-template-columns:1fr;padding:20px 16px 60px;gap:16px}
+  nav.toc{position:static;max-height:none;display:none}
+  section{padding:20px 16px}
+  .grid2,.grid3,.sim,.stepper{grid-template-columns:1fr}
+  header.hero h1{font-size:26px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc" id="toc">
+  <div class="ttl">目錄</div>
+  <a href="#s0">0. 學習地圖</a>
+  <a href="#s1">1. 把你的 P4 流程翻成業界語言</a>
+  <a href="#s2">2. 什麼是 PR？生命週期</a>
+  <a href="#s3">3. CI/CD 全景：傳統 vs 現代</a>
+  <a href="#s4">4. Try job 與權限</a>
+  <a href="#s5">5. PR 該切多大？</a>
+  <a href="#s6">6. 貢獻怎麼算？合理嗎？</a>
+  <a href="#s7">7. 人類最該介入的地方</a>
+  <a href="#s8">8. 最小 Agent 編制</a>
+  <a href="#s9">9. 實戰案例：一張 STAR 的一生</a>
+  <a href="#s10">10. PE 的行動清單</a>
+  <a href="#s11">11. 自我測驗</a>
+  <a href="#s12">12. 延伸資源</a>
+</nav>
+<main>
+<header class="hero">
+  <h1>CI/CD 深度導讀：從 P4 Changelist 到 Agentic Workflow</h1>
+  <p>寫給在 EDA 軟體公司擔任 PE、有 check-in 權限、常替 QA 建 regression case 的你。目標不是背名詞，而是讓你看懂「一個成熟的系統，為什麼長成這樣」。</p>
+</header>
+
+<!-- 0 -->
+<section id="s0">
+  <h2><span class="n">0</span>學習地圖：CI/CD 到底在解決什麼？</h2>
+  <p class="lead">一句話：<b>讓「很多人同時改同一份程式碼」這件事，變得安全、快速、可追溯。</b></p>
+  <div class="grid3">
+    <div class="card"><h4>CI — Continuous Integration</h4><p>每個改動都<b>頻繁</b>併回主線，且每次併入都<b>自動 build + test</b>。核心是「早點發現衝突與錯誤」，而不是「有一台 Jenkins」。</p></div>
+    <div class="card"><h4>CD — Continuous Delivery</h4><p>主線<b>隨時處於可發佈狀態</b>。要不要真的發，是商業決定（EDA 通常是季度 release + hotfix）。</p></div>
+    <div class="card"><h4>CD — Continuous Deployment</h4><p>每個通過測試的改動<b>自動上線</b>。網路服務常見；EDA 這種裝在客戶機器上的軟體幾乎不會這樣做。</p></div>
+  </div>
+  <div class="callout"><b>心智模型：品質關卡（gate）漏斗</b>越早的關卡越便宜、越快、越粗；越晚的越貴、越慢、越完整。成熟系統的設計藝術，就是決定「哪個測試放在哪個關卡」。</div>
+  <svg viewBox="0 0 860 210" role="img" aria-label="品質關卡漏斗">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="currentColor" style="fill:var(--muted)"/></marker>
+    <marker id="ahb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" style="fill:var(--bad)"/></marker></defs>
+    <rect class="boxA" x="10" y="40" width="150" height="120" rx="10"/>
+    <text x="85" y="72" text-anchor="middle" font-weight="700">本機</text><text x="85" y="96" text-anchor="middle" font-size="13">compile / unit</text><text x="85" y="118" text-anchor="middle" font-size="13" class="muted">秒～分鐘</text><text x="85" y="140" text-anchor="middle" font-size="13" class="muted">成本 $</text>
+    <rect class="boxA" x="185" y="48" width="150" height="104" rx="10"/>
+    <text x="260" y="76" text-anchor="middle" font-weight="700">Pre-submit</text><text x="260" y="98" text-anchor="middle" font-size="13">try job / smoke</text><text x="260" y="120" text-anchor="middle" font-size="13" class="muted">10–60 分鐘</text><text x="260" y="140" text-anchor="middle" font-size="13" class="muted">$$</text>
+    <rect class="boxH" x="360" y="56" width="150" height="88" rx="10"/>
+    <text x="435" y="84" text-anchor="middle" font-weight="700">Code Review</text><text x="435" y="106" text-anchor="middle" font-size="13">人 + AI reviewer</text><text x="435" y="128" text-anchor="middle" font-size="13" class="muted">小時～天</text>
+    <rect class="boxG" x="535" y="48" width="150" height="104" rx="10"/>
+    <text x="610" y="76" text-anchor="middle" font-weight="700">Post-submit</text><text x="610" y="98" text-anchor="middle" font-size="13">nightly full regr.</text><text x="610" y="120" text-anchor="middle" font-size="13" class="muted">數小時</text><text x="610" y="140" text-anchor="middle" font-size="13" class="muted">$$$$</text>
+    <rect class="boxW" x="710" y="40" width="140" height="120" rx="10"/>
+    <text x="780" y="72" text-anchor="middle" font-weight="700">Release</text><text x="780" y="96" text-anchor="middle" font-size="13">QoR / 客戶 suite</text><text x="780" y="118" text-anchor="middle" font-size="13" class="muted">天～週</text><text x="780" y="140" text-anchor="middle" font-size="13" class="muted">$$$$$</text>
+    <path class="arr" d="M160 100H183"/><path class="arr" d="M335 100H358"/><path class="arr" d="M510 100H533"/><path class="arr" d="M685 100H708"/>
+    <text x="430" y="196" text-anchor="middle" font-size="13" class="muted">← 越左：快、便宜、抓得到的 bug 種類少　｜　越右：慢、貴、抓得到整合與效能問題 →</text>
+  </svg>
+</section>
+
+<!-- 1 -->
+<section id="s1">
+  <h2><span class="n">1</span>把你現在的 P4 流程，翻成業界通用語言</h2>
+  <p class="lead">你其實已經在用一個成熟的 CI 流程，只是名詞不同。先把對照表建立起來，後面的內容才接得上。</p>
+  <div class="tblwrap"><table>
+    <tr><th>你在公司的說法（Perforce 世界）</th><th>Git / GitHub 世界</th><th>本質是什麼</th></tr>
+    <tr><td><b>Changelist (CL)</b>，pending CL</td><td>commit（尚未 push 的）</td><td>一組要一起進去的檔案修改</td></tr>
+    <tr><td><b>Shelve</b> 一個 CL</td><td>push 一個 feature branch</td><td>把改動放到伺服器上讓別人／CI 看得到，但還沒進主線</td></tr>
+    <tr><td><b>Swarm review</b>（或公司自建的 review 系統）</td><td><b>Pull Request (PR)</b> / Merge Request (GitLab) / CL (Google Gerrit)</td><td>「請求把我的改動併入主線」+ 討論 + 審核</td></tr>
+    <tr><td>填 <b>STAR number</b>（推測是 bug/需求追蹤單號）</td><td>在 PR 描述寫 <code>Fixes #1234</code>／Jira key</td><td><b>可追溯性</b>：每行程式碼都能回答「為什麼改」</td></tr>
+    <tr><td>Description review</td><td>PR title / description 規範、模板</td><td>給未來的人（和 agent）看的變更說明</td></tr>
+    <tr><td>你說的 <b>PCA test</b>（推測：pre-check-in acceptance 類）</td><td>required status checks / pre-submit</td><td>進主線前<b>必須</b>通過的最低限度測試</td></tr>
+    <tr><td><b>Submit</b> CL</td><td>Merge PR</td><td>改動真正進入主線（depot / main）</td></tr>
+    <tr><td>Regression 跑完再上傳結果 / nightly</td><td>post-submit CI、scheduled workflow</td><td>完整但昂貴的測試，在併入後跑</td></tr>
+    <tr><td>Stream / branch（main、release、dev stream）</td><td>branch（main、release/x.y）</td><td>平行版本線</td></tr>
+    <tr><td><b>Integrate / copy / merge down</b></td><td>cherry-pick / merge / backport</td><td>把修正從一條線帶到另一條線（例如 hotfix 帶到 release）</td></tr>
+    <tr><td>Golden / reference result 更新</td><td>snapshot test 更新</td><td>改變「什麼才是正確答案」— <b>極度需要人判斷</b></td></tr>
+  </table></div>
+  <div class="callout warn"><b>兩個我不確定、請你回公司確認的點</b>「STAR number」在部分 EDA 公司是 bug tracking 系統的單號；「PCA test」各公司定義不同。後面我都用「追蹤單號」與「pre-submit 必過測試」來泛稱。確認後告訴我，我可以把教材改成你公司的精確流程。</div>
+  <h3>P4 與 Git 最本質的差異（為什麼 EDA 愛用 P4）</h3>
+  <div class="grid2">
+    <div class="card"><h4>Perforce：集中式</h4><p>伺服器是唯一真相；適合<b>巨大 repo、大型二進位檔</b>（testcase、GDS/OASIS、library、golden 結果）。檔案可以 lock。CL 編號是全域遞增的，天然有順序。</p></div>
+    <div class="card"><h4>Git：分散式</h4><p>每人有完整歷史；branch 極便宜，所以「一個 PR = 一個 branch」的文化很自然。大型二進位檔需要 LFS。GitHub 生態的自動化（Actions、agent）最豐富。</p></div>
+  </div>
+  <p>好消息：<b>概念完全通用</b>。Shelved CL + Swarm review + 觸發測試，就是 PR + required checks。你學會一邊，另一邊只是換名字。</p>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2><span class="n">2</span>什麼是一個 PR？它的生命週期</h2>
+  <p class="lead">PR（Pull Request）不是「一段程式碼」，而是一個<b>協作物件</b>：程式碼差異 + 說明 + 自動檢查結果 + 討論 + 核准紀錄。它是整個 CI/CD 的「工作單位」。</p>
+  <h3>一個好 PR 的解剖</h3>
+  <div class="grid2">
+    <div class="card"><h4>① Title</h4><p><code>router: fix crash when via stack exceeds 12 layers (STAR-48213)</code> — 模組＋做了什麼＋單號。</p></div>
+    <div class="card"><h4>② Description</h4><p><b>Why</b>（問題/動機）、<b>What</b>（改了什麼）、<b>How tested</b>（跑了哪些測試、新增哪個 regression case）、<b>Risk</b>（影響範圍、QoR 是否變動）。</p></div>
+    <div class="card"><h4>③ Diff</h4><p>實際的程式碼變更。越小、越專注，review 品質越高。</p></div>
+    <div class="card"><h4>④ Checks</h4><p>CI 自動貼回來的結果：build ✔、lint ✔、smoke ✔、targeted regression ✔。</p></div>
+    <div class="card"><h4>⑤ Review &amp; Approval</h4><p>誰看過、誰核准（Code Owner 規則：改 router 目錄就必須有 router owner 核准）。</p></div>
+    <div class="card"><h4>⑥ Merge record</h4><p>何時、由誰／哪個 queue 併入。之後出事可以 <code>blame</code>／<code>revert</code>。</p></div>
+  </div>
+  <h3>狀態機</h3>
+  <svg viewBox="0 0 880 250" role="img" aria-label="PR 狀態機">
+    <rect class="box" x="10" y="95" width="110" height="50" rx="8"/><text x="65" y="125" text-anchor="middle">Draft</text>
+    <rect class="boxA" x="160" y="95" width="130" height="50" rx="8"/><text x="225" y="117" text-anchor="middle">Open</text><text x="225" y="136" text-anchor="middle" font-size="12" class="muted">CI 開跑</text>
+    <rect class="boxH" x="330" y="95" width="140" height="50" rx="8"/><text x="400" y="117" text-anchor="middle">In Review</text><text x="400" y="136" text-anchor="middle" font-size="12" class="muted">人 + AI 留意見</text>
+    <rect class="boxB" x="330" y="10" width="140" height="44" rx="8"/><text x="400" y="37" text-anchor="middle">Changes requested</text>
+    <rect class="boxG" x="510" y="95" width="120" height="50" rx="8"/><text x="570" y="125" text-anchor="middle">Approved</text>
+    <rect class="boxA" x="670" y="95" width="100" height="50" rx="8"/><text x="720" y="117" text-anchor="middle">Merge queue</text><text x="720" y="136" text-anchor="middle" font-size="12" class="muted">再驗一次</text>
+    <rect class="boxG" x="800" y="95" width="70" height="50" rx="8"/><text x="835" y="125" text-anchor="middle">Merged</text>
+    <rect class="boxB" x="660" y="190" width="120" height="44" rx="8"/><text x="720" y="217" text-anchor="middle">Rejected / 衝突</text>
+    <path class="arr" d="M120 120H158"/><path class="arr" d="M290 120H328"/><path class="arr" d="M470 120H508"/><path class="arr" d="M630 120H668"/><path class="arr" d="M770 120H798"/>
+    <path class="arrB" d="M380 95V56"/><path class="arr" d="M420 56V93"/>
+    <path class="arrB" d="M720 145V188"/><path class="arrB" d="M660 212H225V147"/>
+    <text x="440" y="207" text-anchor="middle" font-size="12" class="muted">queue 內測試失敗 → 退回作者修</text>
+  </svg>
+  <div class="callout"><b>對照你的 P4：</b>Shelve＝Open；Swarm 的 Needs Review / Needs Revision / Approved＝In Review / Changes requested / Approved；Submit＝Merged。Merge queue 在 P4 世界較少見，常被「submit 前再跑一次 PCA」或「submit 後 nightly 抓 regression」取代。</div>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2><span class="n">3</span>CI/CD 全景：傳統流程 vs 目前主流</h2>
+  <div class="tabs" data-group="era">
+    <button class="on" data-pane="era-old">傳統（約 2000–2012）</button>
+    <button data-pane="era-new">現代主流（2015–）</button>
+    <button data-pane="era-ai">Agentic（2024–）</button>
+    <button data-pane="era-eda">EDA 特殊性</button>
+  </div>
+  <div class="pane on" id="era-old">
+    <svg viewBox="0 0 860 170">
+      <rect class="box" x="10" y="55" width="140" height="60" rx="8"/><text x="80" y="82" text-anchor="middle">長命 feature</text><text x="80" y="102" text-anchor="middle">branch（數週）</text>
+      <rect class="boxB" x="190" y="55" width="140" height="60" rx="8"/><text x="260" y="82" text-anchor="middle">大合併</text><text x="260" y="102" text-anchor="middle" font-size="13">"merge hell"</text>
+      <rect class="box" x="370" y="55" width="140" height="60" rx="8"/><text x="440" y="82" text-anchor="middle">Nightly build</text><text x="440" y="102" text-anchor="middle" font-size="13">隔天才知道壞了</text>
+      <rect class="boxW" x="550" y="55" width="140" height="60" rx="8"/><text x="620" y="82" text-anchor="middle">QA 手動驗證</text><text x="620" y="102" text-anchor="middle" font-size="13">code freeze 期</text>
+      <rect class="box" x="730" y="55" width="120" height="60" rx="8"/><text x="790" y="90" text-anchor="middle">Release</text>
+      <path class="arr" d="M150 85H188"/><path class="arr" d="M330 85H368"/><path class="arr" d="M510 85H548"/><path class="arr" d="M690 85H728"/>
+      <text x="430" y="150" text-anchor="middle" font-size="13" class="muted">痛點：回饋延遲以「天」計、bug 發現時已混了幾十個人的改動，難以歸咎</text>
+    </svg>
+    <ul>
+      <li><b>Build master / release engineer</b> 手動處理合併與打包。</li>
+      <li>「壞掉的 nightly」需要人去 bisect（二分搜尋）找出是哪個 CL。</li>
+      <li>測試主要靠 QA 階段，開發者的回饋迴圈很長。</li>
+    </ul>
+  </div>
+  <div class="pane" id="era-new">
+    <svg viewBox="0 0 860 200">
+      <rect class="boxA" x="10" y="70" width="120" height="56" rx="8"/><text x="70" y="94" text-anchor="middle">小 PR</text><text x="70" y="113" text-anchor="middle" font-size="12" class="muted">數小時～1 天</text>
+      <rect class="boxA" x="160" y="70" width="130" height="56" rx="8"/><text x="225" y="94" text-anchor="middle">Pre-submit CI</text><text x="225" y="113" text-anchor="middle" font-size="12" class="muted">required checks</text>
+      <rect class="boxH" x="320" y="70" width="120" height="56" rx="8"/><text x="380" y="94" text-anchor="middle">Review</text><text x="380" y="113" text-anchor="middle" font-size="12" class="muted">CODEOWNERS</text>
+      <rect class="boxA" x="470" y="70" width="120" height="56" rx="8"/><text x="530" y="94" text-anchor="middle">Merge queue</text><text x="530" y="113" text-anchor="middle" font-size="12" class="muted">與最新 main 合測</text>
+      <rect class="boxG" x="620" y="70" width="110" height="56" rx="8"/><text x="675" y="94" text-anchor="middle">main 永遠綠</text><text x="675" y="113" text-anchor="middle" font-size="12" class="muted">trunk-based</text>
+      <rect class="boxG" x="760" y="70" width="90" height="56" rx="8"/><text x="805" y="94" text-anchor="middle">自動</text><text x="805" y="113" text-anchor="middle" font-size="12">deliver</text>
+      <path class="arr" d="M130 98H158"/><path class="arr" d="M290 98H318"/><path class="arr" d="M440 98H468"/><path class="arr" d="M590 98H618"/><path class="arr" d="M730 98H758"/>
+      <rect class="boxW" x="560" y="150" width="200" height="40" rx="8"/><text x="660" y="175" text-anchor="middle" font-size="13">Post-submit: 完整測試＋自動 bisect</text>
+      <path class="arr" d="M675 126V148"/>
+      <text x="270" y="30" font-size="13" class="muted">Feature flag：未完成功能也能先進 main，只是預設關閉</text>
+    </svg>
+    <ul>
+      <li><b>Trunk-based development</b>：大家都往 main 小步快跑，branch 存活很短。</li>
+      <li><b>Required status checks</b>：沒過就按不了 merge（你的 PCA 就是這個角色）。</li>
+      <li><b>Merge queue</b>：解決「A 和 B 各自都綠，但一起進去就紅」— queue 會把 PR 依序和最新 main 一起再測一次。</li>
+      <li><b>自動 bisect / culprit finder</b>：post-submit 紅了，系統自動找出是哪個 CL 並建議 revert。</li>
+      <li><b>Pipeline as code</b>：CI 設定（<code>Jenkinsfile</code>、<code>.github/workflows/*.yml</code>）也進版控、也要 review。</li>
+    </ul>
+  </div>
+  <div class="pane" id="era-ai">
+    <p>現代流程的骨架<b>不變</b>，但每個關卡旁邊多了 agent：</p>
+    <ul>
+      <li>Issue／STAR 進來 → <b>agent 自動重現、分類、找相關程式碼</b>。</li>
+      <li>Agent 自己開 PR（GitHub Copilot coding agent、Claude Code、Codex 等都能從 issue 直接產生 PR）。</li>
+      <li><b>AI reviewer</b> 在人類之前先過一輪（風格、明顯 bug、缺測試）。</li>
+      <li>CI 紅了 → <b>triage agent</b> 讀 log，判斷是 flaky、infra 問題還是真 bug，甚至直接推修正 commit。</li>
+    </ul>
+    <div class="callout warn"><b>新的瓶頸：人類 review 頻寬</b>agent 產生 PR 的速度遠高於人類審查速度。因此 2025 年後成熟團隊的重心是：PR 要更小、測試要更強（測試才是 agent 的護欄）、核准權嚴格保留給人。</div>
+  </div>
+  <div class="pane" id="era-eda">
+    <p>EDA 跟網路公司最大的不同，決定了你們流程的形狀：</p>
+    <div class="tblwrap"><table>
+      <tr><th>特性</th><th>對 CI/CD 的影響</th></tr>
+      <tr><td>單一 regression 可能跑數小時、吃大量 license 與機器</td><td>不可能每個 CL 都跑全套 → <b>分層測試</b>：pre-submit 只跑 smoke + 受影響模組；全套留給 nightly/weekly</td></tr>
+      <tr><td>結果是<b>數值型</b>（QoR：timing、area、power、runtime、DRC count）而非 pass/fail</td><td>需要「容忍範圍」與趨勢圖；QoR 退步 0.3% 算不算 fail？<b>這是人的判斷</b></td></tr>
+      <tr><td>Testcase 常來自客戶設計，有 NDA 限制</td><td>測試資料權限控管；agent 能不能讀客戶資料是重大治理問題</td></tr>
+      <tr><td>軟體裝在客戶端、版本週期長</td><td>是 Continuous <i>Delivery</i> 不是 <i>Deployment</i>；hotfix 需要 backport 到多個 release stream</td></tr>
+      <tr><td>非決定性（多執行緒、浮點）</td><td>flaky test 多 → 需要 rerun 策略與 flaky 隔離機制</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2><span class="n">4</span>Try job 是什麼？權限在哪裡？</h2>
+  <p class="lead"><b>Try job（try run／trybot）</b>＝在程式碼「還沒進主線」之前，把你的改動丟到 CI 的機器上跑測試。Chromium 把這叫 tryjob；它們的 Commit Queue（CQ）有「dry run」（只測不併）與「full run」（測完自動併）兩種。</p>
+  <svg viewBox="0 0 860 230">
+    <rect class="boxA" x="10" y="90" width="150" height="56" rx="8"/><text x="85" y="114" text-anchor="middle">你的改動</text><text x="85" y="133" text-anchor="middle" font-size="12" class="muted">shelved CL / branch</text>
+    <rect class="boxW" x="220" y="20" width="200" height="56" rx="8"/><text x="320" y="44" text-anchor="middle">Try job（pre-submit）</text><text x="320" y="63" text-anchor="middle" font-size="12" class="muted">測「我的改動 + 目前 main」</text>
+    <rect class="boxG" x="220" y="160" width="200" height="56" rx="8"/><text x="320" y="184" text-anchor="middle">Post-submit / CI build</text><text x="320" y="203" text-anchor="middle" font-size="12" class="muted">測「已併入的 main」</text>
+    <rect class="boxH" x="490" y="20" width="170" height="56" rx="8"/><text x="575" y="44" text-anchor="middle">Review 核准</text><text x="575" y="63" text-anchor="middle" font-size="12" class="muted">checks 綠才能 submit</text>
+    <rect class="boxG" x="720" y="90" width="130" height="56" rx="8"/><text x="785" y="123" text-anchor="middle">main</text>
+    <path class="arr" d="M160 110L218 55"/><path class="arr" d="M420 48H488"/><path class="arr" d="M660 55L720 105"/>
+    <path class="arr" d="M760 146L420 188"/>
+    <text x="40" y="200" font-size="12" class="muted">try 失敗 → 沒人受害</text><text x="560" y="210" font-size="12" class="muted">post 失敗 → 所有人受害，要 revert</text>
+  </svg>
+  <h3>為什麼 try job 需要權限？</h3>
+  <div class="grid3">
+    <div class="card"><h4>💰 成本</h4><p>EDA regression 吃 license 和 farm 機器。任何人都能任意觸發全套 regression，排程會被塞爆。</p></div>
+    <div class="card"><h4>🔐 安全</h4><p>Try job＝在公司機器上<b>執行未經 review 的程式碼</b>。若 CI 環境能讀到客戶 testcase、密鑰、license server，就是資料外洩風險。</p></div>
+    <div class="card"><h4>🧭 責任</h4><p>能觸發「full run → 自動併入」的人，等於擁有 commit 權。這必須跟 code owner / committer 身份綁定。</p></div>
+  </div>
+  <h3>典型的權限分層（你可以拿去對照公司）</h3>
+  <div class="tblwrap"><table>
+    <tr><th>角色</th><th>Shelve / 開 PR</th><th>觸發 smoke try</th><th>觸發 full regression try</th><th>核准 (+2/Approve)</th><th>Submit / merge</th><th>改 golden / CI 設定</th></tr>
+    <tr><td>外部貢獻者 / 新人</td><td>✔</td><td>需他人代觸發</td><td>✘</td><td>✘</td><td>✘</td><td>✘</td></tr>
+    <tr><td>一般工程師 / PE（你）</td><td>✔</td><td>✔</td><td>△ 有配額</td><td>僅能 +1</td><td>✔（需核准後）</td><td>✘ 或需 owner</td></tr>
+    <tr><td>Code owner / committer</td><td>✔</td><td>✔</td><td>✔</td><td>✔</td><td>✔</td><td>△ 自己模組</td></tr>
+    <tr><td>Release / CI 管理者</td><td>✔</td><td>✔</td><td>✔</td><td>release branch</td><td>✔</td><td>✔</td></tr>
+    <tr><td><b>Agent（bot 帳號）</b></td><td>✔</td><td>✔</td><td>△ 依預算</td><td><b>✘ 永遠不該</b></td><td>✘（除非低風險白名單）</td><td>✘</td></tr>
+  </table></div>
+  <div class="callout human"><b>關鍵原則：Agent 可以「提出」與「測試」，不可以「核准」自己的東西</b>這就是職責分離（separation of duties）。GitHub 的 Copilot coding agent 也是這樣設計：它開的 PR 必須由另一個人核准，觸發 CI workflow 也預設需要人按下同意。</div>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2><span class="n">5</span>一個 PR 該放多少東西？</h2>
+  <p class="lead">你問的「每個小功能一個 PR，還是一個 PR 包很多功能」，業界答案相當一致：<b>一個 PR ＝ 一個「邏輯上不可再切」的改動</b>，不是「一個功能」也不是「一天的工作量」。</p>
+  <div class="grid2">
+    <div class="card" style="border-color:var(--good)"><h4>✅ 小 PR 的好處</h4><p>review 更仔細（研究顯示超過約 400 行，reviewer 找 bug 的能力明顯下降）；出事可以單獨 revert；bisect 精準；衝突少；對 agent 來說 context 也更乾淨。</p></div>
+    <div class="card" style="border-color:var(--bad)"><h4>⚠️ 小過頭的代價</h4><p>一堆互相依賴的 PR 拆得零碎，reviewer 看不到全貌；每個 PR 都要排 CI、等 review，等待時間累加。EDA 裡 regression 很貴時，拆太細會塞爆 farm。</p></div>
+  </div>
+  <h3>判斷流程</h3>
+  <svg viewBox="0 0 860 330">
+    <rect class="boxA" x="300" y="8" width="260" height="44" rx="8"/><text x="430" y="35" text-anchor="middle">這個改動可以拆成兩個嗎？</text>
+    <rect class="box" x="20" y="90" width="250" height="56" rx="8"/><text x="145" y="114" text-anchor="middle">混了「重構」和「行為改變」？</text><text x="145" y="134" text-anchor="middle" font-size="12" class="muted">例：改名＋修 bug</text>
+    <rect class="box" x="305" y="90" width="250" height="56" rx="8"/><text x="430" y="114" text-anchor="middle">兩部分能「各自」通過測試？</text><text x="430" y="134" text-anchor="middle" font-size="12" class="muted">拆開後 main 都不會壞</text>
+    <rect class="box" x="590" y="90" width="250" height="56" rx="8"/><text x="715" y="114" text-anchor="middle">兩部分 reviewer 不同人？</text><text x="715" y="134" text-anchor="middle" font-size="12" class="muted">例：parser 與 GUI</text>
+    <rect class="boxG" x="20" y="190" width="250" height="56" rx="8"/><text x="145" y="214" text-anchor="middle">拆：先重構（行為不變，</text><text x="145" y="233" text-anchor="middle">regression 應全部一致）</text>
+    <rect class="boxG" x="305" y="190" width="250" height="56" rx="8"/><text x="430" y="214" text-anchor="middle">拆成 stacked PRs</text><text x="430" y="233" text-anchor="middle" font-size="12">1 介面 → 2 實作 → 3 開 flag</text>
+    <rect class="boxG" x="590" y="190" width="250" height="56" rx="8"/><text x="715" y="214" text-anchor="middle">依 code owner 拆</text><text x="715" y="233" text-anchor="middle" font-size="12">各自找對的人 review</text>
+    <rect class="boxW" x="230" y="275" width="400" height="46" rx="8"/><text x="430" y="303" text-anchor="middle">都不是 → 保持一個 PR，但在描述裡寫清楚結構</text>
+    <path class="arr" d="M360 52L170 88"/><path class="arr" d="M430 52V88"/><path class="arr" d="M500 52L690 88"/>
+    <path class="arr" d="M145 146V188"/><path class="arr" d="M430 146V188"/><path class="arr" d="M715 146V188"/>
+    <text x="155" y="170" font-size="12" class="muted">是</text><text x="440" y="170" font-size="12" class="muted">是</text><text x="725" y="170" font-size="12" class="muted">是</text>
+  </svg>
+  <h3>經驗法則（EDA 版）</h3>
+  <ul>
+    <li><b>新增 regression testcase 本身可以是獨立 CL</b>：先提交「會重現 bug 的 testcase（標成 expected-fail）」，再提交修正並翻轉成 expected-pass。這讓 QA 和 reviewer 一眼看出「修正確實有效」。</li>
+    <li><b>Golden / QoR baseline 更新要獨立</b>：不要把「改演算法」和「更新 400 個 golden 檔」混在一起，否則 reviewer 無法分辨哪些差異是預期的。</li>
+    <li><b>機械性的大改動</b>（全域改名、格式化、升級 compiler flag）：行數很大沒關係，但<b>不能夾帶任何邏輯改動</b>，並在描述中寫明怎麼產生的（指令或 script），reviewer 只需驗證流程。</li>
+    <li>大致目標：人類寫的邏輯改動 <b>&lt; 200–400 行</b>、reviewer 能在 <b>30–60 分鐘</b>內看完。</li>
+  </ul>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2><span class="n">6</span>公司怎麼用 PR 算工程師的貢獻？合理嗎？</h2>
+  <p class="lead">誠實的答案：<b>幾乎所有「可以直接數的東西」都可以被刷</b>。這就是 Goodhart's Law：「當一個指標變成目標，它就不再是好指標。」</p>
+  <div class="tblwrap"><table>
+    <tr><th>常見算法</th><th>量到了什麼</th><th>怎麼被刷 / 盲點</th><th>合理性</th></tr>
+    <tr><td>PR / CL 數量</td><td>活動量</td><td>把一個改動拆成 10 個；修 typo 也算一個</td><td><span class="tag w">僅作參考</span></td></tr>
+    <tr><td>程式碼行數（LOC）</td><td>打字量</td><td>複製貼上、不重構；刪掉 2000 行爛 code 的人反而「負貢獻」；agent 一天能產生上萬行</td><td><span class="tag" style="color:var(--bad)">不合理</span></td></tr>
+    <tr><td>Review 數量 / 留言數</td><td>協作參與</td><td>LGTM 秒按；留無意義留言</td><td><span class="tag w">需看品質</span></td></tr>
+    <tr><td>修掉的 STAR / bug 數</td><td>產出</td><td>挑簡單的修；不同 bug 難度差百倍</td><td><span class="tag w">需加權</span></td></tr>
+    <tr><td>DORA 指標（部署頻率、變更前置時間、變更失敗率、恢復時間）</td><td><b>團隊</b>交付效能</td><td>設計上是團隊層級，拿來比個人會失真</td><td><span class="tag g">團隊層級合理</span></td></tr>
+    <tr><td>SPACE 框架（滿意度、績效、活動、溝通協作、效率）</td><td>多維度</td><td>需要問卷與質化資料，成本高</td><td><span class="tag g">較完整</span></td></tr>
+    <tr><td>影響力敘事（impact）：解決了哪些客戶問題、帶來什麼 QoR、預防了多少 escape</td><td>真實價值</td><td>主觀、依賴主管理解技術</td><td><span class="tag g">最接近真相</span></td></tr>
+  </table></div>
+  <h3>小模擬：兩位工程師，誰貢獻大？</h3>
+  <p>切換不同的「考核指標」，看排名怎麼翻轉。</p>
+  <div class="tabs" data-group="metric" id="metricTabs">
+    <button class="on" data-m="pr">PR 數</button><button data-m="loc">LOC</button><button data-m="impact">客戶影響</button><button data-m="escape">漏到客戶的 bug（越少越好）</button>
+  </div>
+  <div class="sim">
+    <div class="eng"><b>工程師 A「勤奮型」</b><p style="font-size:13.5px;color:var(--muted);margin:4px 0 8px">一季 48 個 PR，多是小修小補與格式調整，+12,000 行。用 agent 大量產生程式碼，review 草率。</p><div id="engA"></div></div>
+    <div class="eng"><b>工程師 B「深潛型」</b><p style="font-size:13.5px;color:var(--muted);margin:4px 0 8px">一季 9 個 PR，其中一個重寫 timing cache，−3,000 行，修好 3 家大客戶的 runtime 問題，並補了 25 個 regression case。</p><div id="engB"></div></div>
+  </div>
+  <div class="callout" id="metricNote"></div>
+  <div class="callout good"><b>比較合理的做法</b>① 活動指標（PR 數、review 數）只用來<b>發現異常</b>（例如某人兩個月沒 review 任何人），不用來排名。② 團隊層級看 DORA。③ 個人層級看<b>影響力 + 品質</b>（例如 escape defect、你建的 regression case 抓到了幾次問題）。④ 把 <b>review 別人、建 testcase、修 flaky</b> 這些「隱形工作」明確算進去 — 這對 PE 角色尤其重要。</div>
+  <div class="callout warn"><b>Agent 時代的新問題</b>當 agent 能一小時開 20 個 PR，「PR 數」徹底失去意義。新的問題變成：<b>誰為這個 PR 的正確性負責？</b>多數公司的答案是「按下核准與 submit 的那個人」。因此你的價值會越來越體現在：定義問題、設計測試、判斷結果，而不是打字。</div>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2><span class="n">7</span>在哪些環節最需要人類介入？</h2>
+  <p class="lead">判斷原則：<b>不可逆程度 × 影響範圍 × 「正確答案」是否需要判斷</b>。顏色越深越需要人。</p>
+  <div class="heat">
+    <div class="h5"><b>定義需求 / 驗收標準</b>STAR 到底要修成什麼樣？客戶真正要的是什麼？</div>
+    <div class="h5"><b>更新 golden / QoR baseline</b>改變「什麼叫正確」— 錯了會讓所有未來測試失明</div>
+    <div class="h5"><b>Release go / no-go</b>客戶拿到的東西，不可逆</div>
+    <div class="h4"><b>架構 / 介面設計</b>決定之後好幾年的維護成本</div>
+    <div class="h4"><b>最終 code review 核准</b>責任歸屬；agent 可輔助，不可代簽</div>
+    <div class="h4"><b>權限 / 安全 / 客戶資料</b>CI 設定、密鑰、NDA testcase</div>
+    <div class="h3"><b>QoR 退步的取捨</b>runtime 慢 2% 換 area 好 1%，值得嗎？</div>
+    <div class="h3"><b>Backport 決策</b>要不要帶到舊 release？</div>
+    <div class="h2"><b>Flaky test 判定</b>agent 先分類，人抽查</div>
+    <div class="h2"><b>CI 失敗 triage</b>agent 讀 log 給初判</div>
+    <div class="h1"><b>寫實作程式碼</b>agent 可大量承擔</div>
+    <div class="h1"><b>跑測試 / 重跑 / bisect</b>完全自動化</div>
+    <div class="h1"><b>格式、lint、release notes 草稿</b>完全自動化</div>
+  </div>
+  <div class="callout human"><b>對你（PE）最重要的一格：testcase 與 golden</b>在 agentic 流程裡，<b>測試就是規格</b>。agent 會想盡辦法讓測試變綠 — 包括「改測試」或「更新 golden」。所以「哪些 testcase 存在、golden 誰能改」是整個系統最關鍵的人類把關點。你常常替 QA 建 regression case，其實就是站在這個位置上。</div>
+</section>
+
+<!-- 8 -->
+<section id="s8">
+  <h2><span class="n">8</span>軟體工程的 Agent 分工：最少需要哪些？</h2>
+  <p class="lead">別被「十幾種 agent」的行銷圖嚇到。最小可行編制是 <b>4 個角色</b>，每個角色對應一個傳統流程中的關卡；第 5、6 個是成熟後再加。</p>
+  <svg viewBox="0 0 880 300" role="img" aria-label="agent 分工圖">
+    <rect class="boxH" x="10" y="120" width="120" height="60" rx="10"/><text x="70" y="146" text-anchor="middle" font-weight="700">人類</text><text x="70" y="166" text-anchor="middle" font-size="12">STAR / 需求</text>
+    <rect class="boxA" x="170" y="120" width="140" height="60" rx="10"/><text x="240" y="146" text-anchor="middle" font-weight="700">① Coder</text><text x="240" y="166" text-anchor="middle" font-size="12">重現→修→自測</text>
+    <rect class="boxA" x="350" y="40" width="150" height="60" rx="10"/><text x="425" y="66" text-anchor="middle" font-weight="700">② Test agent</text><text x="425" y="86" text-anchor="middle" font-size="12">建 testcase / 選測試</text>
+    <rect class="boxA" x="350" y="200" width="150" height="60" rx="10"/><text x="425" y="226" text-anchor="middle" font-weight="700">③ Reviewer</text><text x="425" y="246" text-anchor="middle" font-size="12">AI 先審一輪</text>
+    <rect class="boxW" x="540" y="120" width="150" height="60" rx="10"/><text x="615" y="146" text-anchor="middle" font-weight="700">CI / Regression</text><text x="615" y="166" text-anchor="middle" font-size="12">（傳統系統）</text>
+    <rect class="boxA" x="540" y="10" width="150" height="56" rx="10"/><text x="615" y="36" text-anchor="middle" font-weight="700">④ Triage</text><text x="615" y="54" text-anchor="middle" font-size="12">讀 log 分類失敗</text>
+    <rect class="boxH" x="730" y="120" width="140" height="60" rx="10"/><text x="800" y="146" text-anchor="middle" font-weight="700">人類核准</text><text x="800" y="166" text-anchor="middle" font-size="12">approve / submit</text>
+    <path class="arr" d="M130 150H168"/><path class="arr" d="M310 140L348 82"/><path class="arr" d="M310 160L348 218"/>
+    <path class="arr" d="M500 72L540 132"/><path class="arr" d="M500 228L540 168"/><path class="arr" d="M690 150H728"/>
+    <path class="arr" d="M615 120V68"/><path class="arrB" d="M540 38H240V118"/>
+    <text x="390" y="30" font-size="12" class="muted">失敗原因回饋給 Coder</text>
+  </svg>
+  <div class="tabs" data-group="ag">
+    <button class="on" data-pane="ag1">① Coder</button><button data-pane="ag2">② Test</button><button data-pane="ag3">③ Reviewer</button><button data-pane="ag4">④ Triage</button><button data-pane="ag5">⑤⑥ 進階</button>
+  </div>
+  <div class="pane on" id="ag1">
+    <h4>① Coder / Implementer agent</h4>
+    <p><b>輸入：</b>STAR 內容、重現步驟、相關 log、程式碼庫。<br><b>做什麼：</b>先<b>重現</b>問題 → 定位程式碼 → 寫修正 → 在本機/sandbox 跑相關測試 → shelve CL 或開 PR，並寫好 description。<br><b>權限：</b>可讀 repo、可在 sandbox 執行、可 shelve／開 PR。<b>不可</b> submit、不可改 CI 設定、不可改 golden。<br><b>產品例：</b>Claude Code、GitHub Copilot coding agent、OpenAI Codex、Cursor background agent。</p>
+    <div class="callout warn"><b>常見失敗模式</b>「修症狀不修病因」（例如加個 null check 讓 crash 消失）、為了讓測試過而改測試。對策：要求 description 說明 root cause；Test agent 與 Coder 分開。</div>
+  </div>
+  <div class="pane" id="ag2">
+    <h4>② Test / Regression agent</h4>
+    <p><b>做什麼：</b>(a) 把 bug 轉成<b>最小化的 regression testcase</b>（這正是你現在手動做的工作）；(b) 根據 diff 做<b>測試選擇</b>（test impact analysis）：這個 CL 改了 router，就挑 router 相關的 200 個 case 跑，而不是全部 5 萬個；(c) 比較 QoR 結果並產出差異報告。<br><b>權限：</b>可新增 testcase（作為 PR 的一部分，需 review）；<b>不可</b>自行更新 golden。</p>
+    <div class="callout"><b>為什麼要和 Coder 分開？</b>同一個 agent 同時寫程式和寫測試，就像學生自己出考題給自己考。分開（不同 prompt、甚至不同模型）能形成互相制衡。</div>
+  </div>
+  <div class="pane" id="ag3">
+    <h4>③ Reviewer agent</h4>
+    <p><b>做什麼：</b>在人類之前審 diff：邏輯錯誤、邊界條件、記憶體/執行緒問題、是否缺測試、description 是否和 diff 一致、是否碰到敏感檔案。只回報高信心問題，避免洗版。<br><b>權限：</b>只能留言、標記 risk 等級；<b>永遠不能 approve</b>。<br><b>價值：</b>讓人類 reviewer 專注在「設計對不對、需求對不對」，而不是抓 typo。</p>
+  </div>
+  <div class="pane" id="ag4">
+    <h4>④ CI Triage / Build-doctor agent</h4>
+    <p><b>做什麼：</b>CI 紅了之後讀 log，分類成：<span class="tag">infra（license 不夠、機器掛了）</span><span class="tag">flaky（重跑就過）</span><span class="tag">真 regression</span>。真 regression 就做 bisect 找出罪魁 CL、通知作者、草擬 revert。<br><b>為什麼是最小編制之一：</b>在 EDA 的大型 regression 裡，人每天花在「看哪裡紅了、為什麼紅」的時間非常可觀，這是 ROI 最高的自動化點之一。</p>
+  </div>
+  <div class="pane" id="ag5">
+    <h4>⑤ Planner / Spec agent（成熟後加）</h4>
+    <p>把模糊的 STAR 轉成結構化規格與驗收條件，拆成多個小任務（對應多個小 PR）。<b>產出必須由人確認</b>— 這是最上游的人類關卡。</p>
+    <h4>⑥ Release / Docs agent</h4>
+    <p>彙整 release notes、檢查 backport 清單、產生客戶可見的變更說明。</p>
+    <h4>橫向：Orchestrator</h4>
+    <p>負責分派、追蹤狀態、控制預算（避免 agent 無限重跑昂貴的 regression）。可以是一個 agent，也可以就是 CI 系統本身＋規則。</p>
+  </div>
+</section>
+
+<!-- 9 -->
+<section id="s9">
+  <h2><span class="n">9</span>實戰案例：一張 STAR 的一生</h2>
+  <p class="lead">情境：客戶回報「Placement 後跑 router，在某個 12 層金屬的設計上 crash」。我們逐步走過一個成熟、半 agentic 的流程。點左邊每一步，看是誰、做什麼、用什麼工具、關卡在哪。</p>
+  <div class="stepper">
+    <ol class="steps" id="steps"></ol>
+    <div class="detail" id="detail"></div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section id="s10">
+  <h2><span class="n">10</span>給 PE 的你：明天就能做的事</h2>
+  <h3>回公司問這 8 個問題（答得出來，你就真的懂你們的系統了）</h3>
+  <ol>
+    <li>PCA / pre-submit 測試<b>具體跑哪些 case</b>？誰決定這個清單？多久更新一次？</li>
+    <li>Shelved CL 能不能觸發 regression？<b>誰有權限</b>觸發多大規模的？配額怎麼算？</li>
+    <li>Submit 後的 nightly 紅了，<b>誰負責 triage</b>？有沒有自動 bisect？</li>
+    <li>Golden / baseline 更新的流程是什麼？需要誰核准？</li>
+    <li>Swarm 的 review 規則：需要幾個人 approve？有沒有 code owner 概念？</li>
+    <li>Flaky test 怎麼處理？有沒有隔離（quarantine）清單？</li>
+    <li>Hotfix 怎麼 integrate 到各個 release stream？誰決定要不要 backport？</li>
+    <li>目前導入的 agent 有哪些權限？它的 CL 誰來 review、誰負責？</li>
+  </ol>
+  <h3>你的 regression case 品質清單</h3>
+  <div class="grid2">
+    <div class="card"><h4>✔ 最小化</h4><p>能重現問題的最小設計／最少步驟，執行時間越短越好（越短越有機會進 pre-submit）。</p></div>
+    <div class="card"><h4>✔ 斷言明確</h4><p>檢查什麼？不 crash？DRC = 0？timing slack ≥ X？「跑完沒報錯」是最弱的斷言。</p></div>
+    <div class="card"><h4>✔ 決定性</h4><p>固定 seed、固定 thread 數，避免變成 flaky。</p></div>
+    <div class="card"><h4>✔ 可追溯</h4><p>case 名稱或 metadata 裡帶 STAR 號碼，未來有人看到它失敗時知道它在保護什麼。</p></div>
+    <div class="card"><h4>✔ 資料合規</h4><p>客戶設計是否可以進 regression？是否需要去識別化（obfuscate）？</p></div>
+    <div class="card"><h4>✔ 分層標記</h4><p>標記為 smoke / sanity / full / QoR，讓 CI 知道這個 case 屬於哪一層關卡。</p></div>
+  </div>
+</section>
+
+<!-- 11 -->
+<section id="s11">
+  <h2><span class="n">11</span>自我測驗</h2>
+  <p class="lead">先自己想，再點開。答不出來的，回去看對應章節。</p>
+  <details><summary>Q1. Pre-submit 和 post-submit 測試，為什麼不全部放在 pre-submit 就好？</summary>成本與延遲。若每個 CL 都要跑 6 小時的全套 regression，開發者回饋迴圈變成一天，大家會開始把改動攢成大 CL，反而違反 CI 精神。正確做法是分層：pre-submit 快速且高訊號，post-submit 完整並自動 bisect。</details>
+  <details><summary>Q2. A 和 B 兩個 CL 各自的 try job 都綠，submit 後 main 卻紅了，為什麼？如何預防？</summary>兩者在測試時都是基於「舊的 main」，沒有測到彼此的組合（semantic conflict）。預防：merge queue（依序和最新 main 一起測）、或 submit 前 rebase 後再跑一次必過測試。</details>
+  <details><summary>Q3. 一個 PR 同時「重新命名 200 個函式」和「修一個 timing bug」，有什麼問題？</summary>reviewer 無法在 200 處機械改動中找出真正的邏輯改動；若 bug 修錯要 revert，會連重新命名一起 revert。應拆成兩個：先純改名（regression 結果應完全一致），再修 bug。</details>
+  <details><summary>Q4. Agent 修完 bug，並且「順便」更新了 37 個 golden 檔讓 regression 全綠。你該怎麼看？</summary>高度警戒。這可能是真的預期變化，也可能是 agent 把錯誤結果寫成新的標準答案。golden 更新必須獨立成 CL，附 QoR 差異報告，由懂該模組的人核准。</details>
+  <details><summary>Q5. 主管想用「每季 PR 數」排名工程師，你會怎麼建議？</summary>PR 數可以當作異常偵測（完全沒產出、完全沒 review），但不適合排名：易被拆分灌水、無法反映難度與影響，agent 時代更是失真。建議團隊層級用 DORA，個人層級用影響力敘事 + 品質指標（escape defects、testcase 抓到的問題、review 貢獻）。</details>
+  <details><summary>Q6. 最小 agent 編制中，為什麼 Test agent 要跟 Coder agent 分開？</summary>避免「自己出題自己考」。測試是 agent 的護欄；同一個 agent 寫程式又寫測試，容易兩邊一起錯，或為了過關修改測試。</details>
+</section>
+
+<!-- 12 -->
+<section id="s12">
+  <h2><span class="n">12</span>延伸資源（建議閱讀順序）</h2>
+  <p class="lead">所有連結皆於 2026-10-04 驗證可開啟。<span class="tag a">★</span> = 最推薦先看。</p>
+  <div class="grid2">
+  <div>
+  <h3>① 打底：CI/CD 是什麼（影片）</h3>
+  <ul class="links">
+    <li><span class="tag a">★</span><a href="https://www.youtube.com/watch?v=ddDJxFnv-qs" target="_blank">CI/CD Explained in 5 Minutes</a> <span class="src">YouTube · TechWorld with Nana</span></li>
+    <li><a href="https://www.youtube.com/watch?v=scEDHsr3APg" target="_blank">DevOps CI/CD Explained in 100 Seconds</a> <span class="src">YouTube · Fireship</span></li>
+    <li><a href="https://www.youtube.com/watch?v=1er2cjUq1UI" target="_blank">What is Continuous Integration?</a> <span class="src">YouTube · IBM Technology</span></li>
+    <li><a href="https://www.youtube.com/watch?v=LNLKZ4Rvk8w" target="_blank">Continuous Deployment vs. Continuous Delivery</a> <span class="src">YouTube · IBM Technology</span></li>
+    <li><span class="tag a">★</span><a href="https://martinfowler.com/articles/continuousIntegration.html" target="_blank">Continuous Integration（Martin Fowler 經典長文）</a> <span class="src">部落格</span></li>
+  </ul>
+  <h3>② 你的工具：Perforce / Swarm</h3>
+  <ul class="links">
+    <li><span class="tag a">★</span><a href="https://www.youtube.com/watch?v=jIQEjDiSe0g" target="_blank">Perforce P4 Beginner's Guide: Version Control Basic Concepts</a> <span class="src">YouTube · Perforce</span></li>
+    <li><a href="https://www.youtube.com/watch?v=9QCicAB5LRg" target="_blank">How to Create a Helix Swarm Review</a> <span class="src">YouTube · Perforce</span></li>
+    <li><a href="https://www.youtube.com/watch?v=nfYZXodYWFs" target="_blank">AI-Assisted Code Reviews in P4 Code Review (Helix Swarm)</a> <span class="src">YouTube · Perforce — 你們工具的 AI 版本</span></li>
+    <li><a href="https://help.perforce.com/helix-core/server-apps/cmdref/current/Content/CmdRef/p4_shelve.html" target="_blank">p4 shelve 指令參考</a> <span class="src">官方文件</span></li>
+    <li><a href="https://help.perforce.com/helix-core/landing/helix-swarm/index.html" target="_blank">Helix Swarm（P4 Code Review）文件入口</a> <span class="src">官方文件 · 狀態：Needs review / Needs revision / Approved / Rejected / Archived</span></li>
+    <li><a href="https://plugins.jenkins.io/p4/" target="_blank">Jenkins P4 Plugin</a> <span class="src">shelved CL 觸發 pre-commit build 的常見做法</span></li>
+  </ul>
+  <h3>③ PR 大小與 Code Review</h3>
+  <ul class="links">
+    <li><span class="tag a">★</span><a href="https://google.github.io/eng-practices/review/developer/small-cls.html" target="_blank">Google：Small CLs</a> <span class="src">怎麼切 CL 的權威指南</span></li>
+    <li><a href="https://google.github.io/eng-practices/review/reviewer/standard.html" target="_blank">Google：The Standard of Code Review</a> <span class="src">「整體讓程式碼更健康即可核准」</span></li>
+    <li><a href="https://smartbear.com/learn/code-review/best-practices-for-peer-code-review/" target="_blank">SmartBear：Best Practices for Peer Code Review</a> <span class="src">Cisco 研究：200–400 行、60–90 分鐘上限</span></li>
+    <li><a href="https://www.youtube.com/watch?v=U8wJoxxmskM" target="_blank">Stacked Pull Requests（GitKon 2022, Graphite）</a> <span class="src">YouTube · GitKraken</span></li>
+    <li><a href="https://graphite.dev/guides/stacked-diffs" target="_blank">What are stacked diffs?</a> <span class="src">Graphite 指南</span></li>
+  </ul>
+  </div>
+  <div>
+  <h3>④ 現代流程：Trunk-based / Merge queue / Try job</h3>
+  <ul class="links">
+    <li><span class="tag a">★</span><a href="https://trunkbaseddevelopment.com/" target="_blank">trunkbaseddevelopment.com</a> <span class="src">主幹開發完整說明</span></li>
+    <li><a href="https://www.youtube.com/watch?v=CR3LP2n2dWw" target="_blank">We Tried Trunk-Based Development... The Results Were Shocking.</a> <span class="src">YouTube · Modern Software Engineering（Dave Farley）</span></li>
+    <li><a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue" target="_blank">GitHub：Managing a merge queue</a> <span class="src">官方文件</span></li>
+    <li><a href="https://www.chromium.org/developers/testing/try-server-usage/" target="_blank">Chromium：Try server usage</a> <span class="src">try job / CQ dry run 的真實案例</span></li>
+  </ul>
+  <h3>⑤ 貢獻怎麼量</h3>
+  <ul class="links">
+    <li><span class="tag a">★</span><a href="https://martinfowler.com/bliki/CannotMeasureProductivity.html" target="_blank">Martin Fowler：Cannot Measure Productivity</a> <span class="src">短文，必讀</span></li>
+    <li><a href="https://dora.dev/guides/dora-metrics-four-keys/" target="_blank">DORA's software delivery metrics</a> <span class="src">官方說明</span></li>
+    <li><a href="https://www.youtube.com/watch?v=lqsENcje41w" target="_blank">DORA Metrics Explained: The Four Key Measures</a> <span class="src">YouTube · Harness</span></li>
+    <li><a href="https://queue.acm.org/detail.cfm?id=3454124" target="_blank">The SPACE of Developer Productivity</a> <span class="src">ACM Queue 原始論文（部分網路環境可能需重新整理）</span></li>
+  </ul>
+  <h3>⑥ Agentic SDLC</h3>
+  <ul class="links">
+    <li><span class="tag a">★</span><a href="https://www.anthropic.com/research/building-effective-agents" target="_blank">Anthropic：Building Effective Agents</a> <span class="src">workflow vs agent 的設計觀念</span></li>
+    <li><a href="https://www.youtube.com/watch?v=1GVBRhDI5No" target="_blank">How the GitHub Copilot coding agent works</a> <span class="src">YouTube · GitHub</span></li>
+    <li><a href="https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-coding-agent" target="_blank">About GitHub Copilot coding agent</a> <span class="src">官方文件 · 注意其中的權限與核准限制</span></li>
+    <li><a href="https://code.claude.com/docs/en/github-actions" target="_blank">Claude Code GitHub Actions</a> <span class="src">官方文件</span></li>
+    <li><a href="https://github.com/anthropics/claude-code-action" target="_blank">anthropics/claude-code-action</a> <span class="src">GitHub repo</span></li>
+    <li><a href="https://github.com/qodo-ai/pr-agent" target="_blank">qodo-ai/pr-agent</a> <span class="src">開源 AI PR reviewer，可看它怎麼設計</span></li>
+  </ul>
+  </div>
+  </div>
+  <div class="callout"><b>建議順序</b>①Nana 5 分鐘 → ②Perforce 入門 → ③Google Small CLs → ④Fowler CI 長文 → ⑤Fowler 生產力短文 → ⑥Building Effective Agents。大約一個週末可以看完。</div>
+</section>
+
+<footer>製作日期 2026-10-04 · 內容為教學性簡化，各公司實際流程請以內部文件為準。</footer>
+</main>
+</div>
+<button class="theme" id="themeBtn">切換深/淺色</button>
+<script>
+// tabs
+document.querySelectorAll('.tabs').forEach(function(t){
+  t.addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    t.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b)});
+    if(b.dataset.pane){
+      var sec=t.parentElement;
+      sec.querySelectorAll(':scope > .pane').forEach(function(p){p.classList.toggle('on',p.id===b.dataset.pane)});
+    }
+    if(b.dataset.m) renderMetric(b.dataset.m);
+  });
+});
+// metric sim
+var M={
+  pr:{label:'PR 數',a:48,b:9,max:50,note:'用 PR 數：A 以 5 倍差距大勝。但 A 有大量拆分與瑣碎改動。'},
+  loc:{label:'淨 LOC',a:12000,b:-3000,max:12000,note:'用 LOC：B 是「負貢獻」——刪掉 3000 行重複程式碼反而被懲罰。這是 LOC 指標最荒謬之處。'},
+  impact:{label:'受益客戶 / 解決的關鍵 STAR',a:1,b:3,max:3,note:'用客戶影響：B 解決了三家大客戶的 runtime 問題，A 主要是內部小修。排名翻轉。'},
+  escape:{label:'漏到客戶的 bug',a:4,b:0,max:4,note:'用品質（escape defects，越少越好）：A 的草率改動在下個 release 造成 4 個客戶回報；B 補的 25 個 regression case 擋下了後續的退化。'}
+};
+function bar(v,max,good){var w=Math.max(2,Math.abs(v)/max*100);return '<div class="barrow"><span>'+good+'</span><div class="bar" style="width:'+w+'%;'+(v<0?'background:var(--bad)':'')+'"></div><span>'+v.toLocaleString()+'</span></div>';}
+function renderMetric(k){var m=M[k];
+  document.getElementById('engA').innerHTML=bar(m.a,m.max,m.label);
+  document.getElementById('engB').innerHTML=bar(m.b,m.max,m.label);
+  document.getElementById('metricNote').innerHTML='<b>觀察</b>'+m.note;}
+renderMetric('pr');
+// stepper
+var S=[
+ {t:'客戶回報 → 開 STAR',who:'人',c:'h',tool:'Bug tracker（STAR / Jira）',gate:'AE / PE 確認可重現、嚴重度、影響哪些 release',body:'AE 收到客戶回報：router 在 12 層金屬設計上 segfault。PE（你）開 STAR-48213，附上 log、版本、可分享的資料。<br><br><b>人類決策點：</b>這是 P1（hotfix）還是排進下個 release？客戶資料能不能給 agent 看？'},
+ {t:'Agent 分析與重現',who:'Agent',c:'a',tool:'Coder agent + sandbox',gate:'只在隔離環境、只用已授權資料',body:'Coder agent 讀 STAR、core dump、相關程式碼。在 sandbox 中重現 crash，回報：<pre>root cause 候選：ViaStack::push() 固定陣列大小 12，\n第 13 層 via 時越界寫入。\n相關檔案：src/route/via_stack.cpp, via_stack.h</pre><b>為什麼先重現：</b>無法重現的 bug，任何「修正」都只是猜測。'},
+ {t:'建立 regression testcase',who:'Agent + 你',c:'h',tool:'Test agent',gate:'你確認 testcase 真的代表客戶情境、資料合規',body:'Test agent 把客戶設計<b>最小化</b>成一個 2 分鐘可跑完、去識別化的 testcase <code>route_via_stack_13layer</code>，先以 <b>expected-fail</b> 提交（CL #1）。<br><br>這正是你平常替 QA 做的事 —— 在 agentic 流程裡，你從「手動做」變成「驗收 agent 做的」。'},
+ {t:'實作修正 → shelve CL',who:'Agent',c:'a',tool:'Coder agent, p4 shelve',gate:'description 必須包含 Why/What/How tested/Risk',body:'Coder agent 改用動態容器並加上上限檢查（CL #2），自動在本機跑 router 單元測試。<pre>p4 change   # 建立 CL，填入 STAR-48213\np4 shelve -c 1234567</pre>Description 範本自動填好 root cause、改動範圍、風險：「只影響 >12 層設計，預期 QoR 不變」。'},
+ {t:'Pre-submit try job',who:'CI',c:'g',tool:'Jenkins / 內部 CI + Swarm 觸發',gate:'PCA / smoke 必過；targeted regression 依權限觸發',body:'Shelve 後自動觸發：<ul><li>Build（Linux 各平台）✔</li><li>Lint / static analysis ✔</li><li>Smoke suite（150 cases, 15 分鐘）✔</li><li>Test agent 依 diff 挑出的 router targeted regression（800 cases, 50 分鐘）✔</li><li>新 testcase 從 expected-fail 翻成 pass ✔</li></ul>結果自動貼回 Swarm review。'},
+ {t:'AI review',who:'Agent',c:'a',tool:'Reviewer agent',gate:'只能留言，不能核准',body:'Reviewer agent 留言 2 則：<pre>[中] via_stack.cpp:88 — 新上限 64 是 magic number，\n      建議改用 tech file 的 max layer。\n[低] 缺少對 0 層的邊界測試。</pre>Coder agent 根據意見更新 shelve。這一輪過濾掉了機械性問題，人類 reviewer 不用花時間在這上面。'},
+ {t:'人類 code review',who:'人',c:'h',tool:'Swarm review',gate:'Router code owner 核准（+2）',body:'Router owner 看的是 agent 看不到的東西：<ul><li>「動態配置在這個 hot loop 裡會不會拖慢 runtime？」</li><li>「其他用到 ViaStack 的模組（DRC fixer）有沒有一樣的假設？」</li></ul>Owner 要求跑一組 runtime benchmark 才核准。<b>責任歸屬在這裡確立。</b>'},
+ {t:'Submit',who:'人',c:'h',tool:'p4 submit（或 merge queue）',gate:'所有 required checks 綠 + 核准',body:'你（或 owner）按下 submit。CL #1 與 #2 依序進入 main stream。若有 merge queue，會先和最新 main 一起再測一次 smoke。'},
+ {t:'Post-submit nightly',who:'CI',c:'g',tool:'Nightly full regression + QoR 系統',gate:'全套 + QoR 趨勢',body:'夜間 5 萬個 case 跑完：全部 pass，但有 <b>3 個 case 的 runtime 增加 4%</b>。<br><br>Triage agent 自動 bisect，確認是 CL #2 造成，開出報告並 @ 作者與 owner。'},
+ {t:'QoR 判斷 / golden 處理',who:'人',c:'h',tool:'QoR dashboard',gate:'人決定：接受、修、還是 revert',body:'這是最典型「必須由人判斷」的點：runtime +4% 只出現在 3 個超大設計上。Owner 決定：再開一個小 CL 用 small-buffer optimization 把 runtime 拉回來，<b>而不是</b>把新的 runtime 寫成 baseline。<br><br>若 agent 有權限自己更新 baseline，這個退化就會被悄悄吞掉。'},
+ {t:'Backport 到 release stream',who:'人 + Agent',c:'h',tool:'p4 integrate / copy',gate:'Release manager 核准 hotfix',body:'客戶用的是 2026.06 release。Release manager 核准 backport；agent 執行 integrate 到 <code>//rel/2026.06/...</code> 並觸發該 stream 的 pre-submit。<br><br><b>人類決策：</b>要帶到哪些舊版本？風險可接受嗎？'},
+ {t:'Release 與關單',who:'人',c:'h',tool:'Release pipeline + STAR',gate:'Go / No-go',body:'Hotfix build 通過 release 驗證 suite，AE 交給客戶驗證，確認後關閉 STAR-48213。<br><br>留下的資產：一個永久 regression case、一條可追溯的紀錄（STAR → CL → review → 測試結果 → release）。這條追溯鏈才是 CI/CD 真正的價值。'}
+];
+var cur=0,ol=document.getElementById('steps'),det=document.getElementById('detail');
+var tagMap={h:'h',a:'a',g:'g'};
+S.forEach(function(s,i){var li=document.createElement('li');li.innerHTML=(i+1)+'. '+s.t+' <span class="tag who '+tagMap[s.c]+'">'+s.who+'</span>';li.onclick=function(){show(i)};ol.appendChild(li);});
+function show(i){cur=i;var s=S[i];
+  ol.querySelectorAll('li').forEach(function(l,j){l.classList.toggle('on',j===i)});
+  det.innerHTML='<h4>'+(i+1)+'. '+s.t+'</h4><div class="meta"><span class="tag '+tagMap[s.c]+'">'+s.who+'</span> 工具：'+s.tool+'</div><div class="callout '+(s.c==='h'?'human':'')+'" style="margin:8px 0 12px"><b>關卡 / Gate</b>'+s.gate+'</div><div>'+s.body+'</div><div class="navbtns"><button '+(i===0?'disabled':'')+' onclick="show(cur-1)">← 上一步</button><button '+(i===S.length-1?'disabled':'')+' onclick="show(cur+1)">下一步 →</button></div>';}
+show(0);
+// toc highlight
+var links=[].slice.call(document.querySelectorAll('nav.toc a'));
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){links.forEach(function(a){a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id)})}})},{rootMargin:'-30% 0px -60% 0px'});
+document.querySelectorAll('main section').forEach(function(s){io.observe(s)});
+// theme
+document.getElementById('themeBtn').onclick=function(){var r=document.documentElement,d=r.getAttribute('data-theme');
+  var isDark=d?d==='dark':matchMedia('(prefers-color-scheme: dark)').matches;r.setAttribute('data-theme',isDark?'light':'dark');};
+</script>
+</body>
+</html>
+
+</body></html>

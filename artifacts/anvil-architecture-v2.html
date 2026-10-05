@@ -1,0 +1,652 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>anvil 架構 v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root {
+    --ground:    #F6F8FA;
+    --surface:   #FFFFFF;
+    --surface-2: #EEF2F5;
+    --ink:       #16202B;
+    --ink-soft:  #56646F;
+    --ink-faint: #8593A0;
+    --rule:      #DCE3E9;
+    --rule-hard: #B9C4CD;
+    --steel:     #12697A;
+    --steel-bg:  #E2F0F2;
+    --ember:     #A84A16;
+    --ember-bg:  #F8EAE0;
+    --alert:     #8C2F39;
+    --alert-bg:  #F7E7E8;
+
+    --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --body: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+
+    --measure: 66ch;
+    --shell: 1180px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:    #0D1318;
+      --surface:   #151D24;
+      --surface-2: #1C262F;
+      --ink:       #E3EAEF;
+      --ink-soft:  #95A3B0;
+      --ink-faint: #6C7B88;
+      --rule:      #263039;
+      --rule-hard: #3A4854;
+      --steel:     #57B8C8;
+      --steel-bg:  #10323A;
+      --ember:     #E0904F;
+      --ember-bg:  #3A2413;
+      --alert:     #DE8189;
+      --alert-bg:  #3A1B1F;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:    #0D1318;
+    --surface:   #151D24;
+    --surface-2: #1C262F;
+    --ink:       #E3EAEF;
+    --ink-soft:  #95A3B0;
+    --ink-faint: #6C7B88;
+    --rule:      #263039;
+    --rule-hard: #3A4854;
+    --steel:     #57B8C8;
+    --steel-bg:  #10323A;
+    --ember:     #E0904F;
+    --ember-bg:  #3A2413;
+    --alert:     #DE8189;
+    --alert-bg:  #3A1B1F;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16.5px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .shell { max-width: var(--shell); margin: 0 auto; padding: 0 28px 120px; }
+
+  /* masthead */
+  .mast { border-bottom: 2px solid var(--ink); padding: 64px 0 22px; margin-bottom: 40px; }
+  .mast-eyebrow {
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--ember); margin-bottom: 20px;
+  }
+  .mast h1 {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(2.5rem, 6vw, 3.9rem); line-height: .98;
+    letter-spacing: -.028em; margin: 0; text-wrap: balance;
+  }
+  .mast .lede {
+    display: block; font-family: var(--body); font-weight: 500;
+    font-size: clamp(1.02rem, 2.3vw, 1.32rem); letter-spacing: .01em;
+    line-height: 1.45; color: var(--ink-soft); margin-top: 18px; max-width: 62ch;
+  }
+  .mast-meta {
+    display: flex; flex-wrap: wrap; gap: 8px 26px;
+    font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 26px;
+  }
+  .mast-meta b { color: var(--ink-soft); font-weight: 500; }
+
+  /* thesis strip */
+  .thesis {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+    background: var(--rule-hard); border: 1px solid var(--rule-hard);
+    border-radius: 3px; margin-bottom: 56px; overflow: hidden;
+  }
+  .thesis > div { background: var(--surface); padding: 22px 24px; }
+  .thesis .ver {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .14em;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  .thesis .old .ver { color: var(--ink-faint); }
+  .thesis .new .ver { color: var(--ember); }
+  .thesis .flow {
+    font-family: var(--display); font-weight: 600; font-size: 1.12rem;
+    line-height: 1.4; letter-spacing: -.01em; margin-bottom: 10px;
+  }
+  .thesis .old .flow { color: var(--ink-faint); }
+  .thesis .gloss { font-size: 14.5px; color: var(--ink-soft); line-height: 1.6; }
+
+  /* sections */
+  section { margin-bottom: 72px; scroll-margin-top: 24px; }
+  .sec-head {
+    display: grid; grid-template-columns: 62px 1fr; align-items: start; gap: 0 18px;
+    border-top: 1px solid var(--rule-hard); padding-top: 16px; margin-bottom: 28px;
+  }
+  .sec-num {
+    font-family: var(--mono); font-size: 13px; font-weight: 500;
+    color: var(--ember); padding-top: .45em; letter-spacing: .04em;
+  }
+  .sec-head h2 {
+    font-family: var(--display); font-weight: 600;
+    font-size: clamp(1.42rem, 2.9vw, 1.9rem); line-height: 1.18;
+    letter-spacing: -.016em; margin: 0; text-wrap: balance;
+  }
+  .sec-head .dek {
+    grid-column: 2; color: var(--ink-soft); font-size: 15.5px;
+    margin: 10px 0 0; max-width: var(--measure);
+  }
+
+  .body-col { max-width: var(--measure); }
+  .body-col > * + * { margin-top: 1.05em; }
+  p { margin: 0; }
+
+  h3 {
+    font-family: var(--display); font-weight: 600; font-size: 1.1rem;
+    letter-spacing: -.008em; margin: 40px 0 14px;
+  }
+  h3 .mark {
+    font-family: var(--mono); font-size: .74em; font-weight: 400;
+    color: var(--ink-faint); margin-right: .6em;
+  }
+  strong { font-weight: 700; }
+  code {
+    font-family: var(--mono); font-size: .875em; background: var(--surface-2);
+    padding: .1em .38em; border-radius: 2px;
+  }
+  a { color: var(--steel); text-underline-offset: 2px; }
+  a:focus-visible { outline: 2px solid var(--ember); outline-offset: 3px; }
+  ul.tight { margin: 0; padding-left: 1.25em; }
+  ul.tight li + li { margin-top: .45em; }
+
+  /* tables */
+  .scroller {
+    overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px;
+    background: var(--surface); margin: 4px 0;
+  }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14.5px; }
+  caption {
+    text-align: left; font-family: var(--mono); font-size: 11.5px;
+    letter-spacing: .08em; text-transform: uppercase;
+    color: var(--ink-faint); padding: 12px 16px 0;
+  }
+  th, td {
+    text-align: left; padding: 11px 16px;
+    border-bottom: 1px solid var(--rule); vertical-align: top; line-height: 1.6;
+  }
+  thead th {
+    font-family: var(--mono); font-size: 11.5px; font-weight: 500;
+    letter-spacing: .07em; text-transform: uppercase; color: var(--ink-faint);
+    background: var(--surface-2); border-bottom: 1px solid var(--rule-hard); white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.no { color: var(--alert); font-family: var(--mono); font-size: 12.5px; white-space: nowrap; }
+  td.yes { color: var(--steel); font-family: var(--mono); font-size: 12.5px; white-space: nowrap; }
+
+  /* rounds */
+  .rounds { display: flex; flex-direction: column; gap: 12px; margin: 4px 0; }
+  .round {
+    display: grid; grid-template-columns: 96px 1fr; gap: 0 20px;
+    border: 1px solid var(--rule); border-left: 4px solid var(--rule-hard);
+    border-radius: 3px; background: var(--surface); padding: 18px 20px;
+  }
+  .round.r2 { border-left-color: var(--steel); }
+  .round.r3 { border-left-color: var(--alert); }
+  .round .n {
+    font-family: var(--mono); font-size: 12px; letter-spacing: .06em;
+    color: var(--ink-faint); text-transform: uppercase;
+  }
+  .round .how { font-weight: 700; margin-bottom: 6px; }
+  .round .got { color: var(--ink-soft); font-size: 15px; line-height: 1.6; }
+  @media (max-width: 680px) {
+    .round { grid-template-columns: 1fr; gap: 6px; }
+  }
+
+  /* loop diagram */
+  .loops {
+    border: 1px solid var(--rule); border-radius: 3px;
+    background: var(--surface); padding: 26px 24px; margin: 4px 0;
+    overflow-x: auto;
+  }
+  .loop-row { display: flex; align-items: stretch; gap: 10px; min-width: 620px; }
+  .node {
+    flex: 1 1 0; border: 1px solid var(--rule-hard); border-radius: 3px;
+    background: var(--surface-2); padding: 13px 12px; text-align: center;
+  }
+  .node .st {
+    font-family: var(--mono); font-size: 11px; color: var(--ink-faint);
+    letter-spacing: .06em; display: block; margin-bottom: 4px;
+  }
+  .node .nm {
+    font-family: var(--display); font-weight: 600; font-size: .98rem; letter-spacing: -.005em;
+  }
+  .node.is-new { background: var(--ember-bg); border-color: var(--ember); }
+  .node.is-new .nm { color: var(--ember); }
+  .node.is-new .st::after { content: " ★"; }
+  .arrow {
+    align-self: center; font-family: var(--mono); color: var(--ink-faint);
+    font-size: 15px; flex: 0 0 auto;
+  }
+  .loop-label {
+    display: flex; align-items: center; gap: 12px;
+    font-family: var(--mono); font-size: 12px; letter-spacing: .04em;
+    margin: 18px 0 6px; min-width: 620px;
+  }
+  .loop-label .bar { flex: 1 1 auto; height: 1px; }
+  .loop-label.dir { color: var(--steel); }
+  .loop-label.dir .bar { background: var(--steel); }
+  .loop-label.ver { color: var(--alert); }
+  .loop-label.ver .bar { background: var(--alert); }
+  .loop-note {
+    font-size: 14px; color: var(--ink-soft); line-height: 1.6;
+    max-width: 78ch; margin-top: 4px;
+  }
+
+  /* callouts */
+  .callout {
+    border: 1px solid var(--rule-hard); border-left: 4px solid var(--ink);
+    border-radius: 3px; background: var(--surface); padding: 20px 22px; margin: 4px 0;
+  }
+  .callout-label {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--ink-faint); margin-bottom: 10px;
+  }
+  .callout > * + * { margin-top: .9em; }
+  .callout > p { max-width: var(--measure); }
+  .callout.key { border-left-color: var(--ember); background: var(--ember-bg); }
+  .callout.key .callout-label { color: var(--ember); }
+  .callout.warn { border-left-color: var(--alert); background: var(--alert-bg); }
+  .callout.warn .callout-label { color: var(--alert); }
+  .pull {
+    font-family: var(--display); font-weight: 600;
+    font-size: clamp(1.15rem, 2.4vw, 1.5rem); line-height: 1.38;
+    letter-spacing: -.014em; text-wrap: balance;
+  }
+
+  pre {
+    font-family: var(--mono); font-size: 12.5px; line-height: 1.65;
+    background: var(--surface-2); border: 1px solid var(--rule);
+    border-radius: 3px; padding: 16px 18px; overflow-x: auto; margin: 4px 0;
+  }
+  pre code { background: none; padding: 0; font-size: 1em; }
+
+  /* deletions */
+  ul.kill { list-style: none; margin: 4px 0; padding: 0; }
+  ul.kill li {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px 22px;
+    padding: 14px 0; border-top: 1px solid var(--rule); align-items: baseline;
+  }
+  ul.kill li .gone {
+    font-family: var(--mono); font-size: 13.5px;
+    color: var(--ink-faint); text-decoration: line-through;
+    text-decoration-color: var(--alert); text-decoration-thickness: 1px;
+  }
+  ul.kill li .why { font-size: 14.5px; color: var(--ink-soft); line-height: 1.55; }
+  @media (max-width: 680px) { ul.kill li { grid-template-columns: 1fr; } }
+
+  /* challenge priority */
+  ol.prio { list-style: none; counter-reset: pr; margin: 4px 0; padding: 0; }
+  ol.prio li {
+    counter-increment: pr; display: grid; grid-template-columns: 40px 1fr;
+    gap: 16px; padding: 15px 0; border-top: 1px solid var(--rule);
+  }
+  ol.prio li::before {
+    content: counter(pr); font-family: var(--mono); font-size: 13px;
+    color: var(--ink-faint); padding-top: .3em;
+  }
+  ol.prio li.first { background: var(--ember-bg); border-top-color: var(--ember); padding: 18px 0 18px 14px; }
+  ol.prio li.first::before { color: var(--ember); font-weight: 500; }
+  ol.prio li .what { font-weight: 700; }
+  ol.prio li .rz { color: var(--ink-soft); font-size: 14.5px; margin-top: 3px; line-height: 1.55; }
+
+  footer.foot {
+    border-top: 2px solid var(--ink); margin-top: 20px; padding-top: 20px;
+    font-family: var(--mono); font-size: 12px; color: var(--ink-faint);
+    display: flex; flex-wrap: wrap; gap: 6px 28px;
+  }
+
+  @media (max-width: 720px) {
+    .shell { padding: 0 18px 80px; }
+    .sec-head { grid-template-columns: 1fr; gap: 6px; }
+    .sec-num { padding-top: 0; }
+    .sec-head .dek { grid-column: 1; }
+    .thesis { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="shell">
+
+  <header class="mast">
+    <div class="mast-eyebrow">架構提煉 · 來源案例 MHS 首期</div>
+    <h1>anvil 架構 v2
+      <span class="lede">從一次完整實跑提煉出的結構。三輪檢索各否證了 v0.2 的一個假設 —— 管線不是線性的，證據類別決定查詢，而過濾與查證在稀缺時反向移動。</span>
+    </h1>
+    <div class="mast-meta">
+      <span><b>日期</b> 2026-09-26</span>
+      <span><b>取代</b> DESIGN_ANVIL.md §B 管線定義</span>
+      <span><b>案例</b> MHS 協議 #01 · 已寄出</span>
+      <span><b>撤回</b> 2 條（1 條網址實測 404）</span>
+    </div>
+  </header>
+
+  <div class="thesis">
+    <div class="old">
+      <div class="ver">v0.2</div>
+      <div class="flow">搜集 → 篩選 → 寫作</div>
+      <div class="gloss">假設新聞存在，工作是挑選。這就是 STORM 與 Artifact App 失敗的地方 —— 彙整報導是任何人都能做的事。</div>
+    </div>
+    <div class="new">
+      <div class="ver">v2</div>
+      <div class="flow">假設 → 按證據類別探勘 → 挑戰 → 寫作</div>
+      <div class="gloss">假設新聞不存在，工作是偵測與驗證。起點是專案擁有者的定調：「News 的意義在於檢測，得到最珍貴的一手消息。」</div>
+    </div>
+  </div>
+
+  <!-- ===== 0 ===== -->
+  <section id="case">
+    <div class="sec-head">
+      <div class="sec-num">§ 0</div>
+      <h2>案例發生了什麼</h2>
+      <p class="dek">去掉修飾的版本。三輪，各否證一個結構假設。</p>
+    </div>
+
+    <div class="rounds">
+      <div class="round r1">
+        <div class="n">第一輪</div>
+        <div>
+          <div class="how">機械式兩層檢索模板，搜「關於 MHS 的新聞」</div>
+          <div class="got">8 條，多為媒體轉述。Judge 依 65 分線砍掉 3 條。產出等於一份報導彙整。</div>
+        </div>
+      </div>
+      <div class="round r2">
+        <div class="n">第二輪</div>
+        <div>
+          <div class="how">改為假設驅動，搜「誰出貨了程式碼與介面」</div>
+          <div class="got">6 條，硬度大幅提升。撈到 Qwen 倉庫 —— 本期最有價值的一條。</div>
+        </div>
+      </div>
+      <div class="round r3">
+        <div class="n">第三輪</div>
+        <div>
+          <div class="how">orchestrator 逐條追問查證</div>
+          <div class="got">撤回 2 條、降級 2 條。挑戰 4 條，命中率 50%。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout key" style="margin-top:24px;">
+      <div class="callout-label">關鍵觀察</div>
+      <p class="pull">第二輪撈到的 Qwen 倉庫，第一輪的方法論永遠不可能找到 —— 因為沒有人會為一行 changelog 寫新聞。</p>
+      <p>第一輪搜的是「關於它的報導」，第二輪搜的是「它被使用的痕跡」。這是兩種不同的東西，不是同一件事的粗細差別。</p>
+    </div>
+  </section>
+
+  <!-- ===== 1 ===== -->
+  <section id="loops">
+    <div class="sec-head">
+      <div class="sec-num">§ 1</div>
+      <h2>管線不是線性的，是兩個迴圈</h2>
+      <p class="dek">實跑用了三輪，而那三輪不是「重試」—— 它們的觸發條件、處置方式、終止條件全都不同。</p>
+    </div>
+
+    <div class="loops">
+      <div class="loop-label dir"><span>方向迴圈 ◀ 回 ② 換證據類別</span><span class="bar"></span></div>
+      <div class="loop-row">
+        <div class="node"><span class="st">②</span><span class="nm">Hypothesize</span></div>
+        <span class="arrow">→</span>
+        <div class="node"><span class="st">③</span><span class="nm">Probe</span></div>
+        <span class="arrow">→</span>
+        <div class="node"><span class="st">④</span><span class="nm">Assay</span></div>
+      </div>
+      <div class="loop-label ver"><span>查證迴圈 ◀ 有撤回則回 ④ 重排</span><span class="bar"></span></div>
+      <div class="loop-row">
+        <div class="node is-new"><span class="st">⑤</span><span class="nm">Challenge</span></div>
+        <span class="arrow">→</span>
+        <div class="node"><span class="st">⑥</span><span class="nm">Compose</span></div>
+        <span class="arrow">→</span>
+        <div class="node"><span class="st">⑦</span><span class="nm">Deliver</span></div>
+      </div>
+      <p class="loop-note"><strong>方向迴圈</strong>的觸發條件是「證據硬度不足」，處置是換證據類別重新假設。<strong>查證迴圈</strong>的觸發條件是「有宣稱該被挑戰」，處置是逐條追問，結果可能是撤回。</p>
+    </div>
+
+    <div class="callout warn" style="margin-top:22px;">
+      <div class="callout-label">v0.2 錯在哪</div>
+      <p>v0.2 只有一個「覆蓋率熔斷 → 放寬查詢重試」。但<strong>方向錯的時候，放寬查詢只會撈到更多同類雜訊</strong>。</p>
+      <p>所以 v2 把方向迴圈的觸發條件寫死，不靠感覺：<strong>若排序後最高分那批的 <code>evidence_type</code> 仍全為 <code>media</code></strong>，代表只撈到「別人怎麼說」、沒撈到「發生了什麼」→ 強制回 ② 換方向。第一輪正好符合此條件，但當時沒有這個判準，所以是靠專案擁有者指正才轉向。</p>
+    </div>
+  </section>
+
+  <!-- ===== 2 ===== -->
+  <section id="evidence">
+    <div class="sec-head">
+      <div class="sec-num">§ 2</div>
+      <h2>證據類別決定查詢，不只決定分數</h2>
+      <p class="dek">這是 v0.2 最深的錯誤。它把來源品質當成評分階段的事，檢索時對所有來源用同一組關鍵詞。</p>
+    </div>
+
+    <div class="scroller">
+      <table>
+        <caption>不同證據類別要用完全不同的查詢才找得到</caption>
+        <thead><tr><th>要找的東西</th><th>有效查詢的形狀</th><th>用「主題名 + 新聞」找得到嗎</th></tr></thead>
+        <tbody>
+          <tr><td>一行 changelog</td><td><code>site:github.com</code> + 倉庫名 + 檔案路徑</td><td class="no">找不到</td></tr>
+          <tr><td>廠商支援聲明</td><td><code>site:&lt;vendor&gt;</code> + developer / release notes</td><td class="no">幾乎找不到</td></tr>
+          <tr><td>標準組織表態</td><td><code>site:&lt;org&gt;</code> + 主題名（預期命中 0）</td><td class="no">找不到</td></tr>
+          <tr><td>徵才需求</td><td>職缺平台 + 技能名</td><td class="no">找不到</td></tr>
+          <tr><td>媒體報導</td><td>主題名 + 一般查詢</td><td class="yes">找得到</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="body-col" style="margin-top:20px;">
+      <p>所以順序必須反轉：<strong>先選證據類別，再由類別導出查詢。</strong>「先搜尋，再按來源品質評分」這個順序注定只會撈到最容易被搜到的那一類 —— 也就是最弱的那一類。</p>
+    </div>
+
+    <h3><span class="mark">2.1</span>新增 ② Hypothesize，產出 evidence_plan.json</h3>
+
+<pre><code>{
+  "hypothesis": "若 MHS 的採用是真的，硬證據會是有人出貨了驅動或介面",
+  "evidence_classes": [
+    { "class": "code", "rank": 1,
+      "queries": ["site:github.com \"Model Hardware Standard\"", "…"],
+      "must_capture": ["star 數", "最後 commit 日期", "含 MHS 的實際檔案路徑"] },
+    { "class": "standards_body", "rank": 3,
+      "queries": ["site:sila-standard.org Anthropic"],
+      "expect_zero": true, "zero_is_signal": true }
+  ],
+  "domain_judgement": "既有標準為 SiLA 2 與 OPC UA LADS；共存或取代決定投資論述",
+  "agent_proposed": []
+}</code></pre>
+
+    <div class="body-col" style="margin-top:18px;">
+      <p><code>must_capture</code> 是關鍵欄位：<strong>類別特有的驗證欄位必須在檢索時一併取回，不能事後補。</strong>實跑中 agy 兩次漏掉 <code>code</code> 類的最後 commit 日期 —— 而那個欄位正是區分「真的在做」與「發了就沒動」的唯一依據。</p>
+      <p><code>domain_judgement</code> 是 orchestrator 必須貢獻的領域判斷。agent 不被告知前，不會自己想到既有標準的存在。</p>
+    </div>
+  </section>
+
+  <!-- ===== 3 ===== -->
+  <section id="regime">
+    <div class="sec-head">
+      <div class="sec-num">§ 3</div>
+      <h2>過濾與查證反向移動</h2>
+      <p class="dek">v0.2 的 Judge 同時負責「這條重要嗎」與「這條可信嗎」。兩者的失敗模式相反。</p>
+    </div>
+
+    <div class="callout key">
+      <div class="callout-label">核心原則</div>
+      <p class="pull">供給稀缺時，過濾要變鬆，查證要變緊。</p>
+      <p>稀缺時每條候選的邊際價值高（不該砍），但佔比權重也高 —— <strong>一條假的在 8 條裡的破壞力，遠大於在 80 條裡</strong>。v0.2 把兩者綁在同一個 65 分門檻上，鬆緊只能同向動。必須拆開。</p>
+    </div>
+
+    <div class="scroller" style="margin-top:22px;">
+      <table>
+        <caption>同一套管線，兩套參數。判準是候選數，不是主題類型</caption>
+        <thead><tr><th></th><th>稀缺 · &lt; 15（新主題常態）</th><th>豐沛 · &gt; 40（高流量主題）</th></tr></thead>
+        <tbody>
+          <tr><td><strong>過濾</strong></td><td>排序全收，只剔低地板（約 40）</td><td>入選線 75，強化冗餘懲罰</td></tr>
+          <tr><td><strong>查證</strong></td><td><strong>逐條挑戰</strong>（可負擔）</td><td>抽樣挑戰 + 要求多源互證</td></tr>
+          <tr><td><strong>證據類別</strong></td><td>盡量拓寬，納入弱訊號</td><td>收窄到最硬的兩三類</td></tr>
+          <tr><td><strong>查無</strong></td><td><strong>本身是交付物</strong></td><td>通常無意義</td></tr>
+          <tr><td><strong>主要風險</strong></td><td>虛構內容混入</td><td>真訊號被雜訊淹沒</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 4 ===== -->
+  <section id="budget">
+    <div class="sec-head">
+      <div class="sec-num">§ 4</div>
+      <h2>真正的稀缺資源是「可被挑戰的宣稱數」</h2>
+      <p class="dek">v0.2 花整節算 token 預算，結論是「成本從來不是約束」—— 然後轉頭把 context 當約束，也錯。</p>
+    </div>
+
+    <div class="body-col">
+      <p>實跑的真實瓶頸：第三輪挑戰了 4 條，2 條被撤回，<strong>命中率 50%</strong>。決定產出品質的不是候選數、不是 token、不是成本，而是<strong>一期之內有多少宣稱真的被挑戰過</strong>。</p>
+    </div>
+
+    <div class="callout key" style="margin-top:20px;">
+      <div class="callout-label">目標函數改寫</div>
+      <p class="pull">最大化的不是「收錄條目數」，是經得起挑戰的宣稱數。</p>
+      <p>寧可 5 條被逐一挑戰過的卡片，不要 15 條沒人查過的卡片。稀缺主題下兩者不衝突 —— 條目本來就少，那正是該逐條挑戰的理由。</p>
+    </div>
+
+    <h3><span class="mark">4.1</span>挑戰預算的優先序</h3>
+
+    <ol class="prio">
+      <li class="first">
+        <div>
+          <div class="what">最印證 orchestrator 假設的那一條</div>
+          <div class="rz">實跑中被撤回的 404 文章，正是最完美印證假設的那條。<code>harnessrouter.ai</code> 提出的分層框架與 orchestrator 前一輪的推理完全一致 —— 正因如此它才顯得可信，而它的網址實測是 404。</div>
+        </div>
+      </li>
+      <li><div><div class="what">會被引用為數字的宣稱</div><div class="rz">幻覺最常出現在具體數值。</div></div></li>
+      <li><div><div class="what">URL 未被開啟驗證過的</div><div class="rz">harnessrouter 那條實測 404 才現形。</div></div></li>
+      <li><div><div class="what">日期與事件順序可交叉檢查的</div><div class="rz">OPC Foundation 那條靠「頁面早於事件兩天」拆穿。</div></div></li>
+      <li><div><div class="what">高分但低 Auth 的</div><div class="rz">Tecan 那條：Dec 高、Auth 僅 20。</div></div></li>
+    </ol>
+
+    <div class="callout warn" style="margin-top:22px;">
+      <div class="callout-label">本案最反直覺的發現</div>
+      <p class="pull">最可能是虛構的，是最完美印證你假設的那一條。該懷疑的不是那個來源，是你想採信它的衝動。</p>
+      <p>這不是通則的老話。它是實跑中真的發生過一次的事。</p>
+    </div>
+
+    <h3><span class="mark">4.2</span>Challenge 的三種結論</h3>
+
+    <div class="scroller">
+      <table>
+        <thead><tr><th>結論</th><th>處置</th></tr></thead>
+        <tbody>
+          <tr><td class="yes">survived</td><td>維持分數與 verification 等級</td></tr>
+          <tr><td style="color:var(--ember);font-family:var(--mono);font-size:12.5px;">downgraded</td><td>Auth 下調，verification 降為 <code>unverified_claim</code>，<strong>在卡片內明講來源性質</strong></td></tr>
+          <tr><td class="no">retracted</td><td>移出本期，但<strong>在 TL;DR 明示本期撤回了幾條</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="body-col" style="margin-top:18px;">
+      <p>撤回必須對讀者可見。實跑的 TL;DR 第三行就是「本期撤回兩條」—— 這比假裝它們從未存在更有情報價值，也讓讀者知道這份簡報被挑戰過。</p>
+    </div>
+  </section>
+
+  <!-- ===== 5 ===== -->
+  <section id="absence">
+    <div class="sec-head">
+      <div class="sec-num">§ 5</div>
+      <h2>「查無」是可交付的產出</h2>
+      <p class="dek">v0.2 只有 no_news（整期沒東西）這一種對「沒有」的處理。</p>
+    </div>
+
+    <div class="body-col">
+      <p>實跑產出兩個高價值的「沒有」：</p>
+      <ul class="tight">
+        <li><strong>SiLA 2 與 OPC UA LADS 查無任何 MHS 表態</strong> → 成為本期第 4 高分卡片（78.25）。這是後續最值得盯的單一訊號：任一組織的首次表態，價值高於任何媒體報導。</li>
+        <li>一個 0 star 的垃圾倉庫 README 寫著 <strong>「目前並無公開的 MHS 規格」</strong> → 解釋了為何看不到廠商級實作。弱來源裡的硬事實。</li>
+      </ul>
+      <p><strong>查無必須是 Probe 階段的一等公民輸出</strong>：對錨定來源的零命中要被記錄、被解釋、被評分，而不是靜默丟棄。</p>
+    </div>
+  </section>
+
+  <!-- ===== 6 ===== -->
+  <section id="rights">
+    <div class="sec-head">
+      <div class="sec-num">§ 6</div>
+      <h2>提案權與決定權分離</h2>
+      <p class="dek">orchestrator 一度把「該往哪裡找」外包給 agent（錯），被指正後又過度收回把 agent 當純執行工具（也錯）。</p>
+    </div>
+
+    <div class="scroller">
+      <table>
+        <thead><tr><th></th><th>提案權</th><th>決定權</th></tr></thead>
+        <tbody>
+          <tr><td>orchestrator</td><td class="yes">有</td><td class="yes">有</td></tr>
+          <tr><td>agent</td><td class="yes">有</td><td class="no">無</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="body-col" style="margin-top:18px;">
+      <p>agent 比 orchestrator 多跑過該主題的實際檢索，知道哪裡有料、哪裡是死路 —— <strong>那是 orchestrator 靠推理拿不到的實地經驗</strong>。每輪 dispatch 的最後一段一律要求 agent 提 2–3 個新方向，附理由與具體查詢式；是否採納由 orchestrator 決定。</p>
+    </div>
+  </section>
+
+  <!-- ===== 7 ===== -->
+  <section id="deleted">
+    <div class="sec-head">
+      <div class="sec-num">§ 7</div>
+      <h2>刪掉什麼</h2>
+      <p class="dek">架構提煉的一半工作是刪除。以下 v0.2 設計正式廢止。</p>
+    </div>
+
+    <ul class="kill">
+      <li><span class="gone">固定 65 分入選線</span><span class="why">隱含「候選供給充足」，新主題不成立。改為 regime 決定的排序取前 N + 低地板</span></li>
+      <li><span class="gone">「一手／二手文獻」的來源分級</span><span class="why">太粗，且無法導出查詢。由 <code>evidence_type</code> 取代</span></li>
+      <li><span class="gone">單次 Harvest</span><span class="why">由方向迴圈取代</span></li>
+      <li><span class="gone">Judge 兼做可信度判斷</span><span class="why">拆出 ⑤ Challenge。兩者失敗模式相反，稀缺時調整方向也相反</span></li>
+      <li><span class="gone">覆蓋率熔斷 → 放寬查詢重試</span><span class="why">方向錯時放寬只會撈到更多同類雜訊。改為觸發方向迴圈</span></li>
+      <li><span class="gone">token 預算表作為主要約束</span><span class="why">真正的約束是挑戰預算。token 表降級為附註</span></li>
+      <li><span class="gone">Tier-2 固定三面向模板</span><span class="why">技術指標／供應鏈／競品綁定技術主題。由 <code>evidence_plan</code> 的類別查詢取代</span></li>
+    </ul>
+  </section>
+
+  <!-- ===== 8 ===== -->
+  <section id="kept">
+    <div class="sec-head">
+      <div class="sec-num">§ 8</div>
+      <h2>不變的部分</h2>
+      <p class="dek">經實跑驗證有效，不動。</p>
+    </div>
+
+    <div class="body-col">
+      <ul class="tight">
+        <li><strong>§A 範疇契約</strong> —— <code>exclude</code> 與 <code>uncertain</code> 仍是最有價值的欄位。唯一例外：新主題首期的 <code>exclude</code> 會誤殺唯一的一手來源（官方發布公告），需在 ② Hypothesize 階段明確豁免。</li>
+        <li><strong>§G 防線 1、2</strong>（無出處即拒收、量測條件強制）—— 實跑中 Validate 零拒收，因為卡片是照規則寫的。這證明規則可遵循，不是空話。</li>
+        <li><strong>§L 交付層</strong> —— <code>render.py</code> 四條禁令、Artifact 與 Gmail 分流、<code>send_message(draftId)</code> 閉環、寄出後才寫 state。全部照設計運作。</li>
+        <li><strong>§H.5 <code>unverified_premise</code></strong> —— 實跑未觸發（前提由專案擁有者確認），但缺口是真的。</li>
+      </ul>
+    </div>
+
+    <div class="callout key" style="margin-top:24px;">
+      <div class="callout-label">§G 防線 3 · 發報前人工復核門</div>
+      <p class="pull">這道門是整個架構最高價值的元件，不是行政程序。</p>
+      <p>理由不是設計得好，是實跑證據：<strong>專案擁有者這一輪的三次指正，全部發生在那道門之前。</strong>不過濾、不偵測、不查證 —— 那道門攔下的東西比任何自動機制都多。</p>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>anvil 架構 v2</span>
+    <span>2026-09-26</span>
+    <span>案例 · MHS 協議 #01</span>
+    <span>原始文件 · ANVIL_ARCH_V2.md</span>
+  </footer>
+
+</div>
+
+</body></html>

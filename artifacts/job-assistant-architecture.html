@@ -1,0 +1,342 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>求職助手 架構與手冊</title>
+<style>
+:root{
+  --bg:#f7f7f5; --panel:#ffffff; --ink:#1d2433; --muted:#5d6678; --line:#d9dce3;
+  --accent:#1f3864; --accent-soft:#e7edf7; --done:#1b7a4b; --done-soft:#e3f4ea;
+  --plan:#9a5b00; --plan-soft:#fbf0dc; --warn:#a33a3a; --code:#f1f2f5;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171d; --panel:#1c2028; --ink:#e6e9ef; --muted:#9aa3b5; --line:#313744;
+    --accent:#9db8e8; --accent-soft:#243149; --done:#6fd39f; --done-soft:#1b3328;
+    --plan:#f0bf6a; --plan-soft:#3a2f1b; --warn:#ef8f8f; --code:#252a34; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14171d; --panel:#1c2028; --ink:#e6e9ef; --muted:#9aa3b5; --line:#313744;
+  --accent:#9db8e8; --accent-soft:#243149; --done:#6fd39f; --done-soft:#1b3328;
+  --plan:#f0bf6a; --plan-soft:#3a2f1b; --warn:#ef8f8f; --code:#252a34; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.65 "Noto Sans TC","Microsoft JhengHei",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px 80px}
+.card,.box,.step,.ph>div{min-width:0}
+pre{max-width:100%}
+header h1{margin:0 0 4px;font-size:26px;color:var(--accent)}
+header p{margin:0;color:var(--muted)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);
+  margin:18px -16px 24px;padding:8px 16px;display:flex;gap:6px;flex-wrap:wrap}
+nav a{color:var(--muted);text-decoration:none;font-size:13px;padding:4px 10px;border-radius:999px}
+nav a:hover{background:var(--accent-soft);color:var(--accent)}
+h2{font-size:20px;margin:40px 0 12px;color:var(--accent);border-bottom:2px solid var(--line);padding-bottom:6px}
+h3{font-size:16px;margin:22px 0 8px}
+p,li{max-width:78ch}
+code{background:var(--code);padding:1px 6px;border-radius:4px;font-family:Consolas,"Cascadia Mono",monospace;font-size:13px}
+pre{background:var(--code);padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:13px;line-height:1.55;margin:8px 0}
+pre code{background:none;padding:0}
+.grid{display:grid;gap:12px}
+.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.card h4{margin:0 0 6px;font-size:15px}
+.card p{margin:0;color:var(--muted);font-size:14px}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;margin-left:6px;vertical-align:2px}
+.done{background:var(--done-soft);color:var(--done)}
+.plan{background:var(--plan-soft);color:var(--plan)}
+.goal .n{font-size:12px;color:var(--muted)}
+.goal strong{display:block;font-size:16px;margin:2px 0 6px}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:8px 0;background:var(--panel)}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.tbl{overflow-x:auto}
+.note{border-left:4px solid var(--accent);background:var(--accent-soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0}
+.note.warn{border-color:var(--warn)}
+
+/* ---------- architecture diagram ---------- */
+.arch{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.arch-row{display:grid;gap:10px;margin:0}
+.r-in{grid-template-columns:repeat(3,1fr)}
+.r-mid{grid-template-columns:1fr 1.3fr 1fr}
+.r-core{grid-template-columns:1fr}
+.r-two{grid-template-columns:2fr 1fr}
+.box{border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--bg);font-size:13px}
+.box b{display:block;font-size:14px;margin-bottom:2px}
+.box small{color:var(--muted);display:block;line-height:1.5}
+.box.input{border-style:dashed;text-align:center}
+.box.core{border-color:var(--accent);background:var(--accent-soft)}
+.box.is-done{border-color:var(--done)}
+.box.is-plan{border-color:var(--plan)}
+.arrow{text-align:center;color:var(--muted);font-size:18px;line-height:1;margin:6px 0}
+.arrow span{font-size:12px;margin-left:6px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:12px}
+.legend i{display:inline-block;width:14px;height:10px;border:1.5px solid;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+/* ---------- timeline ---------- */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;counter-reset:s}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;position:relative}
+.step .t{font-family:Consolas,monospace;color:var(--accent);font-weight:700}
+.step b{display:block;margin:2px 0}
+.step small{color:var(--muted)}
+
+/* ---------- roadmap ---------- */
+.road{display:grid;gap:8px}
+.ph{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:start;background:var(--panel);
+  border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.ph .k{font-weight:700;font-size:18px;color:var(--accent)}
+.ph.is-done{border-left:5px solid var(--done)}
+.ph.next{border-left:5px solid var(--plan)}
+.ph p{margin:2px 0 0;color:var(--muted);font-size:14px}
+
+@media (max-width:720px){
+  .r-in,.r-mid,.r-two{grid-template-columns:1fr}
+  .ph{grid-template-columns:40px 1fr}
+}
+</style>
+<div class="wrap">
+
+<header>
+  <h1>求職助手：架構與使用手冊</h1>
+  <p>0_JobFinding · 2026-10-04 定稿 · 原始文字版見 <code>docs/ARCHITECTURE.md</code></p>
+</header>
+
+<nav>
+  <a href="#goals">目標</a><a href="#arch">架構圖</a><a href="#parts">元件</a>
+  <a href="#flow">15 分鐘流程</a><a href="#modes">兩種互動</a><a href="#ladder">強度階梯</a>
+  <a href="#manual">指令手冊</a><a href="#files">檔案地圖</a><a href="#road">實作路線</a>
+</nav>
+
+<!-- ================================================================ -->
+<section id="goals">
+<h2>目標與原則</h2>
+<div class="grid g3">
+  <div class="card goal"><span class="n">G1</span><strong>15 分鐘投遞</strong>
+    <p>看到 JD，草稿從資料庫自動組裝，不從零寫。</p></div>
+  <div class="card goal"><span class="n">G2</span><strong>每份 JD 一次簡短 grooming</strong>
+    <p>最多 3 題、選擇題為主、5 分鐘內，只問會改變這份草稿的事。</p></div>
+  <div class="card goal"><span class="n">G3</span><strong>Grill 長出洞見</strong>
+    <p>工作描述越磨越準，並看出跨職涯的主軸、跨 JD 的缺口。</p></div>
+</div>
+<div class="note"><b>原則：每次互動的資訊只收一次。</b> 收了就結構化、永久可用；已經回答過的問題不准再問。
+缺的事實記進待問題庫，累積後批次問，用編號作答。</div>
+<div class="note"><b>文字基調：不張揚、不低下。</b> 不靠語感，而是機械化：每個經歷記錄你的實際角色，
+CV 動詞只能落在該角色允許的範圍內（見 <a href="#ladder">主張強度階梯</a>）。</div>
+</section>
+
+<!-- ================================================================ -->
+<section id="arch">
+<h2>架構圖</h2>
+<div class="arch">
+  <div class="arch-row r-in">
+    <div class="box input"><b>JD</b><small>貼文字或 URL</small></div>
+    <div class="box input"><b>你的回答</b><small>grooming／grill／隨手補充</small></div>
+    <div class="box input"><b>投遞結果</b><small>回信、通話、面試、被拒</small></div>
+  </div>
+  <div class="arrow">↓ ↓ ↓</div>
+  <div class="arch-row r-mid">
+    <div class="box is-plan"><b>① JD 分析</b><small>每份 JD 存成 yaml<br>需求清單 must／nice<br>硬條件過濾（地點、待遇、搬遷）</small></div>
+    <div class="box is-plan"><b>④ 互動擷取層</b><small>sessions/：逐字問答＋抽出的事實<br>open_questions.yaml：待問題庫，批次問<br>只增不覆蓋；更正保留歷史</small></div>
+    <div class="box is-done"><b>⑦ 漏斗</b><small>applications.yaml<br>track／log／stats／due</small></div>
+  </div>
+  <div class="arrow">↓ <span>寫入</span></div>
+  <div class="arch-row r-core">
+    <div class="box core"><b>③ 事實庫（唯一事實來源） memory/bank/</b>
+      <small>atoms/ 經歷原子：角色、證據、非機密數字、已核可措辭、禁區　·　frames/ 洞見主軸（coarse-graining…）
+      　·　gaps/ 誠實缺口與揭露話術（PyTorch…）　·　motives/ 動機（醫病資訊不對等…）</small></div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="arch-row r-two">
+    <div class="box is-plan"><b>② 對位矩陣</b><small>JD 每條需求 × atom → 覆蓋度、真缺口與表述缺口、go／no-go 建議</small></div>
+    <div class="box is-done"><b>⑥ 規則層</b><small>redline ✅　頁數門禁 ✅<br>主張強度階梯、風格檢查（規劃中）</small></div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="arch-row r-core">
+    <div class="box is-plan"><b>⑤ 組裝</b><small>起點 master ＋ atom 措辭 → CV／cover letter／平台訊息框／內推聯絡信
+      → grooming（≤3 題）→ 規則門禁 → cvbuild 出 docx／pdf → 你投出 → track 登錄</small></div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="arch-row r-core">
+    <div class="box is-plan"><b>⑧ 洞見迴圈</b><small>跨 JD 缺口統計 → 下一次 grill 議程 → 新 atom／frame　·　漏斗結果 → 哪種定位與管道真的有回應</small></div>
+  </div>
+  <div class="legend">
+    <span><i style="border-color:var(--done)"></i>已完成</span>
+    <span><i style="border-color:var(--plan)"></i>規劃中</span>
+    <span><i style="border-color:var(--accent);background:var(--accent-soft)"></i>核心資料</span>
+  </div>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<section id="parts">
+<h2>元件說明</h2>
+<div class="grid g3">
+  <div class="card"><h4>① JD 分析<span class="badge plan">P2</span></h4>
+    <p>每份看過的 JD 都存（含沒投的），是市場需求樣本。硬條件寫在 <code>memory/criteria.yaml</code>，
+    Huawei 的教訓：條件不對的機會越早篩掉越省時間。</p></div>
+  <div class="card"><h4>② 對位矩陣<span class="badge plan">P2</span></h4>
+    <p>需求逐條對到 atom，分「強／弱／無」。真缺口進 grooming 或 gaps/；表述缺口（bank 有但 master 沒寫）自動補。</p></div>
+  <div class="card"><h4>③ 事實庫<span class="badge plan">P1</span></h4>
+    <p>由現在的 <code>experience_bank.md</code> 遷移，一個 atom 一個檔案。只改結構，不改任何事實。
+    更正不刪舊條目，用 <code>supersedes:</code> 串起來。</p></div>
+  <div class="card"><h4>④ 互動擷取層<span class="badge plan">P1</span></h4>
+    <p>每次 grooming／grill 的逐字問答存 <code>sessions/</code>；缺的事實進 <code>open_questions.yaml</code>，
+    不當場追問。問之前先查，答過的不准再問。</p></div>
+  <div class="card"><h4>⑤ 組裝<span class="badge plan">P3</span></h4>
+    <p>優先用 atom 的已核可措辭；新措辭要標出處，核可後回寫，下次直接用。
+    Synopsys 段落順序鎖定：ILT → SMO → ML-ILT → GPU validation → wrapper(EOU) → imec。</p></div>
+  <div class="card"><h4>⑥ 規則層<span class="badge done">部分完成</span></h4>
+    <p>redline（§3 紅線）與頁數門禁已上線；主張強度階梯與風格檢查在 P4。</p></div>
+  <div class="card"><h4>⑦ 漏斗<span class="badge done">已完成</span></h4>
+    <p>每筆投遞記管道、誰先開口、事件時間軸。狀態、回覆率、待跟進全部從事件推導。</p></div>
+  <div class="card"><h4>⑧ 洞見迴圈<span class="badge plan">P5</span></h4>
+    <p>「最近 N 份 JD 裡 X 出現幾次、bank 覆蓋多強」→ 決定下次 grill 挖什麼、哪個缺口值得補學。</p></div>
+</div>
+
+<h3>atom 長什麼樣子</h3>
+<pre><code>---
+id: ML-01
+title: TensorFlow 訓練資料管道擴量
+role: initiated-and-led          # 決定 CV 可用的動詞範圍
+employer: Synopsys
+tags: [ml, tensorflow, data-pipeline, scale]
+metrics:                         # 只放已驗證、非機密的數字
+  - "訓練樣本 5,000 → 5,000,000"
+  - "場張量 up to 2048×2048；1–2 GPU；TAT &lt; 16h"
+verified: Wei 口述 2026-09-12（Grill-Me, aetherAI）
+phrasings:                       # 已核可的英文句子，CV 直接取用
+  - "Initiated and built the data path that scaled usable training samples from 5,000 to 5,000,000."
+never_say: ["GPU utilization as headline metric"]
+---
+自由敘述：背景、決策、取捨、面試可展開的細節。</code></pre>
+</section>
+
+<!-- ================================================================ -->
+<section id="flow">
+<h2>15 分鐘流程（目標狀態）</h2>
+<div class="flow">
+  <div class="step"><span class="t">0:00</span><b>貼 JD</b><small><code>intake</code>：存 yaml、分方向、硬條件、矩陣</small></div>
+  <div class="step"><span class="t">0:02</span><b>看矩陣</b><small>決定投或不投</small></div>
+  <div class="step"><span class="t">0:03</span><b>組裝草稿</b><small><code>draft</code>：master ＋ HTML 預覽</small></div>
+  <div class="step"><span class="t">0:05</span><b>grooming</b><small>≤3 題，你用編號回答</small></div>
+  <div class="step"><span class="t">0:10</span><b>定稿＋門禁</b><small><code>publish</code>：redline、強度階梯、頁數</small></div>
+  <div class="step"><span class="t">0:13</span><b>投出</b><small>你自己送</small></div>
+  <div class="step"><span class="t">0:15</span><b>登錄</b><small><code>track</code>（你說已投才跑）</small></div>
+</div>
+<p style="color:var(--muted);font-size:13px">目前 <code>intake</code> 與 <code>draft</code> 尚未實作；在那之前用 <code>triage</code> ＋ 手動複製 master 代替（見下方手冊）。</p>
+</section>
+
+<!-- ================================================================ -->
+<section id="modes">
+<h2>兩種互動模式</h2>
+<div class="tbl"><table>
+<tr><th></th><th>Grooming（每份 JD）</th><th>Grill（深挖，不綁 JD）</th></tr>
+<tr><td>時機</td><td>草稿組好之後</td><td>你有空時；或洞見迴圈累積出議程</td></tr>
+<tr><td>題數</td><td>≤ 3，選擇題為主</td><td>不限，逐段</td></tr>
+<tr><td>只問</td><td>會改變<b>這份</b>草稿的真缺口</td><td>單薄的 atom（缺數字、缺決策、缺「為什麼」）、跨 JD 高頻缺口</td></tr>
+<tr><td>產出</td><td>定稿 ＋ session 紀錄</td><td>新／升級的 atom、frame、已核可措辭</td></tr>
+<tr><td>時間</td><td>≤ 5 分鐘</td><td>30–60 分鐘</td></tr>
+</table></div>
+</section>
+
+<!-- ================================================================ -->
+<section id="ladder">
+<h2>主張強度階梯</h2>
+<p>「不張揚、不低下」的機械定義。每個 bullet 要能追溯到某個 atom，動詞必須落在該 atom 的 <code>role</code> 範圍內。</p>
+<div class="tbl"><table>
+<tr><th>role</th><th>允許的英文動詞（上限）</th><th>不可低於</th></tr>
+<tr><td><code>initiated-and-led</code></td><td>initiated, designed, built, drove, led</td><td>不可寫 assisted / supported</td></tr>
+<tr><td><code>owned</code></td><td>owned, built, implemented, maintained</td><td>不可寫 helped</td></tr>
+<tr><td><code>co-led</code> / <code>second-lead</code></td><td>co-led, served as second lead, integrated, tested</td><td>不可單獨寫 led</td></tr>
+<tr><td><code>contributed</code></td><td>contributed to, implemented part of, tested, validated</td><td>—</td></tr>
+<tr><td><code>used</code></td><td>used, applied, evaluated</td><td>不可寫 built / developed</td></tr>
+</table></div>
+</section>
+
+<!-- ================================================================ -->
+<section id="manual">
+<h2>指令手冊</h2>
+<p>所有指令都在專案根目錄執行：<code>D:\DATA_google_dirve\0_JobFinding</code>。</p>
+
+<h3>改履歷：現在就能用<span class="badge done">已上線</span></h3>
+<div class="tbl"><table>
+<tr><th>要做的事</th><th>指令</th></tr>
+<tr><td>判斷 JD 屬於哪個方向、該用哪份 master</td><td><code>python tools/pipeline.py triage &lt;JD.txt&gt;</code></td></tr>
+<tr><td>開新版本（不要覆蓋舊的）</td><td><code>cp DATA/&lt;方向&gt;/masters/&lt;最接近的&gt;.md DATA/&lt;方向&gt;/masters/CV_&lt;公司&gt;_&lt;職缺&gt;.md</code><br>再改 front matter 的 <code>output:</code> 和 <code>target: 公司 — 職缺</code></td></tr>
+<tr><td>看 A4 預覽</td><td><code>python tools/pipeline.py preview &lt;master.md&gt; --open</code></td></tr>
+<tr><td>單獨跑紅線檢查</td><td><code>python tools/redline.py &lt;master.md&gt;</code></td></tr>
+<tr><td>出 docx／pdf（過紅線＋頁數兩道門禁）</td><td><code>python tools/pipeline.py publish &lt;master.md&gt;</code></td></tr>
+<tr><td>確認改版只動到該動的地方</td><td><code>python tools/docxdiff.py 舊.docx 新.docx</code></td></tr>
+<tr><td>逐段質詢、挖數字</td><td>在 Claude Code 裡打 <code>/grill-me</code></td></tr>
+</table></div>
+
+<h3>投遞紀錄<span class="badge done">已上線</span></h3>
+<div class="tbl"><table>
+<tr><th>要做的事</th><th>指令</th></tr>
+<tr><td>看漏斗、各管道回覆率、今天該處理的投遞</td><td><code>python tools/pipeline.py stats</code></td></tr>
+<tr><td>只看今天該跟進的</td><td><code>python tools/pipeline.py due</code></td></tr>
+<tr><td>登錄一筆我方投遞（<b>真的送出後</b>才跑）</td><td><code>python tools/pipeline.py track &lt;master.md&gt; --channel linkedin-apply</code></td></tr>
+<tr><td>登錄 recruiter 主動找上門的</td><td><code>python tools/pipeline.py track --company X --role Y --channel recruiter-email --initiator them</code></td></tr>
+<tr><td>記錄後續（回信、通話、面試、被拒…）</td><td><code>python tools/pipeline.py log aetherAI reply --note "recruiter 來信"</code></td></tr>
+<tr><td>跟進過了</td><td><code>python tools/pipeline.py log PhysicsX followup --note "DM recruiter"</code></td></tr>
+<tr><td>確認石沉大海</td><td><code>python tools/pipeline.py log Siemens no_response</code></td></tr>
+</table></div>
+<p><b>管道代號：</b><code>linkedin-apply</code> LinkedIn 投遞 · <code>company-site</code> 官網／ATS · <code>recruiter-email</code> recruiter email
+· <code>linkedin-dm</code> LinkedIn 私訊 · <code>referral</code> 內推 · <code>outreach</code> 我方主動聯絡 · <code>other</code></p>
+<p><b>事件代號：</b><code>reply</code> 對方回應 · <code>call</code> 通話 · <code>interview</code> 面試 · <code>offer</code>
+· <code>rejected</code> 被拒 · <code>withdrawn</code> 我方停止 · <code>no_response</code> 無回音 · <code>followup</code> 我方跟進 · <code>note</code> 註記</p>
+<p><b>跟進規則：</b>投出第 7 天跟進一次、第 21 天再跟進一次；滿 30 天沒回音就提示你記成 <code>no_response</code>。
+<code>log</code> 的 id 只要打一段能分辨的名字就好。</p>
+
+<h3>投出之後要做的兩件事</h3>
+<ol>
+  <li>把真正送出的檔案歸檔到 <code>DATA/_submitted/&lt;日期&gt;_&lt;公司&gt;_&lt;職缺&gt;/</code>：pdf 用 <code>mv</code>，master 用 <code>cp</code>，再寫一份 <code>SUBMITTED.md</code>。這個資料夾之後唯讀。</li>
+  <li>跑 <code>track</code>，加上 <code>--files ../DATA/_submitted/&lt;資料夾&gt;/</code>。</li>
+</ol>
+
+<h3>規劃中的指令<span class="badge plan">尚未實作</span></h3>
+<div class="tbl"><table>
+<tr><th>指令</th><th>用途</th><th>期</th></tr>
+<tr><td><code>pipeline.py intake &lt;jd.txt&gt;</code></td><td>存 JD、抽需求、硬條件、對位矩陣</td><td>P2</td></tr>
+<tr><td><code>pipeline.py draft &lt;jd-id&gt;</code></td><td>從 atom 組裝 master、cover letter、訊息</td><td>P3</td></tr>
+<tr><td><code>/grill-me groom</code>、<code>/grill-me grill</code></td><td>兩種互動模式</td><td>P1</td></tr>
+<tr><td><code>pipeline.py ask</code></td><td>列出待問題庫，批次作答</td><td>P1</td></tr>
+</table></div>
+</section>
+
+<!-- ================================================================ -->
+<section id="files">
+<h2>檔案地圖</h2>
+<div class="tbl"><table>
+<tr><th>路徑</th><th>是什麼</th><th>誰改</th></tr>
+<tr><td><code>CLAUDE.md</code></td><td>專案規則、紅線、兩個方向的經歷摘要</td><td>規則變更時</td></tr>
+<tr><td><code>docs/ARCHITECTURE.md / .html</code></td><td>本文件（文字版／網頁版）</td><td>架構變更時</td></tr>
+<tr><td><code>memory/experience_bank.md</code></td><td>經歷故事庫（P1 後遷到 <code>memory/bank/</code>）</td><td>Claude，依你的口述</td></tr>
+<tr><td><code>memory/habits_and_preferences.md</code></td><td>你的偏好與禁令（PyTorch、不倒裝、批次問…）</td><td>Claude，依你的指示</td></tr>
+<tr><td><code>memory/applications.yaml</code></td><td><b>投遞紀錄的唯一來源</b></td><td><code>track</code>／<code>log</code></td></tr>
+<tr><td><code>memory/application_tracker.md</code></td><td>由上面自動產生的人看版，不要手改</td><td><code>stats</code></td></tr>
+<tr><td><code>DATA/&lt;方向&gt;/masters/*.md</code></td><td>履歷內容的唯一來源</td><td>每份 JD 開新檔</td></tr>
+<tr><td><code>DATA/&lt;方向&gt;/out/</code></td><td>產出的 docx／pdf（會被重建覆蓋）</td><td><code>publish</code></td></tr>
+<tr><td><code>DATA/_submitted/</code></td><td>真正送出的檔案，凍結唯讀</td><td>投出時歸檔一次</td></tr>
+<tr><td><code>tools/</code></td><td>cvbuild、redline、pipeline、tracker、md2html、docxdiff</td><td>—</td></tr>
+</table></div>
+</section>
+
+<!-- ================================================================ -->
+<section id="road">
+<h2>實作路線</h2>
+<div class="road">
+  <div class="ph is-done"><span class="k">P0</span><div><b>漏斗 <span class="badge done">完成</span></b><p>applications.yaml、track／log／stats／due、測試 8 個。</p></div></div>
+  <div class="ph next"><span class="k">P1</span><div><b>事實庫遷移 <span class="badge plan">下一步</span></b><p>experience_bank → memory/bank/ 結構化 atom（只改結構）；建 sessions/ 與 open_questions.yaml；grill-me 拆成 groom／grill 並修 bullet 順序。</p></div></div>
+  <div class="ph"><span class="k">P2</span><div><b>intake</b><p>JD yaml、需求抽取、criteria.yaml 硬條件、對位矩陣。</p></div></div>
+  <div class="ph"><span class="k">P3</span><div><b>draft</b><p>依矩陣從 atom 措辭組裝 master、cover letter、訊息。</p></div></div>
+  <div class="ph"><span class="k">P4</span><div><b>規則層</b><p>主張強度階梯、atom 追溯標註、風格檢查進 redline。</p></div></div>
+  <div class="ph"><span class="k">P5</span><div><b>洞見迴圈</b><p>跨 JD 缺口統計、grill 議程自動產生。</p></div></div>
+  <div class="ph"><span class="k">P6</span><div><b>管道擴充</b><p>人脈地圖＋聯絡信（Gmail 只建草稿）、LinkedIn 檔案當 master、職缺雷達、面試題庫。</p></div></div>
+  <div class="ph"><span class="k">P7</span><div><b>可分享版</b><p>引擎與個人資料分離、紅線改設定檔、新使用者 onboarding 訪談。</p></div></div>
+</div>
+</section>
+
+</div>
+
+</body></html>

@@ -1,0 +1,668 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>試駕作戰表</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap">
+
+<style>
+:root{
+  --ground:#EDEFF1;
+  --surface:#FFFFFF;
+  --surface-2:#F5F7F8;
+  --ink:#14181C;
+  --ink-2:#5A646D;
+  --ink-3:#8994A0;
+  --rule:#CBD3DA;
+  --rule-soft:#E2E7EB;
+  --accent:#A65A08;
+  --accent-soft:#F6EADA;
+  --veto:#9E2A22;
+  --veto-soft:#F8E7E4;
+  --pass:#1F6349;
+  --pass-soft:#E2F0E9;
+  --shadow:0 1px 2px rgba(20,24,28,.06),0 6px 20px rgba(20,24,28,.05);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#12171A;
+    --surface:#1A2126;
+    --surface-2:#212A30;
+    --ink:#E7EDF1;
+    --ink-2:#9DA9B3;
+    --ink-3:#6E7C87;
+    --rule:#2E3941;
+    --rule-soft:#242E35;
+    --accent:#E9A44A;
+    --accent-soft:#33261440;
+    --veto:#E8837A;
+    --veto-soft:#3A211E80;
+    --pass:#68BC95;
+    --pass-soft:#17352880;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#12171A;
+  --surface:#1A2126;
+  --surface-2:#212A30;
+  --ink:#E7EDF1;
+  --ink-2:#9DA9B3;
+  --ink-3:#6E7C87;
+  --rule:#2E3941;
+  --rule-soft:#242E35;
+  --accent:#E9A44A;
+  --accent-soft:#33261440;
+  --veto:#E8837A;
+  --veto-soft:#3A211E80;
+  --pass:#68BC95;
+  --pass-soft:#17352880;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  font-size:16px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:40px 24px 96px;display:flex;flex-direction:column;gap:44px}
+@media (max-width:520px){.wrap{padding:28px 16px 72px;gap:36px}}
+
+h1,h2,h3{font-family:"Noto Serif TC",Georgia,serif;text-wrap:balance;margin:0;line-height:1.35}
+h1{font-size:clamp(30px,4.4vw,44px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(21px,2.5vw,26px);font-weight:600}
+h3{font-size:17px;font-weight:600}
+p{margin:0}
+.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,monospace;font-variant-numeric:tabular-nums}
+
+.mast{border-bottom:2px solid var(--ink);padding-bottom:22px;display:flex;flex-direction:column;gap:14px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:500}
+.lede{color:var(--ink-2);max-width:64ch;font-size:15.5px}
+.mast-meta{display:flex;flex-wrap:wrap;gap:8px 26px;font-size:13px;color:var(--ink-3)}
+.mast-meta b{color:var(--ink-2);font-weight:500}
+
+section{display:flex;flex-direction:column;gap:18px}
+.sec-head{display:flex;flex-direction:column;gap:7px;border-left:3px solid var(--accent);padding-left:14px}
+.sec-head .tier{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.sec-note{color:var(--ink-2);font-size:14.5px;max-width:70ch}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--rule-soft);border-radius:3px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+.card .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.card .brand{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.card .nm{font-family:"Noto Serif TC",serif;font-size:17px;font-weight:600;line-height:1.35}
+.card .pr{font-family:"IBM Plex Mono",monospace;font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--accent)}
+.card .hint{font-size:13px;color:var(--ink-2);border-top:1px solid var(--rule-soft);padding-top:8px;margin-top:auto}
+.card .wb{display:flex;gap:8px;align-items:baseline;font-family:"IBM Plex Mono",monospace;font-size:12px;font-variant-numeric:tabular-nums}
+.card .wbn{color:var(--ink-2)}
+.card .wbd{font-weight:600}
+.card .wbd.up{color:var(--pass)}
+.card .wbd.down{color:var(--veto)}
+.card.base{background:var(--surface-2);border-style:dashed}
+.card.base .pr{color:var(--ink-2);font-size:16px}
+.card.base .wb .wbn{color:var(--ink-3)}
+.card.watch{opacity:.85;border-style:dashed}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:11.5px;line-height:1.4;padding:2px 7px;border-radius:2px;border:1px solid var(--rule);color:var(--ink-2);background:var(--surface-2)}
+.chip.y{border-color:var(--pass);color:var(--pass);background:var(--pass-soft)}
+.chip.n{border-color:var(--veto);color:var(--veto);background:var(--veto-soft)}
+.chip.q{border-style:dashed}
+.stat{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.08em;padding:1px 6px;border-radius:2px;white-space:nowrap}
+.stat.lead{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent)}
+.stat.obs{color:var(--ink-3);border:1px dashed var(--rule)}
+
+.scroller{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:860px;font-size:14px}
+th,td{border-bottom:1px solid var(--rule-soft);padding:11px 12px;text-align:left;vertical-align:top}
+thead th{position:sticky;top:0;background:var(--surface-2);z-index:2;font-size:12px;font-weight:700;line-height:1.4;border-bottom:1px solid var(--rule)}
+thead th.carcol{text-align:center;min-width:104px}
+thead th .cn{display:block;font-family:"Noto Serif TC",serif;font-size:13px}
+thead th .cp{display:block;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-3);font-weight:400;margin-top:2px}
+thead th .cw{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3);font-weight:400}
+tbody th{font-weight:500;width:38%;min-width:280px}
+tbody th .q{display:block;color:var(--ink);font-size:14.5px}
+tbody th .why{display:block;color:var(--ink-2);font-size:12.5px;line-height:1.55;margin-top:4px}
+td.cell{text-align:center;vertical-align:middle}
+td.known{font-size:12.5px;color:var(--ink-2);text-align:center;vertical-align:middle}
+td.known.y{color:var(--pass);font-weight:600}
+td.known.n{color:var(--veto);font-weight:600}
+td.known.q{color:var(--ink-3)}
+tbody tr:last-child th,tbody tr:last-child td{border-bottom:none}
+tbody tr:hover th,tbody tr:hover td{background:var(--surface-2)}
+tr.ai th .q::before{content:"AI";font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;color:var(--accent);border:1px solid var(--accent);border-radius:2px;padding:0 4px;margin-right:7px;vertical-align:2px}
+
+select,input[type=number]{font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:2px;padding:5px 4px;width:60px;text-align:center;font-variant-numeric:tabular-nums}
+select:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select.ok{background:var(--pass-soft);border-color:var(--pass);color:var(--pass);font-weight:600}
+select.no{background:var(--veto-soft);border-color:var(--veto);color:var(--veto);font-weight:600}
+
+tfoot td,tfoot th{border-top:2px solid var(--ink);border-bottom:none;padding:12px;font-size:13px}
+tfoot th{font-family:"Noto Serif TC",serif;font-weight:600}
+.verdict{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;display:block;text-align:center}
+.verdict.out{color:var(--veto)}
+.verdict.live{color:var(--pass)}
+.verdict.wait{color:var(--ink-3);font-weight:400}
+.total{font-family:"IBM Plex Mono",monospace;font-size:19px;font-weight:600;text-align:center;display:block;font-variant-numeric:tabular-nums}
+
+.asks{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+@media (max-width:360px){.asks,.split{grid-template-columns:1fr}}
+.ask{background:var(--surface);border:1px solid var(--rule-soft);border-left:3px solid var(--accent);border-radius:3px;padding:15px 17px;display:flex;flex-direction:column;gap:9px;box-shadow:var(--shadow)}
+.ask h3{font-size:16px}
+.ask ul{margin:0;padding-left:17px;display:flex;flex-direction:column;gap:7px;font-size:14px;color:var(--ink-2)}
+.ask li strong{color:var(--ink);font-weight:500}
+
+.flag{border:1px solid var(--rule);border-left:3px solid var(--veto);background:var(--veto-soft);border-radius:3px;padding:15px 18px;display:flex;flex-direction:column;gap:9px}
+.flag.acc{border-left-color:var(--accent);background:var(--accent-soft)}
+.flag .lb{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--veto);font-weight:600}
+.flag.acc .lb{color:var(--accent)}
+.flag p,.flag li{font-size:14.5px;color:var(--ink)}
+.flag ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:7px}
+
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:14px}
+.panel{background:var(--surface);border:1px solid var(--rule-soft);border-radius:3px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow)}
+.panel h3{border-bottom:1px solid var(--rule-soft);padding-bottom:8px}
+.panel p{font-size:14px;color:var(--ink-2)}
+.panel ul{margin:0;padding-left:17px;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink-2)}
+.panel ul.plain{list-style:none;padding-left:0}
+.panel ul.plain li{display:flex;gap:9px;align-items:baseline}
+.panel ul.plain li::before{content:"□";font-family:"IBM Plex Mono",monospace;color:var(--accent);font-size:15px}
+.panel .addr{font-size:14px;color:var(--ink);line-height:1.75}
+.panel .addr span{display:block;color:var(--ink-2)}
+.panel a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+.panel b{color:var(--ink);font-weight:500}
+
+.unverified li{color:var(--ink-2);font-size:14px}
+.unverified li b{color:var(--ink);font-weight:500}
+
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button{font-family:"Noto Sans TC",sans-serif;font-size:13.5px;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:2px;padding:7px 15px;cursor:pointer;transition:background .15s,border-color .15s}
+button:hover{background:var(--surface-2);border-color:var(--accent)}
+.saved{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-3)}
+.src{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-3)}
+
+footer{border-top:1px solid var(--rule);padding-top:18px;font-size:13px;color:var(--ink-3);display:flex;flex-direction:column;gap:5px}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <span class="eyebrow">展間現場用 · 第二版 · 2026 年 10 月 3 日</span>
+    <h1>試駕作戰表</h1>
+    <p class="lede">這一版加進了你的新需求：車上的時間是你用 AI 想事情的時間，路上要舒服。所以除了安全與空間，這次也把語音收音、高速安靜程度、座椅和駕駛輔助的信任感列入評分。判準一樣分兩層：第一層任何一項不過就出局，第二層才打分數。</p>
+    <div class="mast-meta">
+      <span><b>家庭</b>　夫妻＋4 歲小孩，接送與出遊</span>
+      <span><b>通勤</b>　每週最多 2 趟桃園↔新竹，可遠距</span>
+      <span><b>現有車</b>　Nissan Sentra B17 ES（空間基準線）</span>
+      <span><b>手機</b>　Pixel 10，只用 Android Auto</span>
+    </div>
+  </header>
+
+  <div class="flag">
+    <span class="lb">這一輪官網查證改掉的事</span>
+    <ul>
+      <li><strong>Camry 油電旗艦 125 萬，已在官網證實。</strong>規配原文列有 PVM 環景、三區恆溫、前座通風、左右後座電動座椅與 HUD，油耗 25.3 km/L。油電尊爵 112.9 萬的規配沒有列 PVM，過不了第一層。</li>
+      <li><strong>RAV4 旗艦比尊爵+ 多的配備，比上一版寫的多很多。</strong>上一版說只多 HUD 和鋁圈，那是從網頁排列推測的，推錯了。官網規配表上，旗艦還多了前座加熱＋通風、後座加熱、副駕八向電動座椅、駕駛座記憶、E-Mirror、前後行車記錄器、天窗、足踢尾門、雙 Qi。對「路上要舒服」來說，8 萬的差距現在有道理了。</li>
+      <li><strong>RAV4 官網現在寫了「支援無線 Apple Carplay 與 Android Auto」。</strong>上一版查不到這行字。</li>
+      <li><strong>上一版的「Tucson L Premium-B」是汽油車。</strong>官網上 Premium A/B/C 是 1.6T 汽油（15.6 km/L），油電版是 GLTH B／GLTH C（綜效 230ps、21.1 km/L）。這一版改列 GLTH C。</li>
+      <li><strong>後方橫向來車「會煞停」，官網寫明的只有 Tucson L 一台</strong>（規配表列 RCCA 後方交通防撞輔助）。RAV4 只寫 RCTA 警示，它的 PKSB 只針對「前、後方靜止障礙物」。Camry 展示頁連 RCTA 都沒列。X-Trail 的 R-AEB 只管正後方。CR-V 的 CTM 寫的是「倒車預警顯示」。這條硬條件現在要靠業務拿出規配表證明。</li>
+    </ul>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <span class="tier">候選名單</span>
+      <h2>這次要開到的六台</h2>
+    </div>
+    <p class="sec-note">CR-V e:HEV 是這次重新放回來的。上一輪 Honda 全系被排除，但沒有記下原因；按官網規配，它在 360 環景、全速域 ACC、無線 Android Auto 上都符合，後方煞停的狀況也跟 RAV4 一樣。X-Trail 降為觀察，原因寫在卡片上。</p>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="tier">新需求</span>
+      <h2>車上是你的思考時間</h2>
+    </div>
+    <p class="sec-note">你要在車上跟 Gemini 講話、想事情，所以規格表上的配備清單不太重要。真正會影響這段時間品質的是下面四件事，而且都只能上高速實測。</p>
+    <div class="split">
+      <div class="panel">
+        <h3>走 Android Auto，不追 Google built-in</h3>
+        <p>agy 掃過一輪的結論是，台灣現售的真油電車裡，沒有一台同時具備內建 Google built-in 又符合你的空間和安全條件。這點我沒有逐台驗證，但方向合理：Gemini 跑在 Pixel 10 上，透過 Android Auto 投到車上，模型更新跟著手機走，不用等車廠 OTA。所以候選車只要求「無線 Android Auto 穩定」。六台裡有五台的官網已寫明支援無線 AA，Camry 還沒查到。</p>
+      </div>
+      <div class="panel">
+        <h3>安靜程度決定語音辨識</h3>
+        <p>時速 110 公里時，胎噪和風切越小，Gemini 越聽得清楚，你也不用提高音量。轎車風阻低是 Camry 的先天優勢，X-Trail 有 Bose 主動降噪。<b>沒有任何一台有可信的公開分貝數據</b>，agy 引用的數字也查不到出處。所以請在試駕時自己比較。</p>
+      </div>
+      <div class="panel">
+        <h3>方向盤語音鍵 → Gemini</h3>
+        <p>試駕時請實際按方向盤的語音鍵，確認叫出來的是手機的 Gemini，不是車機自己的語音系統。然後在高速上跟它連續對話 3 分鐘，聽它會不會中斷、會不會誤判你在說話。</p>
+      </div>
+      <div class="panel">
+        <h3>坐得住、敢放手</h3>
+        <p>能不能在車上想事情，取決於 ACC 和車道置中夠不夠穩，讓你敢把注意力分一點出去。座椅的腰靠和通風決定 45 分鐘後腰會不會酸。通風座椅只出現在 RAV4 旗艦、Camry 油電旗艦、CR-V Prestige 與 Tucson L；X-Trail 官網頁面上找不到。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="tier">第一層</span>
+      <h2>否決清單</h2>
+    </div>
+    <p class="sec-note">每一格選「通過」或「未過」。任一項未過，該車就出局，不用往下評分。空白表示還沒測，出局只看已標「未過」的項目。</p>
+    <div class="bar">
+      <button type="button" id="clearAll">清除全部紀錄</button>
+      <span class="saved">勾選存在這台裝置的瀏覽器裡</span>
+    </div>
+    <div class="scroller"><table id="vetoTable"></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="tier">第二層</span>
+      <h2>主觀評分</h2>
+    </div>
+    <p class="sec-note">只有通過第一層的車才評分。每項 1–5 分，當下打完，不要回家再補，記憶會偏向最後坐的那台。標 AI 的四項是這次新增的，跟你在車上用 Gemini 的體驗直接相關，一定要上高速測。</p>
+    <div class="scroller"><table id="scoreTable"></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="tier">逐車專屬</span>
+      <h2>每台各自要問清楚的事</h2>
+    </div>
+    <div class="asks">
+
+      <div class="ask">
+        <h3>Toyota RAV4（尊爵+ 122 萬／旗艦 130 萬）</h3>
+        <ul>
+          <li><strong>後方橫向來車到底會不會煞停？</strong>官網只寫 RCTA 警示，PKSB 只針對靜止障礙物。請業務指著規配表回答，口頭說「會」不算。</li>
+          <li><strong>兩個等級都坐，尤其是旗艦的座椅。</strong>通風、副駕電動、記憶座椅都只有旗艦有。開 45 分鐘高速的人，這 8 萬比上一版以為的划算。</li>
+          <li><strong>試 HUD。</strong>你在車上要邊想事情邊開車，視線不必低頭，這是安全配備。</li>
+          <li><strong>上高速聽胎噪與 A 柱風切。</strong>這是休旅車輸 Camry 的地方，在 110 公里下跟 Gemini 講話試試。</li>
+          <li>不要只約旗艦。展間常只擺主推等級。</li>
+        </ul>
+      </div>
+
+      <div class="ask">
+        <h3>Toyota Camry 油電旗艦（125 萬）</h3>
+        <ul>
+          <li><strong>先問 Android Auto。</strong>官網展示頁沒有提到 Android Auto 或 CarPlay，帶 Pixel 10 實際配對，確認有線還是無線。</li>
+          <li><strong>問後方車側警示與煞停。</strong>展示頁的安全配備清單裡沒有 RCTA，這台的第一題要問清楚。</li>
+          <li><strong>試後座。</strong>軸距 2,825mm 是六台裡最長的，而且左右後座有電動調整，裝好安全座椅後試試前座要不要往前移。</li>
+          <li><strong>抱小孩上下車一次。</strong>轎車坐得低，這是它唯一輸給休旅的地方，而且接送每天都要做。</li>
+          <li><strong>它有 SEA 安全離座警示</strong>，停車時偵測後方來車，對小孩自己開門很有用。</li>
+        </ul>
+      </div>
+
+      <div class="ask">
+        <h3>Hyundai Tucson L GLTH C（價格待問）</h3>
+        <ul>
+          <li><strong>先問油電版的實際售價。</strong>官網只寫 Premium（汽油）111.9 萬起。車媒說法是 GLTH B 131.9 萬、GLTH C 138.9 萬，沒有官方證實。</li>
+          <li><strong>它是唯一一台官網寫明後方交通防撞輔助（RCCA）的。</strong>現場請業務示範或說明作動條件。</li>
+          <li><strong>確認你看的是 GLTH，不是 Premium。</strong>兩個版本外觀一樣，Premium 是汽油車，不符合硬條件。</li>
+          <li><strong>盲操測試：開車時眼睛不離路面，調溫度和風量。</strong>空調是 6.6 吋觸控介面。</li>
+          <li>原廠胎的高速胎噪是車主常見抱怨（來源：agy 整理的車主評論），在高速上用 Gemini 試試聽不聽得清楚。</li>
+        </ul>
+      </div>
+
+      <div class="ask">
+        <h3>Honda CR-V e:HEV（S 122.9 萬／Prestige 129.9 萬）</h3>
+        <ul>
+          <li><strong>CTM 只警示，還是會煞車？</strong>官網寫「倒車預警顯示輔助」，看起來是警示，但 RAV4 也一樣，要用同一個標準問。</li>
+          <li><strong>ACC 是 30 km/h 以上 ACC 加 0–30 km/h 低速跟車（LSF）。</strong>靜止後要按 RES 或輕踩油門才會再起步，塞車時試試會不會煩。</li>
+          <li><strong>S 和 Prestige 差 7 萬。</strong>通風座椅、Bose 音響、後座滑移只有 Prestige 有。360 環景和 HUD 兩個 e:HEV 版本都有。</li>
+          <li><strong>主機是 9 吋</strong>，是六台中最小的。實測 Android Auto 上 Maps 的可讀性。</li>
+          <li>Honda 桃園據點這次還沒查，出發前請用官網的據點查詢找最近的一家。</li>
+        </ul>
+      </div>
+
+      <div class="ask">
+        <h3>Nissan X-Trail e-POWER（149.9 萬起，觀察）</h3>
+        <ul>
+          <li><strong>降為觀察的原因：</strong>比 RAV4 旗艦貴約 20 萬，官網頁面找不到通風座椅，油耗 17.5 km/L 是六台裡最差的。</li>
+          <li><strong>它的強項正好對上你的新需求：</strong>Bose 音響、ProPILOT 跟車順暢度評價高，e-POWER 由電動馬達驅動，很安靜。如果高速上它明顯比別台安靜，可以把它升回來。</li>
+          <li><strong>R-AEB 只偵測正後方，</strong>後方橫向只有 RCTA 警示。</li>
+          <li>有空再順路去看，不必專程。</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="tier">現場</span>
+      <h2>帶什麼、去哪裡</h2>
+    </div>
+    <div class="split">
+
+      <div class="panel">
+        <h3>出門前清點</h3>
+        <ul class="plain">
+          <li>Pixel 10 ＋ USB-C 傳輸線</li>
+          <li>你自己那張兒童安全座椅</li>
+          <li>太太（請她實際坐上駕駛座）</li>
+          <li>小孩（實際抱進後座、扣一次安全帶）</li>
+          <li>捲尺（量後座膝距、後廂開口高度）</li>
+          <li>一個想問 Gemini 的真實問題，高速上用</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3>中山路：Toyota 與 Nissan</h3>
+        <p class="addr">
+          <b>Toyota</b>　桃苗汽車 桃園營業所
+          <span>桃園區中山路 747 號　<span class="mono">03-2201188</span></span>
+          <span class="mono">09:00–21:00</span>
+        </p>
+        <p class="addr">
+          <b>Nissan</b>　元隆汽車 桃園旗艦展示中心
+          <span>桃園區中山路 1310 號　<span class="mono">03-3601119</span>（未證實）</span>
+        </p>
+        <p><a href="https://www.toyota.com.tw/testdrive.aspx">Toyota 線上預約試乘</a>（網址後接 <span class="mono">#/RAV4</span> 或 <span class="mono">#/CAMRY</span>）</p>
+      </div>
+
+      <div class="panel">
+        <h3>Hyundai 與 Honda</h3>
+        <p class="addr">
+          <b>Hyundai</b>　桃園旗艦展示中心
+          <span>桃園區幸福路 117 號　<span class="mono">03-3263939</span>（未證實）</span>
+        </p>
+        <p class="addr">
+          <b>Honda</b>　桃園據點未查
+          <span>到 <a href="https://www.honda-taiwan.com.tw/Auto">honda-taiwan.com.tw</a> 用「據點」查詢</span>
+        </p>
+        <p>除了桃苗豐田那筆是你自己提供的，其他地址都是網路查到的，出發前用電話確認。</p>
+      </div>
+
+    </div>
+
+    <div class="flag acc">
+      <span class="lb">出發前要打的電話</span>
+      <p>展間通常只擺主推等級。請問：<strong>「現場有沒有 RAV4 尊爵+ 和旗艦可以坐？Camry 油電旗艦有沒有試駕車？試駕可以上高速嗎？」</strong>Hyundai 那邊要問的是 <strong>GLTH（油電）</strong>的試駕車，不是 Premium。這次的評分有四項要在高速上才測得出來，只繞市區等於沒試。</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="tier">資料來源</span>
+      <h2>證實到哪裡</h2>
+    </div>
+    <p class="sec-note">「官網」表示我在 2026-10-03 實際開過該車的台灣官網並讀到原文。「agy」表示來自 Google 搜尋整理，沒有逐條驗證。</p>
+    <div class="split">
+      <div class="panel unverified">
+        <h3>還沒證實</h3>
+        <ul>
+          <li><b>RAV4、Camry、CR-V、X-Trail 的後方橫向來車是否會煞停</b>　官網都只寫警示，或沒寫。</li>
+          <li><b>Camry 是否支援 Android Auto</b>　展示頁沒有提到。</li>
+          <li><b>Tucson L GLTH B／C 售價</b>　131.9／138.9 萬是 agy 引用的車媒說法，官網沒列。</li>
+          <li><b>Tucson L 通風座椅從哪一級開始有</b>　官網行銷頁寫「雙前座通風加熱座椅」，沒有分等級。</li>
+          <li><b>各車高速分貝數</b>　沒有可信的公開數據。agy 給的 Camry「63–65 dBA」找不到出處，已捨棄。</li>
+          <li><b>各車實際成交價與交期</b>　目前全部是牌價，要業務給明確月份。</li>
+        </ul>
+      </div>
+      <div class="panel unverified">
+        <h3>已排除，不必重看</h3>
+        <ul>
+          <li><b>Hyundai KONA Hybrid（99 萬起預售）</b>　Hyundai 自己的新聞稿把它定位為 B-SUV，空間會小於 Sentra。</li>
+          <li><b>Honda HR-V、ZR-V、Toyota Corolla Cross 油電</b>　小一級的休旅，agy 查到的軸距是 2,610／2,655／2,640mm，都小於 Sentra（未逐一驗證）。</li>
+          <li><b>Honda Civic e:HEV</b>　agy 說它是唯一有 Google built-in 的真油電，但沒有 360 環景，而且 Google 語音不支援中文。Honda 官網的車款選單上也沒看到它（未證實）。</li>
+          <li><b>Lexus NX 350h</b>　agy 說最低等級 207.5 萬，超過預算（未驗證）。</li>
+          <li><b>Kia Sportage HEV、Niro HEV</b>　agy 說台灣沒有引進油電版。</li>
+          <li><b>Crown（157 萬）、Lexus ES 300h（203 萬）、Kia Sorento HEV、Santa Fe</b>　超出預算或 7 人座。</li>
+          <li><b>RAV4 尊爵（117 萬）</b>　有環景，但沒有通風座椅，主機是 10.5 吋。這次的舒適需求下，起跳改成尊爵+。</li>
+          <li><b>旅行車、MG 全系、Mazda、Volvo、VW、Škoda</b>　台灣沒有真油電版本。</li>
+          <li><b>Tesla、Lexus LBX／UX、Nissan Kicks、Prius PHEV</b>　前一輪已排除。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>中古車是 B 方案：價差 ≥25 萬、車齡 ≤3 年、里程 ≤4 萬公里、原廠保固（含動力電池）仍有效、四項安全硬條件一項不缺。五條同時成立才考慮。</span>
+    <span class="mono">勾選與評分只存在這台裝置的瀏覽器，不會上傳。</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* y = 官網證實有, n = 官網證實沒有/只有警示, q = 未證實 */
+  var CARS = [
+    {id:"rav4b", brand:"Toyota", name:"RAV4 尊爵+", price:"122 萬", wb:"2,690",
+     tags:[["y","PVM 環景"],["y","無線 AA"],["n","後方僅警示"],["n","無通風"]],
+     hint:"12.9 吋主機、Qi、自動防眩鏡。省錢版的 RAV4。"},
+    {id:"rav4c", brand:"Toyota", name:"RAV4 旗艦", price:"130 萬", wb:"2,690", lead:true,
+     tags:[["y","PVM 環景"],["y","無線 AA"],["y","通風座椅"],["y","HUD"],["n","後方僅警示"]],
+     hint:"比尊爵+ 多通風、後座加熱、副駕電動、記憶座椅、E-Mirror、行車記錄器。"},
+    {id:"camry", brand:"Toyota", name:"Camry 油電旗艦", price:"125 萬", wb:"2,825", lead:true,
+     tags:[["y","PVM 環景"],["y","通風座椅"],["y","HUD"],["q","AA 未證實"],["q","後方未列"]],
+     hint:"軸距最長、最省油（25.3 km/L）、轎車最安靜。缺的兩項要現場問。"},
+    {id:"tucson", brand:"Hyundai", name:"Tucson L GLTH C", price:"138.9 萬 ?", wb:"2,755",
+     tags:[["y","SVM 環景"],["y","無線 AA"],["y","RCCA 煞停"],["q","價格未證實"]],
+     hint:"唯一官網寫明後方會煞停的。認明 GLTH，Premium 是汽油車。"},
+    {id:"crv", brand:"Honda", name:"CR-V e:HEV Prestige", price:"129.9 萬", wb:"2,700",
+     tags:[["y","MVCS 環景"],["y","無線 AA"],["y","通風座椅"],["y","HUD"],["n","CTM 僅警示"]],
+     hint:"這次放回來的。S 版 122.9 萬也有環景與 HUD，少通風與 Bose。"},
+    {id:"xtrail", brand:"Nissan", name:"X-Trail e-POWER", price:"149.9 萬", wb:"2,705", watch:true,
+     tags:[["y","AVM 環景"],["y","無線 AA"],["q","通風查無"],["n","後方僅警示"]],
+     hint:"最貴、油耗 17.5 最差。但 Bose 與 ProPILOT 正對你的新需求。"}
+  ];
+
+  var VETO = [
+    {k:"v1", q:"後方橫向來車會自動煞停，不只是警示",
+             why:"官網只有 Tucson L 寫明（RCCA）。其他車請業務指著規配表回答。若四台都拿不出證據，這條要不要放寬由你決定。"},
+    {k:"v2", q:"Pixel 10 無線 Android Auto 當場連上，Gemini 叫得出來",
+             why:"有線也可以接受，但要真的連得上、不會斷。"},
+    {k:"v3", q:"你自己的安全座椅裝得上，裝完前座不用往前移",
+             why:"帶自己那張去，展間的示範椅不算。"},
+    {k:"v4", q:"後座有冷氣出風口", why:"載 4 歲小孩的硬條件。"},
+    {k:"v5", q:"360 環景畫質清楚可用", why:"主要是讓太太停車有信心。"},
+    {k:"v6", q:"ACC 全速域含 Stop&Go，而且有車道置中", why:"CR-V 是 ACC 加低速跟車，停下後要按鍵或踩油門才會起步，現場確認你能不能接受。"},
+    {k:"v7", q:"業務給出明確交車月份，6 個月內", why:"口頭說「應該很快」不算。"},
+    {k:"v8", q:"後座腿部空間不小於 Sentra B17", why:"坐進去比膝蓋離前椅背的距離。RAV4 軸距短 10mm，這項要實坐。"}
+  ];
+
+  var SCORE = [
+    {k:"s1", q:"駕駛座長途舒適度", why:"腰靠、包覆、通風。想像坐滿 45 分鐘。"},
+    {k:"a1", ai:true, q:"高速上用 Gemini 對話 3 分鐘", why:"110 km/h 下用方向盤語音鍵叫出，連續問答。會不會聽錯、中斷、需要提高音量。"},
+    {k:"a2", ai:true, q:"110 km/h 的胎噪與風切", why:"直接影響語音辨識，也影響你想事情時能不能專心。"},
+    {k:"a3", ai:true, q:"ACC＋車道置中的信任感", why:"高速彎道會不會左右飄、插車時煞得順不順。決定你敢不敢分心想事情。"},
+    {k:"a4", ai:true, q:"Android Auto 從上車到可用的時間", why:"實際數秒數：發動到 Maps 出現、Gemini 可以叫出。"},
+    {k:"s2", q:"太太的視野與停車信心", why:"請她坐上駕駛座，不要只坐副駕。"},
+    {k:"s3", q:"冷氣操作會不會讓你分心", why:"眼睛不離路面，調到想要的溫度。"},
+    {k:"s4", q:"抱小孩上下車時腰的負擔", why:"每天接送都要做，規格表上查不到。"},
+    {k:"s5", q:"後廂開口高度與推車放置", why:"行李箱夠用就好，但推車要放得進去。"},
+    {k:"s6", q:"業務的專業度與資訊透明度", why:"問到「會不會煞停」時的反應，很能看出之後的服務品質。"}
+  ];
+
+  var KEY = "buycar.testdrive.v2";
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch(e) { state = {}; }
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {} }
+
+  function el(tag, cls, txt){
+    var n = document.createElement(tag);
+    if(cls) n.className = cls;
+    if(txt != null) n.textContent = txt;
+    return n;
+  }
+
+  var cards = document.getElementById("cards");
+  CARS.forEach(function(c){
+    var d = el("div","card" + (c.watch ? " watch" : ""));
+    var top = el("div","top");
+    top.appendChild(el("span","brand",c.brand));
+    if(c.lead) top.appendChild(el("span","stat lead","優先試"));
+    if(c.watch) top.appendChild(el("span","stat obs","觀察"));
+    d.appendChild(top);
+    d.appendChild(el("span","nm",c.name));
+    d.appendChild(el("span","pr",c.price));
+    var wb = parseInt(c.wb.replace(",",""),10) - 2700;
+    var wbLine = el("span","wb");
+    wbLine.appendChild(el("span","wbn","軸距 " + c.wb + " mm"));
+    var delta = el("span","wbd", wb === 0 ? "±0 mm" : (wb > 0 ? "+" : "−") + Math.abs(wb) + " mm");
+    if(wb > 0) delta.classList.add("up"); else if(wb < 0) delta.classList.add("down");
+    wbLine.appendChild(delta);
+    d.appendChild(wbLine);
+    var chips = el("div","chips");
+    c.tags.forEach(function(t){ chips.appendChild(el("span","chip " + t[0], t[1])); });
+    d.appendChild(chips);
+    d.appendChild(el("span","hint",c.hint));
+    cards.appendChild(d);
+  });
+  var base = el("div","card base");
+  var bt = el("div","top"); bt.appendChild(el("span","brand","對照基準")); base.appendChild(bt);
+  base.appendChild(el("span","nm","Nissan Sentra B17 ES"));
+  base.appendChild(el("span","pr","你現在開的"));
+  var bwb = el("span","wb");
+  bwb.appendChild(el("span","wbn","軸距 2,700 mm"));
+  bwb.appendChild(el("span","wbn","基準線"));
+  base.appendChild(bwb);
+  var bc = el("div","chips");
+  [["y","綠：官網證實有"],["n","紅：官網證實沒有"],["q","虛線：未證實"]].forEach(function(t){ bc.appendChild(el("span","chip " + t[0], t[1])); });
+  base.appendChild(bc);
+  base.appendChild(el("span","hint","所有候選的空間都拿它來比。卡片上的 ± 是對這條線的差距。"));
+  cards.appendChild(base);
+
+  function buildHead(table, firstLabel){
+    var thead = el("thead"), tr = el("tr");
+    tr.appendChild(el("th", null, firstLabel));
+    CARS.forEach(function(c){
+      var th = el("th","carcol");
+      th.appendChild(el("span","cn",c.name));
+      th.appendChild(el("span","cp",c.price));
+      th.appendChild(el("span","cw","軸距 " + c.wb));
+      tr.appendChild(th);
+    });
+    thead.appendChild(tr);
+    table.appendChild(thead);
+  }
+
+  function buildRows(table, items, cellFactory){
+    var tb = el("tbody");
+    items.forEach(function(it){
+      var tr = el("tr", it.ai ? "ai" : null);
+      var th = el("th");
+      th.appendChild(el("span","q",it.q));
+      th.appendChild(el("span","why",it.why));
+      tr.appendChild(th);
+      CARS.forEach(function(c){
+        var td = el("td","cell");
+        td.appendChild(cellFactory(it, c));
+        tr.appendChild(td);
+      });
+      tb.appendChild(tr);
+    });
+    table.appendChild(tb);
+  }
+
+  function paint(s){ s.classList.remove("ok","no"); if(s.value) s.classList.add(s.value); }
+
+  var vt = document.getElementById("vetoTable");
+  buildHead(vt, "否決題：任一未過即出局");
+  buildRows(vt, VETO, function(it, c){
+    var id = "v." + c.id + "." + it.k;
+    var s = el("select");
+    s.id = "sel-" + c.id + "-" + it.k;
+    s.setAttribute("aria-label", c.name + "：" + it.q);
+    [["","—"],["ok","通過"],["no","未過"]].forEach(function(o){
+      var op = el("option", null, o[1]); op.value = o[0]; s.appendChild(op);
+    });
+    s.value = state[id] || "";
+    paint(s);
+    s.addEventListener("change", function(){ state[id] = s.value; save(); paint(s); renderVerdicts(); });
+    return s;
+  });
+
+  var vfoot = el("tfoot"), vrow = el("tr");
+  vrow.appendChild(el("th", null, "判定"));
+  CARS.forEach(function(c){
+    var td = el("td","cell");
+    var sp = el("span","verdict wait","未測");
+    sp.id = "verdict-" + c.id;
+    td.appendChild(sp);
+    vrow.appendChild(td);
+  });
+  vfoot.appendChild(vrow);
+  vt.appendChild(vfoot);
+
+  function renderVerdicts(){
+    CARS.forEach(function(c){
+      var fail = 0, pass = 0;
+      VETO.forEach(function(it){
+        var v = state["v." + c.id + "." + it.k];
+        if(v === "no") fail++; else if(v === "ok") pass++;
+      });
+      var sp = document.getElementById("verdict-" + c.id);
+      sp.className = "verdict";
+      if(fail > 0){ sp.classList.add("out"); sp.textContent = "出局 (" + fail + ")"; }
+      else if(pass === VETO.length){ sp.classList.add("live"); sp.textContent = "全數通過"; }
+      else { sp.classList.add("wait"); sp.textContent = pass + "/" + VETO.length; }
+    });
+  }
+
+  var st = document.getElementById("scoreTable");
+  buildHead(st, "評分項：每項 1–5 分");
+  buildRows(st, SCORE, function(it, c){
+    var id = "s." + c.id + "." + it.k;
+    var n = document.createElement("input");
+    n.type = "number"; n.min = "1"; n.max = "5"; n.step = "1";
+    n.id = "num-" + c.id + "-" + it.k;
+    n.setAttribute("aria-label", c.name + "：" + it.q);
+    n.value = state[id] || "";
+    n.addEventListener("input", function(){
+      var v = parseInt(n.value, 10);
+      if(isNaN(v)) { n.value = ""; state[id] = ""; }
+      else { if(v < 1) v = 1; if(v > 5) v = 5; n.value = String(v); state[id] = String(v); }
+      save(); renderTotals();
+    });
+    return n;
+  });
+
+  var sfoot = el("tfoot"), srow = el("tr");
+  srow.appendChild(el("th", null, "合計（滿分 " + SCORE.length * 5 + "）"));
+  CARS.forEach(function(c){
+    var td = el("td","cell");
+    var sp = el("span","total","—");
+    sp.id = "total-" + c.id;
+    td.appendChild(sp);
+    srow.appendChild(td);
+  });
+  sfoot.appendChild(srow);
+  st.appendChild(sfoot);
+
+  function renderTotals(){
+    CARS.forEach(function(c){
+      var sum = 0, any = false;
+      SCORE.forEach(function(it){
+        var v = parseInt(state["s." + c.id + "." + it.k], 10);
+        if(!isNaN(v)){ sum += v; any = true; }
+      });
+      document.getElementById("total-" + c.id).textContent = any ? String(sum) : "—";
+    });
+  }
+
+  document.getElementById("clearAll").addEventListener("click", function(){
+    state = {}; save();
+    Array.prototype.forEach.call(document.querySelectorAll("#vetoTable select"), function(s){ s.value = ""; paint(s); });
+    Array.prototype.forEach.call(document.querySelectorAll("#scoreTable input"), function(i){ i.value = ""; });
+    renderVerdicts(); renderTotals();
+  });
+
+  renderVerdicts();
+  renderTotals();
+})();
+</script>
+
+</body></html>

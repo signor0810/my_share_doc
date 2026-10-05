@@ -1,0 +1,491 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>anvil 情報看板</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root {
+    --ground:#F6F8FA; --surface:#FFFFFF; --surface-2:#EEF2F5;
+    --ink:#16202B; --ink-soft:#56646F; --ink-faint:#8593A0;
+    --rule:#DCE3E9; --rule-hard:#B9C4CD;
+    --accent:#12697A; --accent-bg:#E2F0F2;
+    --ok-fg:#15693C; --ok-bg:#E3F1E8;
+    --quiet-fg:#4A5A80; --quiet-bg:#E8ECF6;
+    --warn-fg:#8A5200; --warn-bg:#FAEFDC;
+    --crit-fg:#8C2F39; --crit-bg:#F7E7E8;
+    --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+    --body:"Noto Sans TC","Microsoft JhengHei","PingFang TC",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#0D1318; --surface:#151D24; --surface-2:#1C262F;
+      --ink:#E3EAEF; --ink-soft:#95A3B0; --ink-faint:#6C7B88;
+      --rule:#263039; --rule-hard:#3A4854;
+      --accent:#57B8C8; --accent-bg:#10323A;
+      --ok-fg:#84C99B; --ok-bg:#12301F;
+      --quiet-fg:#A9B6D8; --quiet-bg:#1C2438;
+      --warn-fg:#E0B070; --warn-bg:#33250F;
+      --crit-fg:#DE8189; --crit-bg:#3A1B1F;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#0D1318; --surface:#151D24; --surface-2:#1C262F;
+    --ink:#E3EAEF; --ink-soft:#95A3B0; --ink-faint:#6C7B88;
+    --rule:#263039; --rule-hard:#3A4854;
+    --accent:#57B8C8; --accent-bg:#10323A;
+    --ok-fg:#84C99B; --ok-bg:#12301F;
+    --quiet-fg:#A9B6D8; --quiet-bg:#1C2438;
+    --warn-fg:#E0B070; --warn-bg:#33250F;
+    --crit-fg:#DE8189; --crit-bg:#3A1B1F;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--ground); color:var(--ink); font-family:var(--body);
+         font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased; }
+  .shell { max-width:1080px; margin:0 auto; padding:0 24px 96px; }
+
+  .top { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between;
+         gap:12px 24px; border-bottom:2px solid var(--ink); padding:44px 0 16px; }
+  .top h1 { font-family:var(--display); font-weight:700; font-size:clamp(1.7rem,4vw,2.3rem);
+            letter-spacing:-.022em; margin:0; line-height:1.05; }
+  .conn { display:inline-flex; align-items:center; gap:8px; font-family:var(--mono);
+          font-size:11.5px; letter-spacing:.06em; color:var(--ink-faint); text-transform:uppercase; }
+  .dot { width:7px; height:7px; border-radius:50%; background:var(--ink-faint); flex:none; }
+  .conn.live .dot { background:var(--ok-fg); } .conn.live { color:var(--ok-fg); }
+  .conn.down .dot { background:var(--crit-fg); } .conn.down { color:var(--crit-fg); }
+
+  .board-label { font-family:var(--mono); font-size:11px; letter-spacing:.14em;
+                 text-transform:uppercase; color:var(--ink-faint); margin:30px 0 10px; }
+  .scroller { overflow-x:auto; border:1px solid var(--rule); border-radius:3px; background:var(--surface); }
+  table { border-collapse:collapse; width:100%; min-width:680px; font-size:14.5px; }
+  th,td { text-align:left; padding:12px 14px; border-bottom:1px solid var(--rule); vertical-align:middle; }
+  thead th { font-family:var(--mono); font-size:10.5px; font-weight:500; letter-spacing:.09em;
+             text-transform:uppercase; color:var(--ink-faint); background:var(--surface-2);
+             border-bottom:1px solid var(--rule-hard); white-space:nowrap; }
+  tbody tr:last-child td { border-bottom:none; }
+  td.topic { font-weight:700; }
+  td.topic .qn { display:block; font-weight:400; font-size:12.5px; color:var(--ink-faint);
+                 line-height:1.45; margin-top:2px; }
+  td.n { font-family:var(--mono); font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+  .chip { display:inline-block; font-family:var(--mono); font-size:11px; letter-spacing:.04em;
+          padding:3px 9px; border-radius:2px; border:1px solid currentColor; white-space:nowrap; }
+  .chip.ok{color:var(--ok-fg);background:var(--ok-bg);}
+  .chip.quiet{color:var(--quiet-fg);background:var(--quiet-bg);}
+  .chip.warn{color:var(--warn-fg);background:var(--warn-bg);}
+  .chip.crit{color:var(--crit-fg);background:var(--crit-bg);}
+  .chip.none{color:var(--ink-faint);background:var(--surface-2);}
+
+  .fresh { display:flex; align-items:center; gap:8px; }
+  .fresh-track { width:56px; height:5px; border-radius:3px; background:var(--surface-2);
+                 overflow:hidden; flex:none; }
+  .fresh-fill { height:100%; border-radius:3px; }
+  .fresh-fill.ok{background:var(--ok-fg);} .fresh-fill.warn{background:var(--warn-fg);}
+  .fresh-fill.crit{background:var(--crit-fg);}
+  .fresh-txt { font-family:var(--mono); font-size:12px; color:var(--ink-soft); white-space:nowrap; }
+
+  .cards { display:flex; flex-direction:column; gap:14px; margin-top:12px; }
+  .tcard { border:1px solid var(--rule); border-left:4px solid var(--rule-hard);
+           border-radius:3px; background:var(--surface); }
+  .tcard.s-ok{border-left-color:var(--ok-fg);} .tcard.s-quiet{border-left-color:var(--quiet-fg);}
+  .tcard.s-warn{border-left-color:var(--warn-fg);} .tcard.s-crit{border-left-color:var(--crit-fg);}
+  .tcard-head { padding:16px 20px 14px; }
+  .tcard-title { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 12px;
+                 font-family:var(--display); font-weight:600; font-size:1.14rem;
+                 letter-spacing:-.008em; margin:0 0 6px; }
+  .tcard-meta { font-family:var(--mono); font-size:12px; color:var(--ink-faint);
+                display:flex; flex-wrap:wrap; gap:4px 18px; }
+  .headline { margin:12px 0 0; font-size:15px; line-height:1.6; }
+  .report-link { display:inline-block; margin-top:12px; font-family:var(--mono); font-size:12.5px;
+                 padding:7px 14px; border:1px solid var(--accent); border-radius:2px;
+                 color:var(--accent); text-decoration:none; }
+  .report-link:hover { background:var(--accent-bg); }
+  .report-link.stale-issue::after { content:" （上一期）"; color:var(--ink-faint); }
+
+  details { border-top:1px solid var(--rule); }
+  summary { cursor:pointer; list-style:none; padding:11px 20px; font-family:var(--mono);
+            font-size:12.5px; letter-spacing:.03em; color:var(--accent); }
+  summary::-webkit-details-marker { display:none; }
+  summary::before { content:"+"; display:inline-block; width:1.25em; }
+  details[open] summary::before { content:"\2212"; }
+  details[open] summary { border-bottom:1px solid var(--rule); }
+  .tldr { padding:4px 20px 18px; }
+  .tldr ul { margin:0; padding:0; }
+  .tldr li { list-style:none; padding:10px 0; border-bottom:1px dashed var(--rule);
+             font-size:15px; line-height:1.68; }
+  .tldr li:last-child { border-bottom:none; }
+  .gaps { margin:12px 20px 18px; padding:12px 14px; background:var(--surface-2);
+          border-radius:2px; font-size:13.5px; color:var(--ink-soft); }
+  .gaps b { color:var(--ink); font-weight:500; }
+
+  /* ---- feedback ---- */
+  .fb { border-top:1px solid var(--rule); padding:14px 20px 18px; }
+  .fb-label { font-family:var(--mono); font-size:11px; letter-spacing:.1em;
+              text-transform:uppercase; color:var(--ink-faint); margin-bottom:8px; }
+  .fb textarea { width:100%; min-height:72px; resize:vertical; font-family:var(--body);
+                 font-size:14.5px; line-height:1.6; color:var(--ink);
+                 background:var(--ground); border:1px solid var(--rule-hard);
+                 border-radius:3px; padding:10px 12px; }
+  .fb textarea:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+  .fb-row { display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-top:10px; }
+  .fb-btn { font-family:var(--mono); font-size:13px; padding:9px 18px; cursor:pointer;
+            color:#FFFFFF; background:var(--accent); border:1px solid var(--accent);
+            border-radius:2px; }
+  .fb-btn:hover:not(:disabled) { opacity:.85; }
+  .fb-btn:disabled { opacity:.45; cursor:default; }
+  .fb-btn:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+  .fb-note { font-size:12.5px; color:var(--ink-faint); line-height:1.5; }
+  .fb-note.err { color:var(--crit-fg); }
+  .fb-note.done { color:var(--ok-fg); }
+
+  .fb-list { margin-top:14px; display:flex; flex-direction:column; gap:8px; }
+  .fb-item { border:1px solid var(--rule); border-left:3px solid var(--warn-fg);
+             border-radius:2px; background:var(--ground); padding:10px 12px; font-size:13.5px; }
+  .fb-item.acted { border-left-color:var(--ok-fg); }
+  .fb-item .m { font-family:var(--mono); font-size:11px; color:var(--ink-faint);
+                display:flex; flex-wrap:wrap; gap:4px 12px; margin-bottom:5px; }
+  .fb-item .q { line-height:1.6; }
+  .fb-item .r { margin-top:7px; padding-top:7px; border-top:1px dashed var(--rule);
+                color:var(--ink-soft); line-height:1.55; }
+  .fb-item .r b { color:var(--ok-fg); font-weight:500; }
+
+  .sett { padding:6px 20px 18px; }
+  table.settbl { min-width:520px; font-size:13.5px; }
+  table.settbl th.sk { width:118px; font-family:var(--mono); font-size:11px; font-weight:500;
+                       letter-spacing:.05em; color:var(--ink-faint); background:var(--surface-2);
+                       text-transform:none; white-space:nowrap; vertical-align:top; }
+  table.settbl td { vertical-align:top; line-height:1.9; }
+  code.tag { font-family:var(--mono); font-size:11.5px; background:var(--surface-2);
+             border:1px solid var(--rule); border-radius:2px; padding:2px 6px;
+             white-space:nowrap; display:inline-block; }
+  .dir-label { font-family:var(--mono); font-size:11px; letter-spacing:.1em;
+               text-transform:uppercase; color:var(--ink-faint); margin:18px 0 8px; }
+  .dir { border:1px solid var(--rule); border-left:3px solid var(--accent);
+         border-radius:2px; background:var(--ground); padding:10px 12px; margin-bottom:8px; }
+  .dir-q { font-size:14px; line-height:1.6; color:var(--ink); }
+  .dir-r { font-size:13px; line-height:1.55; color:var(--ink-soft); margin-top:6px;
+           padding-top:6px; border-top:1px dashed var(--rule); }
+  .dir-s { font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); margin-top:5px; }
+  .msg { border:1px solid var(--rule-hard); border-left:4px solid var(--warn-fg);
+         background:var(--warn-bg); color:var(--warn-fg); border-radius:3px;
+         padding:18px 20px; margin-top:24px; font-size:14.5px; line-height:1.65; }
+  .msg.crit { border-left-color:var(--crit-fg); background:var(--crit-bg); color:var(--crit-fg); }
+  .skel { color:var(--ink-faint); font-family:var(--mono); font-size:13px; padding:28px 0; }
+  footer.foot { border-top:1px solid var(--rule); margin-top:44px; padding-top:16px;
+                font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);
+                display:flex; flex-wrap:wrap; gap:6px 22px; }
+  a { color:var(--accent); }
+  @media (max-width:620px){ .shell{padding:0 16px 72px;} .tcard-title{font-size:1.05rem;} }
+  @media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important;} }
+</style>
+
+<div class="shell">
+  <header class="top">
+    <h1>anvil 情報看板</h1>
+    <span class="conn" id="conn"><span class="dot"></span><span id="conn-txt">連線中</span></span>
+  </header>
+
+  <div id="root"><div class="skel">載入主題狀態…</div></div>
+
+  <footer class="foot">
+    <span>anvil</span>
+    <span id="foot-count">—</span>
+    <span>反饋直接寫入，下次跑管線時處理</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STATUS_META = {
+    ok:{cls:"ok",label:"正常"},
+    ok_no_news:{cls:"quiet",label:"無重大進展"},
+    no_news:{cls:"quiet",label:"無重大進展"},
+    all_excluded:{cls:"quiet",label:"全數過濾"},
+    partial:{cls:"warn",label:"來源缺漏"},
+    malformed:{cls:"warn",label:"格式異常"},
+    stale:{cls:"warn",label:"排程可能已死"},
+    broken_canary:{cls:"crit",label:"管線壞了"},
+    auth_failed:{cls:"crit",label:"認證失效"},
+    never_ran:{cls:"none",label:"尚未執行"}
+  };
+
+  var db = null;
+  var state = { conn:"connecting", topics:null, feedback:[], err:null,
+                sending:{}, sent:{}, writeErr:{}, drafts:{} };
+
+  function esc(s){ return String(s==null?"":s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+  function daysSince(iso){ if(!iso) return null; var t=Date.parse(iso);
+    return isNaN(t)?null:Math.floor((Date.now()-t)/86400000); }
+
+  // Staleness is derived at read time — the writer cannot know when you look.
+  function derivedStatus(t){
+    var raw = t.status || "never_ran";
+    if (raw==="ok"||raw==="ok_no_news"||raw==="no_news"){
+      var d=daysSince(t.date), p=Number(t.period_days)||7;
+      if (d!=null && d>p*1.5) return "stale";
+    }
+    return raw;
+  }
+  function metaOf(t){ return STATUS_META[derivedStatus(t)] || {cls:"none",label:derivedStatus(t)}; }
+
+  function freshCell(t){
+    var d=daysSince(t.date), p=Number(t.period_days)||7;
+    if(d==null) return '<span class="fresh-txt">—</span>';
+    var r=Math.min(d/(p*1.5),1);
+    var cls = r<0.7?"ok":(r<1?"warn":"crit");
+    var pct = Math.max(4, Math.round((1-r)*100));
+    return '<span class="fresh"><span class="fresh-track"><span class="fresh-fill '+cls+
+           '" style="width:'+pct+'%"></span></span><span class="fresh-txt">'+
+           (d===0?"今天":d+" 天前")+"</span></span>";
+  }
+  function chip(s){ var m=STATUS_META[s]||{cls:"none",label:s};
+    return '<span class="chip '+m.cls+'">'+esc(m.label)+"</span>"; }
+
+  function reportLink(t){
+    if(!t.artifact_url) return '<span class="fresh-txt">尚無報告</span>';
+    var st=derivedStatus(t);
+    var stale = (st==="no_news"||st==="ok_no_news"||st==="all_excluded");
+    return '<a class="report-link'+(stale?" stale-issue":"")+'" href="'+esc(t.artifact_url)+
+           '" target="_blank" rel="noopener">開啟最新報告'+
+           (t.issue?" #"+String(t.issue).padStart(2,"0"):"")+"</a>";
+  }
+
+  function row(t){
+    var f=Number(t.consecutive_failures)||0;
+    var pend=state.feedback.filter(function(x){return x.topic_id===t.id && x.status!=="acted";}).length;
+    return "<tr>"+
+      '<td class="topic">'+esc(t.name||t.id)+
+        (t.core_question?'<span class="qn">'+esc(t.core_question)+"</span>":"")+"</td>"+
+      "<td>"+chip(derivedStatus(t))+"</td>"+
+      '<td class="n">'+(t.issue?"#"+String(t.issue).padStart(2,"0"):"—")+"</td>"+
+      "<td>"+freshCell(t)+"</td>"+
+      '<td class="n">'+(t.cards==null?"—":t.cards)+"</td>"+
+      '<td class="n">'+(f>0?'<span class="chip crit">連續 '+f+" 次</span>":"0")+"</td>"+
+      '<td class="n">'+(pend>0?'<span class="chip warn">'+pend+" 則待處理</span>":"—")+"</td>"+
+      "<td>"+(t.artifact_url?'<a href="'+esc(t.artifact_url)+
+        '" target="_blank" rel="noopener">開啟</a>':'<span class="fresh-txt">—</span>')+"</td>"+
+      "</tr>";
+  }
+
+  function fbItems(tid){
+    var items = state.feedback.filter(function(x){return x.topic_id===tid;})
+      .sort(function(a,b){ return String(b.created||"").localeCompare(String(a.created||"")); });
+    if(!items.length) return "";
+    return '<div class="fb-list">'+items.map(function(it){
+      var acted = it.status==="acted";
+      return '<div class="fb-item'+(acted?" acted":"")+'">'+
+        '<div class="m"><span>'+esc(String(it.created||"").slice(0,16).replace("T"," "))+"</span>"+
+        "<span>"+(acted?"已處理":"待處理")+"</span></div>"+
+        '<div class="q">'+esc(it.text)+"</div>"+
+        (acted && it.response ? '<div class="r"><b>處理結果</b>　'+esc(it.response)+"</div>" : "")+
+        "</div>";
+    }).join("")+"</div>";
+  }
+
+  function fbBlock(t){
+    var tid=t.id;
+    var busy = !!state.sending[tid];
+    var done = !!state.sent[tid];
+    var werr = state.writeErr[tid];
+    var note = werr
+      ? '<span class="fb-note err">寫入失敗（'+esc(werr)+'）。你的文字還留在框裡，可再試一次。</span>'
+      : (done ? '<span class="fb-note done">已送出。下次跑管線時處理，處理結果會顯示在下方。</span>'
+              : '<span class="fb-note">送出後會記錄你的原話。要產生新報告需要我在 session 裡跑一次 —— 這個按鈕不會自己生成報告。</span>');
+    return '<div class="fb">'+
+      '<div class="fb-label">對這個主題的反饋</div>'+
+      '<textarea id="fb-'+esc(tid)+'" placeholder="這期哪裡不對、想看什麼、判斷方向該怎麼調整…"'+
+        (busy?" disabled":"")+">"+esc(state.drafts[tid]||"")+"</textarea>"+
+      '<div class="fb-row">'+
+        '<button class="fb-btn" data-fb="'+esc(tid)+'"'+(busy?" disabled":"")+">"+
+          (busy?"送出中…":"送出反饋")+"</button>"+note+
+      "</div>"+
+      fbItems(tid)+
+    "</div>";
+  }
+
+  function kvRow(k,v){
+    return '<tr><th class="sk">'+esc(k)+"</th><td>"+v+"</td></tr>";
+  }
+  function listCell(a){
+    if(!Array.isArray(a)||!a.length) return '<span class="fresh-txt">—</span>';
+    return a.map(function(x){return '<code class="tag">'+esc(x)+"</code>";}).join(" ");
+  }
+
+  function settingsBlock(t){
+    var s=t.settings;
+    var ds=Array.isArray(t.directives)?t.directives.filter(function(d){
+      return d && d.status!=="superseded"; }):[];
+    if(!s && !ds.length) return "";
+
+    var h="<details><summary>現行設定與生效指令"+
+      (ds.length?"（"+ds.length+" 條指令）":"")+"</summary><div class=\"sett\">";
+
+    if(s){
+      h+='<div class="scroller"><table class="settbl"><tbody>'+
+        kvRow("purpose", '<code class="tag">'+esc(s.purpose||"—")+"</code>")+
+        kvRow("level", '<code class="tag">'+esc(s.level||"—")+"</code>")+
+        kvRow("週期", '<code class="tag">'+esc((s.period_days||7)+" 天")+"</code>")+
+        kvRow("收錄 include", listCell(s.include))+
+        kvRow("排除 exclude", listCell(s.exclude))+
+        kvRow("錨點 anchors", listCell(s.anchors))+
+        (s.investment_lens?kvRow("投資視角", esc(s.investment_lens)):"")+
+        (s.note?kvRow("備註", esc(s.note)):"")+
+      "</tbody></table></div>";
+    }
+
+    if(ds.length){
+      h+='<div class="dir-label">生效中的指令</div>';
+      h+=ds.map(function(d){
+        return '<div class="dir">'+
+          '<div class="dir-q">「'+esc(d.origin_quote||"")+"」</div>"+
+          '<div class="dir-r">'+esc(d.derived_rule||"")+"</div>"+
+          '<div class="dir-s">'+esc(d.scope||"")+"</div></div>";
+      }).join("");
+    }
+    return h+"</div></details>";
+  }
+
+  function card(t){
+    var m=metaOf(t);
+    var tldr=Array.isArray(t.tldr)?t.tldr:[];
+    var h='<article class="tcard s-'+m.cls+'">'+
+      '<div class="tcard-head">'+
+        '<h2 class="tcard-title">'+esc(t.name||t.id)+chip(derivedStatus(t))+"</h2>"+
+        '<div class="tcard-meta"><span>'+(t.issue?"#"+String(t.issue).padStart(2,"0"):"尚未出刊")+
+          "</span><span>"+esc(t.date||"—")+"</span>"+
+          (t.window_start?"<span>窗 "+esc(t.window_start)+" → "+esc(t.window_end||"")+"</span>":"")+
+        "</div>"+
+        (t.headline?'<p class="headline">'+esc(t.headline)+"</p>":"")+
+        reportLink(t)+
+      "</div>";
+    if(tldr.length){
+      h+="<details><summary>展開本期 TL;DR（"+tldr.length+" 則）</summary>"+
+         '<div class="tldr"><ul>'+tldr.map(function(l){return "<li>"+esc(l)+"</li>";}).join("")+
+         "</ul></div></details>";
+    }
+    if(t.gaps) h+='<div class="gaps"><b>來源缺口</b>　'+esc(t.gaps)+"</div>";
+    h+=settingsBlock(t);
+    h+=fbBlock(t);
+    return h+"</article>";
+  }
+
+  function render(){
+    var connEl=document.getElementById("conn"), connTxt=document.getElementById("conn-txt");
+    connEl.className="conn"+(state.conn==="live"?" live":(state.conn==="down"?" down":""));
+    connTxt.textContent = state.conn==="live"?"即時":(state.conn==="down"?"離線":"連線中");
+
+    var root=document.getElementById("root"), foot=document.getElementById("foot-count");
+
+    if(state.conn==="down"){
+      root.innerHTML='<div class="msg crit"><b>看板無法取得資料。</b>'+
+        "這個頁面的狀態存在 artifact 資料庫裡，需要以組織成員身分登入才讀得到。</div>";
+      foot.textContent="—"; return;
+    }
+    if(state.err){ root.innerHTML='<div class="msg crit"><b>讀取錯誤：</b>'+esc(state.err)+"</div>"; return; }
+    if(state.topics===null){ root.innerHTML='<div class="skel">載入主題狀態…</div>'; return; }
+    if(!state.topics.length){
+      root.innerHTML='<div class="msg"><b>尚無主題。</b>管線還沒寫入任何狀態。</div>';
+      foot.textContent="0 個主題"; return;
+    }
+
+    var rank={crit:0,warn:1,ok:2,quiet:3,none:4};
+    var ts=state.topics.slice().sort(function(a,b){
+      var ra=rank[metaOf(a).cls], rb=rank[metaOf(b).cls];
+      if(ra===undefined) ra=9; if(rb===undefined) rb=9;
+      if(ra!==rb) return ra-rb;
+      return String(a.name||a.id).localeCompare(String(b.name||b.id));
+    });
+
+    var alerts=ts.filter(function(t){var c=metaOf(t).cls;return c==="crit"||c==="warn";});
+    var html="";
+    if(alerts.length){
+      html+='<div class="msg'+(alerts.some(function(t){return metaOf(t).cls==="crit";})?" crit":"")+
+        '"><b>需要處理：</b>'+alerts.map(function(t){
+          return esc(t.name||t.id)+"（"+esc(metaOf(t).label)+"）";}).join("、")+"</div>";
+    }
+    var pending=state.feedback.filter(function(x){return x.status!=="acted";}).length;
+    if(pending){
+      html+='<div class="msg"><b>'+pending+' 則反饋待處理。</b>'+
+        "已記錄，下次跑管線時處理。</div>";
+    }
+
+    html+='<div class="board-label">狀態總覽</div><div class="scroller"><table><thead><tr>'+
+      "<th>主題</th><th>狀態</th><th>期次</th><th>新鮮度</th><th>卡片</th><th>連續失敗</th>"+
+      "<th>反饋</th><th></th></tr></thead><tbody>"+ts.map(row).join("")+"</tbody></table></div>";
+    html+='<div class="board-label">各主題重點與反饋</div><div class="cards">'+
+      ts.map(card).join("")+"</div>";
+
+    root.innerHTML=html;
+    foot.textContent=ts.length+" 個主題"+(pending?" · "+pending+" 則反饋待處理":"");
+  }
+
+  // Keep the draft as the user types so a re-render never eats it.
+  document.addEventListener("input", function(e){
+    var ta=e.target;
+    if(ta && ta.id && ta.id.indexOf("fb-")===0) state.drafts[ta.id.slice(3)]=ta.value;
+  });
+
+  document.addEventListener("click", function(e){
+    var btn=e.target.closest ? e.target.closest("[data-fb]") : null;
+    if(!btn) return;
+    var tid=btn.getAttribute("data-fb");
+    var text=(state.drafts[tid]||"").trim();
+    if(!text || !db || state.sending[tid]) return;
+
+    var topic=(state.topics||[]).filter(function(t){return t.id===tid;})[0]||{};
+    state.sending[tid]=true; state.writeErr[tid]=null; render();
+
+    // One write, on a user action — never from render.
+    db.collection("feedback").add({
+      topic_id: tid,
+      topic_name: topic.name || tid,
+      text: text,                       // the user's own words, verbatim
+      created: new Date().toISOString(),
+      status: "new",
+      issue_at_time: topic.issue || null
+    }).then(function(){
+      state.sending[tid]=false; state.sent[tid]=true; state.drafts[tid]=""; render();
+    }).catch(function(err){
+      state.sending[tid]=false;
+      state.writeErr[tid]=(err && err.code) ? err.code : "unavailable";
+      render();
+    });
+  });
+
+  render();
+
+  // Capability resolves later and may be null. Subscribe ONCE, outside render.
+  (async function(){
+    try { db = await window.claude.use("db"); } catch(e){ db = null; }
+    if(!db){ state.conn="down"; render(); return; }
+    state.conn="live"; render();
+
+    db.collection("topics").onSnapshot(function(snap){
+      state.err=null;
+      state.topics=snap.docs.map(function(d){
+        return Object.assign({id:d.id}, d.data()||{});
+      });
+      render();
+    }, function(e){
+      state.err=(e&&e.code)?e.code:"unavailable";
+      if(state.err==="revoked"||state.err==="not_granted") state.conn="down";
+      render();
+    });
+
+    db.collection("feedback").onSnapshot(function(snap){
+      state.feedback=snap.docs.map(function(d){
+        return Object.assign({id:d.id}, d.data()||{});
+      });
+      render();
+    }, function(){ /* feedback listener failure must not blank the board */ });
+  })();
+})();
+</script>
+
+</body></html>

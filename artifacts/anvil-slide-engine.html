@@ -1,0 +1,1179 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>anvil 簡報引擎</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root {
+    --ground:    #F6F8FA;
+    --surface:   #FFFFFF;
+    --surface-2: #EEF2F5;
+    --ink:       #16202B;
+    --ink-soft:  #56646F;
+    --ink-faint: #8593A0;
+    --rule:      #DCE3E9;
+    --rule-hard: #B9C4CD;
+    --steel:     #12697A;
+    --steel-bg:  #E2F0F2;
+    --ember:     #A84A16;
+    --ember-bg:  #F8EAE0;
+    --alert:     #8C2F39;
+    --alert-bg:  #F7E7E8;
+
+    --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --body: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+
+    --measure: 66ch;
+    --shell: 1180px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:    #0D1318;
+      --surface:   #151D24;
+      --surface-2: #1C262F;
+      --ink:       #E3EAEF;
+      --ink-soft:  #95A3B0;
+      --ink-faint: #6C7B88;
+      --rule:      #263039;
+      --rule-hard: #3A4854;
+      --steel:     #57B8C8;
+      --steel-bg:  #10323A;
+      --ember:     #E0904F;
+      --ember-bg:  #3A2413;
+      --alert:     #DE8189;
+      --alert-bg:  #3A1B1F;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:    #0D1318;
+    --surface:   #151D24;
+    --surface-2: #1C262F;
+    --ink:       #E3EAEF;
+    --ink-soft:  #95A3B0;
+    --ink-faint: #6C7B88;
+    --rule:      #263039;
+    --rule-hard: #3A4854;
+    --steel:     #57B8C8;
+    --steel-bg:  #10323A;
+    --ember:     #E0904F;
+    --ember-bg:  #3A2413;
+    --alert:     #DE8189;
+    --alert-bg:  #3A1B1F;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16.5px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .shell {
+    max-width: var(--shell);
+    margin: 0 auto;
+    padding: 0 28px 120px;
+  }
+
+  /* ---------- masthead ---------- */
+
+  .mast {
+    border-bottom: 2px solid var(--ink);
+    padding: 64px 0 22px;
+    margin-bottom: 44px;
+  }
+  .mast-eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--ember);
+    margin-bottom: 20px;
+  }
+  .mast h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(2.6rem, 6.5vw, 4.1rem);
+    line-height: .98;
+    letter-spacing: -.028em;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+  .mast h1 .lede-cjk {
+    display: block;
+    font-family: var(--body);
+    font-weight: 500;
+    font-size: clamp(1.05rem, 2.4vw, 1.4rem);
+    letter-spacing: .01em;
+    line-height: 1.4;
+    color: var(--ink-soft);
+    margin-top: 16px;
+  }
+  .mast-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 26px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+    margin-top: 26px;
+  }
+  .mast-meta b { color: var(--ink-soft); font-weight: 500; }
+
+  /* ---------- legend ---------- */
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 52px;
+  }
+  .chip {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .05em;
+    padding: 5px 11px;
+    border-radius: 2px;
+    border: 1px solid var(--rule-hard);
+    color: var(--ink-soft);
+    background: var(--surface);
+    white-space: nowrap;
+  }
+  .chip.code  { color: var(--steel); background: var(--steel-bg); border-color: var(--steel); }
+  .chip.agent { color: var(--ember); background: var(--ember-bg); border-color: var(--ember); }
+  .chip.human { color: var(--ink); background: var(--surface-2); border-color: var(--rule-hard); }
+
+  /* ---------- sections ---------- */
+
+  section { margin-bottom: 76px; scroll-margin-top: 24px; }
+
+  .sec-head {
+    display: grid;
+    grid-template-columns: 62px 1fr;
+    align-items: start;
+    gap: 0 18px;
+    border-top: 1px solid var(--rule-hard);
+    padding-top: 16px;
+    margin-bottom: 30px;
+  }
+  .sec-num {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ember);
+    padding-top: .45em;
+    letter-spacing: .04em;
+  }
+  .sec-head h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(1.45rem, 3vw, 1.95rem);
+    line-height: 1.18;
+    letter-spacing: -.016em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .sec-head .dek {
+    grid-column: 2;
+    color: var(--ink-soft);
+    font-size: 15.5px;
+    margin: 10px 0 0;
+    max-width: var(--measure);
+  }
+
+  .body-col { max-width: var(--measure); }
+  .body-col > * + * { margin-top: 1.1em; }
+  p { margin: 0; }
+
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.12rem;
+    letter-spacing: -.008em;
+    margin: 42px 0 14px;
+    color: var(--ink);
+  }
+  h3 .h3-mark {
+    font-family: var(--mono);
+    font-size: .74em;
+    font-weight: 400;
+    color: var(--ink-faint);
+    margin-right: .6em;
+  }
+
+  strong { font-weight: 700; }
+  code {
+    font-family: var(--mono);
+    font-size: .875em;
+    background: var(--surface-2);
+    padding: .1em .38em;
+    border-radius: 2px;
+    color: var(--ink);
+  }
+  a { color: var(--steel); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--ember);
+    outline-offset: 3px;
+  }
+
+  ul.tight { margin: 0; padding-left: 1.25em; }
+  ul.tight li + li { margin-top: .45em; }
+
+  /* ---------- pipeline ---------- */
+
+  .pipe {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-family: var(--mono);
+    font-size: 13px;
+    margin: 4px 0 8px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .pipe-row {
+    display: grid;
+    grid-template-columns: 74px 128px 1fr 104px;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border-left: 4px solid var(--rule-hard);
+  }
+  .pipe-row.is-code  { border-left-color: var(--steel); background: var(--steel-bg); }
+  .pipe-row.is-agent { border-left-color: var(--ember); background: var(--ember-bg); }
+  .pipe-row.is-human { border-left-color: var(--ink); background: var(--surface-2); }
+  .pipe-stage { color: var(--ink-faint); letter-spacing: .04em; }
+  .pipe-name  { font-weight: 500; color: var(--ink); }
+  .pipe-what  { font-family: var(--body); font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
+  .pipe-out   { color: var(--ink-soft); font-size: 11.5px; text-align: right; }
+  .pipe-row.is-new .pipe-name::after {
+    content: "NEW";
+    font-size: 9px;
+    letter-spacing: .1em;
+    color: var(--ember);
+    border: 1px solid var(--ember);
+    border-radius: 2px;
+    padding: 1px 4px;
+    margin-left: 8px;
+    vertical-align: 2px;
+  }
+
+  /* ---------- tables ---------- */
+
+  .scroller {
+    overflow-x: auto;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: var(--surface);
+    margin: 4px 0;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 560px;
+    font-size: 14.5px;
+  }
+  caption {
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 12px 16px 0;
+  }
+  th, td {
+    text-align: left;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  thead th {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--rule-hard);
+    white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.tag-code  { color: var(--steel); font-family: var(--mono); font-size: 12.5px; white-space: nowrap; }
+  td.tag-agent { color: var(--ember); font-family: var(--mono); font-size: 12.5px; white-space: nowrap; }
+  tfoot td {
+    background: var(--surface-2);
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    border-top: 1px solid var(--rule-hard);
+  }
+
+  /* ---------- callouts ---------- */
+
+  .callout {
+    border: 1px solid var(--rule-hard);
+    border-left: 4px solid var(--ink);
+    border-radius: 3px;
+    background: var(--surface);
+    padding: 20px 22px;
+    margin: 4px 0;
+  }
+  .callout-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+  }
+  .callout > p { max-width: var(--measure); }
+  .callout > * + * { margin-top: .9em; }
+  .callout.retract { border-left-color: var(--alert); background: var(--alert-bg); }
+  .callout.retract .callout-label { color: var(--alert); }
+  .callout.verified { border-left-color: var(--steel); }
+  .callout.verified .callout-label { color: var(--steel); }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.65;
+    background: var(--surface-2);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    margin: 4px 0;
+    color: var(--ink);
+  }
+  pre code { background: none; padding: 0; font-size: 1em; }
+
+  /* ---------- attribution ---------- */
+
+  .src {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 2px;
+    vertical-align: 2px;
+    margin-left: 10px;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+  .src-agy    { color: var(--ember); background: var(--ember-bg); border: 1px solid var(--ember); }
+  .src-hermes { color: var(--steel); background: var(--steel-bg); border: 1px solid var(--steel); }
+  .src-me     { color: var(--ink-soft); background: var(--surface-2); border: 1px solid var(--rule-hard); }
+
+  /* ---------- score grid ---------- */
+
+  .score-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(212px, 1fr));
+    gap: 14px;
+    margin: 4px 0;
+  }
+  .score-card {
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--ember);
+    border-radius: 3px;
+    background: var(--surface);
+    padding: 16px 18px 18px;
+  }
+  .score-card .dim {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.02rem;
+    letter-spacing: -.005em;
+  }
+  .score-card .wt {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+    margin-top: 3px;
+  }
+  .score-card p { font-size: 13.5px; color: var(--ink-soft); line-height: 1.6; margin-top: 11px; }
+  .score-card .hard {
+    margin-top: 11px;
+    padding-top: 11px;
+    border-top: 1px dashed var(--rule-hard);
+    font-size: 13px;
+    color: var(--ember);
+    font-weight: 500;
+  }
+
+  /* ---------- details ---------- */
+
+  details {
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: var(--surface);
+    margin: 4px 0;
+  }
+  summary {
+    cursor: pointer;
+    padding: 13px 18px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    letter-spacing: .04em;
+    color: var(--ink-soft);
+    list-style: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before {
+    content: "+";
+    display: inline-block;
+    width: 1.2em;
+    color: var(--ember);
+    font-weight: 500;
+  }
+  details[open] summary::before { content: "\2212"; }
+  details[open] summary { border-bottom: 1px solid var(--rule); color: var(--ink); }
+  .details-body { padding: 18px; }
+  .details-body > * + * { margin-top: 1em; }
+  .details-body p { max-width: var(--measure); font-size: 15px; }
+
+  /* ---------- open items ---------- */
+
+  ol.open-list { list-style: none; counter-reset: oi; margin: 0; padding: 0; }
+  ol.open-list li {
+    counter-increment: oi;
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 14px;
+    padding: 15px 0;
+    border-top: 1px solid var(--rule);
+    max-width: 78ch;
+  }
+  ol.open-list li::before {
+    content: counter(oi, decimal-leading-zero);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+    padding-top: .35em;
+  }
+
+  footer.doc-foot {
+    border-top: 2px solid var(--ink);
+    margin-top: 20px;
+    padding-top: 20px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 28px;
+  }
+
+  @media (max-width: 720px) {
+    .shell { padding: 0 18px 80px; }
+    .sec-head { grid-template-columns: 1fr; gap: 6px; }
+    .sec-num { padding-top: 0; }
+    .sec-head .dek { grid-column: 1; }
+    .pipe-row { grid-template-columns: 62px 1fr; gap: 4px 12px; }
+    .pipe-what { grid-column: 2; }
+    .pipe-out { grid-column: 2; text-align: left; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="shell">
+
+  <header class="mast">
+    <div class="mast-eyebrow">設計文件 · v0.2</div>
+    <h1>anvil
+      <span class="lede-cjk">任意主題簡報引擎 —— 接受任何主題、任何程度，以 grill 契約約束範疇，由 Google 搜尋供料，產出 HTML 並寄送連結。</span>
+    </h1>
+    <div class="mast-meta">
+      <span><b>日期</b> 2026-09-25</span>
+      <span><b>取代</b> PLAN.md 架構部分</span>
+      <span><b>評審</b> agy · hermes</span>
+      <span><b>狀態</b> 設計定案 · §0–§L</span>
+      <span><b>實作</b> 進行中 · IMPL_PLAN_SHELL.md</span>
+    </div>
+  </header>
+
+  <div class="legend">
+    <span class="chip code">程式碼 — 決定性操作，0 token</span>
+    <span class="chip agent">Agent — 不可化約的判斷</span>
+    <span class="chip human">人 — 品質把關</span>
+  </div>
+
+  <!-- ===================== A ===================== -->
+  <section id="a">
+    <div class="sec-head">
+      <div class="sec-num">§ A</div>
+      <h2>泛用化的關鍵不是「更多來源」，是「範疇契約」</h2>
+      <p class="dek">一換主題就全廢的來源矩陣，換成一份每期都被遵守的契約。</p>
+    </div>
+
+    <div class="body-col">
+      <p><code>PLAN.md</code> 把來源矩陣寫死 —— SPIE、ASML、IEEE Xplore。那套東西一換主題就全廢。</p>
+      <p>泛用引擎不能有固定來源清單，也不能有固定過濾規則。但「任何主題」的過濾器本來就無法預先定義 —— <strong>grill 就是範疇被定義的那一刻。</strong></p>
+      <p>使用者給一個粗糙主題，系統把他問到吐出三件事：精確問題、語境與程度、收錄邊界。這三件事凝結成 <code>brief.json</code>。之後的搜尋、過濾、寫作<strong>全部只服從這份契約</strong>。</p>
+      <p>來源清單改由 agy 在 Discover 階段現場探勘，快取進該主題的狀態檔 —— 這就是來源矩陣的泛用化版本。</p>
+    </div>
+
+    <h3><span class="h3-mark">A.1</span>先行技術的死法<span class="src src-agy">agy 查核</span></h3>
+
+    <div class="scroller">
+      <table>
+        <caption>通用型簡報系統的兩個結構性死穴</caption>
+        <thead>
+          <tr><th>死穴</th><th>內容</th><th>證據</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>無聊的平均值</strong><br><span style="color:var(--ink-faint);font-size:13px;">Boring Average</span></td>
+            <td>開放式搜尋抓到的多是公關稿、SEO 內容農場、二手轉載。缺乏本體約束時，LLM 產出文筆流暢但零情報密度的「百科型陳腔濫調」。</td>
+            <td>Stanford STORM<br><a href="https://arxiv.org/abs/2402.14207">arXiv:2402.14207</a> 錯誤分析</td>
+          </tr>
+          <tr>
+            <td><strong>紅鯡魚關聯</strong><br><span style="color:var(--ink-faint);font-size:13px;">Red Herrings</span></td>
+            <td>LLM 把表面相關的次要花絮放大成核心趨勢；下游 agent 把上游誤判當既定事實疊加，形成內部自洽的串聯假象。</td>
+            <td>同上</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="body-col" style="margin-top:20px;">
+      <p>補充教訓：Instagram 創辦人的 AI 新聞 App <strong>Artifact 於 2024 年關閉</strong>（後被 Yahoo 收購），證明通用型 AI 新聞聚合缺乏決策護城河 —— 泛泛總結無法替代高精度垂直情報。</p>
+      <p><strong>這是 anvil 最大的存在風險。</strong>反制手段分散在四處：決策異動點（§C）、硬負向過濾（§C）、四維評分（§F）、對抗性查核（§G）。</p>
+    </div>
+  </section>
+
+  <!-- ===================== B ===================== -->
+  <section id="b">
+    <div class="sec-head">
+      <div class="sec-num">§ B</div>
+      <h2>管線：判斷與機械分離</h2>
+      <p class="dek">分界線按「操作」畫，不按「階段」畫 —— v0.1 畫粗了。</p>
+    </div>
+
+    <div class="pipe">
+      <div class="pipe-row is-human">
+        <span class="pipe-stage">①</span><span class="pipe-name">Grill</span>
+        <span class="pipe-what">人機對話：問出確切問題、align context、釐清範疇</span>
+        <span class="pipe-out">brief.json</span>
+      </div>
+      <div class="pipe-row is-agent">
+        <span class="pipe-stage">②</span><span class="pipe-name">Discover</span>
+        <span class="pipe-what">agy 搜尋：探勘權威來源，萃取可執行的檢索運算式</span>
+        <span class="pipe-out">sources.json</span>
+      </div>
+      <div class="pipe-row is-agent">
+        <span class="pipe-stage">③</span><span class="pipe-name">Harvest</span>
+        <span class="pipe-what">agy 搜尋（主引擎）：兩層檢索 + 微摘要萃取</span>
+        <span class="pipe-out">nuggets.json</span>
+      </div>
+      <div class="pipe-row is-code is-new">
+        <span class="pipe-stage">③.5</span><span class="pipe-name">Prefilter</span>
+        <span class="pipe-what">規則過濾 + 去重，零 token、可重現</span>
+        <span class="pipe-out">filtered.json</span>
+      </div>
+      <div class="pipe-row is-agent">
+        <span class="pipe-stage">④</span><span class="pipe-name">Judge</span>
+        <span class="pipe-what">對照契約做四維評分（評微摘要，不評標題）</span>
+        <span class="pipe-out">candidates.json</span>
+      </div>
+      <div class="pipe-row is-agent">
+        <span class="pipe-stage">⑤</span><span class="pipe-name">Compose</span>
+        <span class="pipe-what">分析 + 跨源合成 + 對抗性查核</span>
+        <span class="pipe-out">issue.json</span>
+      </div>
+      <div class="pipe-row is-code is-new">
+        <span class="pipe-stage">⑤.5</span><span class="pipe-name">Validate</span>
+        <span class="pipe-what">schema 校驗 + 無出處即拒收</span>
+        <span class="pipe-out">issue.json ✓</span>
+      </div>
+      <div class="pipe-row is-code">
+        <span class="pipe-stage">⑥</span><span class="pipe-name">Deliver</span>
+        <span class="pipe-what">render.py → Artifact 頁 → Gmail 輕量信</span>
+        <span class="pipe-out">https:// 連結</span>
+      </div>
+    </div>
+
+    <h3><span class="h3-mark">B.1</span>分界線重畫<span class="src src-hermes">hermes</span></h3>
+
+    <div class="body-col">
+      <p>v0.1 把整段 ③④⑤ 歸 agent，這畫粗了。省 token 的本質是「機械歸零、判斷有界」；分界線畫在階段級別，等於讓機械過濾混在 LLM 判斷裡一起跑 —— 每期白燒 token 且不可重現。</p>
+    </div>
+
+    <div class="scroller">
+      <table>
+        <thead><tr><th>操作</th><th>歸屬</th><th>理由</th></tr></thead>
+        <tbody>
+          <tr><td>include／exclude 關鍵詞比對</td><td class="tag-code">程式碼</td><td>決定性操作，0 token，可重現</td></tr>
+          <tr><td>跨期去重（URL 正規化、指紋）</td><td class="tag-code">程式碼</td><td>同上</td></tr>
+          <tr><td>來源黑名單過濾</td><td class="tag-code">程式碼</td><td>同上</td></tr>
+          <tr><td>「什麼算重要」評分</td><td class="tag-agent">agent</td><td>不可化約的判斷</td></tr>
+          <tr><td>跨源合成分析</td><td class="tag-agent">agent</td><td>⑤ 的核心價值</td></tr>
+          <tr><td>schema 校驗 + provenance 拒收</td><td class="tag-code">程式碼</td><td><strong>v0.1 完全漏寫</strong></td></tr>
+          <tr><td>② 來源快取何時失效</td><td class="tag-agent">orchestrator</td><td>是判斷，不寫死 TTL</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3><span class="h3-mark">B.2</span>撤回：headless 自動化在技術上完全可行</h3>
+
+    <div class="callout retract">
+      <div class="callout-label">v0.1 的結論錯誤</div>
+      <p>v0.1 斷定「agy 需要活著的 herdr session，headless 腳本叫不到它，因此 anvil 永遠不可能是純 cron job」。<strong>此結論錯誤。</strong>agy 提出反駁，我在本機查核後確認 agy 是對的 —— 而這個結論原本是整個 §B 的支柱。</p>
+    </div>
+
+    <div class="callout verified" style="margin-top:14px;">
+      <div class="callout-label">本機實測確認</div>
+<pre><code>agy --print / -p          單一 prompt 非互動執行並印出回應
+    --output-format json  結構化輸出 (text | json | stream-json)
+    --json-schema &lt;file&gt;  強制結構化輸出符合指定 schema
+    --input-format stream-json   NDJSON 管線串接
+    --dangerously-skip-permissions</code></pre>
+      <p><code>agy --help</code> 實測；另 PyPI 上 <code>google-antigravity</code> 0.1.18 確實存在，<code>pip index versions</code> 實測確認。<strong>herdr 只是終端多工器，不是 agy 的運行依賴。</strong></p>
+    </div>
+
+    <div class="body-col" style="margin-top:20px;">
+      <p><strong>修正後的定位：</strong>保留「人工 Grill」與「寄送前確認」是<strong>品質把關政策</strong>，不是技術限制。系統成熟後可平滑升級為排程無人模式，屆時只需把對話式 dispatch 換成 <code>agy -p --json-schema</code> 呼叫。</p>
+      <p><strong>附帶收穫：</strong><code>--json-schema</code> 直接服務微摘要與評分的輸出格式 —— 不必靠 prompt 祈禱 LLM 回傳合法 JSON，可由 CLI 強制。</p>
+    </div>
+  </section>
+
+  <!-- ===================== C ===================== -->
+  <section id="c">
+    <div class="sec-head">
+      <div class="sec-num">§ C</div>
+      <h2>Grill Gate</h2>
+      <p class="dek">一輪批次問完，不做來回盤問。這是省 token 的設計決策，不只是體貼使用者。</p>
+    </div>
+
+    <div class="scroller">
+      <table>
+        <caption>五類必問 — 只問會改變產出的問題</caption>
+        <thead><tr><th>類別</th><th>要逼出什麼</th><th>問不出來的代價</th></tr></thead>
+        <tbody>
+          <tr><td><strong>目標</strong><br><span style="color:var(--ink-faint);font-size:12.5px;font-family:var(--mono);">purpose</span></td><td>你要這份簡報去做什麼決定？</td><td>寫成無用的百科摘要</td></tr>
+          <tr style="background:var(--ember-bg);"><td><strong>決策異動點</strong><br><span style="color:var(--ember);font-size:12.5px;font-family:var(--mono);">delta ‧ NEW</span></td><td><strong>發生何種具體指標變化，你才會改變既有決策或行動？</strong></td><td>產出「發生了什麼事」而非「這件事對你的淨衝擊」</td></tr>
+          <tr><td><strong>程度</strong><br><span style="color:var(--ink-faint);font-size:12.5px;font-family:var(--mono);">level</span></td><td>L1 外行 / L2 入門 / L3 從業者 / L4 專家 / L5 研究前沿</td><td>術語密度全錯，讀不下去或太淺</td></tr>
+          <tr><td><strong>邊界</strong><br><span style="color:var(--ink-faint);font-size:12.5px;font-family:var(--mono);">scope</span></td><td>明確的 in／<strong>out</strong> 清單</td><td>③.5 無法過濾，垃圾進垃圾出</td></tr>
+          <tr><td><strong>既有認知</strong><br><span style="color:var(--ink-faint);font-size:12.5px;font-family:var(--mono);">known / uncertain</span></td><td>已經知道什麼、哪裡沒把握</td><td>重複講已懂的，跳過不懂的</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3><span class="h3-mark">C.2</span>決策異動點是反制「無聊的平均值」的主要武器<span class="src src-agy">agy</span></h3>
+    <div class="body-col">
+      <p><code>purpose</code> 必須被逼問到可操作的門檻形式 —— 例：「若 High-NA 良率數據低於 X，我就改變對 A14 時程的判斷」。⑤ Compose 被要求只寫<strong>對這些門檻的淨衝擊</strong>，不寫事件敘述。這是把 §A.1 的死穴反轉成產品優勢的機制。</p>
+    </div>
+
+    <h3><span class="h3-mark">C.3</span>自動注入的硬負向過濾</h3>
+    <div class="body-col">
+      <p>Grill 階段由系統<strong>自動注入</strong>預設黑名單，不需使用者自己想。可覆寫，但預設開啟。</p>
+      <ul class="tight">
+        <li>無實質資料支撐的公關稿發布平台（PR Newswire、Business Wire 等）</li>
+        <li>缺乏第一手數據的彙編盤點文、內容農場</li>
+        <li>純轉載、無新增分析者</li>
+      </ul>
+    </div>
+
+    <h3><span class="h3-mark">C.4</span>程度旋鈕控制的四件事</h3>
+    <div class="body-col">
+      <ul class="tight">
+        <li>術語是否附解釋</li>
+        <li>TL;DR 長度</li>
+        <li>是否收錄一次文獻 (primary literature)</li>
+        <li>卡片的推測性上限 —— L1 禁止推測；L5 允許明確標記的前瞻判斷</li>
+      </ul>
+      <p><strong><code>known</code> 欄位有雙重用途：</strong>既是過濾器（別再講一遍），也是彈藥 —— 使用者寫下的 <code>uncertain</code> 正是 ③ Harvest 該去找反證的地方，也是 ④ Judge「決策攻擊力」的評分基準。</p>
+    </div>
+  </section>
+
+  <!-- ===================== D ===================== -->
+  <section id="d">
+    <div class="sec-head">
+      <div class="sec-num">§ D</div>
+      <h2>資料契約</h2>
+      <p class="dek">四份 JSON。<code>exclude</code>、<code>uncertain</code>、<code>delta_triggers</code> 是 PLAN.md 完全沒有的三欄，也是最有價值的三欄。</p>
+    </div>
+
+    <details open>
+      <summary>brief.json — 範疇契約</summary>
+      <div class="details-body">
+<pre><code>{
+  "topic": "…",
+  "core_question": "一句話，可被回答的",
+  "level": "L3",
+  "purpose": "decision | learning | monitoring",
+  "delta_triggers": ["若 X 指標跨過 Y，我會改變 Z 決策"],
+  "scope": { "include": ["…"], "exclude": ["…"], "sections": ["…"] },
+  "known":     ["讀者已掌握，勿重述"],
+  "uncertain": ["讀者沒把握 → Harvest 優先攻擊、Judge 優先給分"],
+  "sources":   { "authoritative": [], "banned": [] },
+  "hard_filters": { "pr_wire": true, "listicle": true, "pure_syndication": true },
+  "cadence": "weekly | oneshot",
+  "skip_empty": false
+}</code></pre>
+        <p><strong>注意：<code>seen_ids</code> 不放在 brief 裡</strong>（v0.1 的錯誤）。跨期去重狀態移到 <code>state.json</code>，避免數百個 id 污染 orchestrator context。<span class="src src-hermes">hermes</span></p>
+      </div>
+    </details>
+
+    <details>
+      <summary>nuggets.json — ③ Harvest 輸出的微摘要</summary>
+      <div class="details-body">
+        <p>由抓取子 agent 在<strong>它自己的 context</strong> 內把每篇候選壓成約 80 字結構化微摘要。</p>
+<pre><code>{ "id": "…", "title": "…",
+  "core_claim": "一至兩句具體技術或指標異動",
+  "metric_delta": "量化指標或監管狀態變化",
+  "source_domain": "…", "url": "…", "date": "…",
+  "facet": "A | B | C", "tier": 1 }</code></pre>
+      </div>
+    </details>
+
+    <details>
+      <summary>sources.json — ② Discover 輸出，含可執行運算式</summary>
+      <div class="details-body">
+        <p>不只記來源名稱，<strong>必須萃取可執行的檢索運算式</strong>。</p>
+<pre><code>{ "anchors": [
+    { "name": "ASML IR", "operator": "site:asml.com/en/investors", "weight": "primary" },
+    { "name": "arXiv",   "operator": "site:arxiv.org",             "weight": "primary" }
+  ],
+  "discovered_at": "2026-09-25", "hit_rates": {} }</code></pre>
+      </div>
+    </details>
+
+    <details>
+      <summary>state.json — 跨期狀態，滾動保留最近 8 期</summary>
+      <div class="details-body">
+<pre><code>{ "topic": "…",
+  "issues": [ { "n": 1, "date": "2026-09-25", "status": "normal",
+                "seen": ["正規化 URL"], "fingerprints": ["標題 SimHash"] } ],
+  "url_overrides": [],
+  "queries_log": [ { "issue": 1, "query": "…", "facet": "A", "hits": 12 } ] }</code></pre>
+        <p><code>queries_log</code> 同時服務可重現性：每期實際跑過的 query 逐字留存，重跑可比對覆蓋率差異。</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ===================== E ===================== -->
+  <section id="e">
+    <div class="sec-head">
+      <div class="sec-num">§ E</div>
+      <h2>交付與 token 預算</h2>
+      <p class="dek">重內容走 Artifact，輕通知走 Gmail —— 這個分工讓 Gmail 的 CSS 閹割實質不構成問題。</p>
+    </div>
+
+    <div class="body-col">
+      <p><code>render.py</code> 把已驗證的 <code>issue.json</code> 灌進 HTML 模板，發布成 <strong>Artifact</strong>（真實 <code>https://</code> 網址，跨裝置可點，支援表格、摺疊、深色模式），Gmail 只收一封輕量信：TL;DR 三行 + 連結。</p>
+      <p><strong>寄送前一律先給專案擁有者確認，不自動發。</strong></p>
+    </div>
+
+    <h3><span class="h3-mark">E.1</span>Gmail 端硬限制<span class="src src-agy">agy 查核</span></h3>
+    <div class="body-col">
+      <ul class="tight">
+        <li>HTML 信件 <strong>102 KB</strong> 上限，超過顯示 <code>[Message clipped]</code></li>
+        <li>禁止外部樣式表；<code>&lt;style&gt;</code> 區塊行動端常被剝除 → <strong>一律 100% 行內樣式</strong></li>
+        <li><strong>不支援 <code>&lt;details&gt;</code>／<code>&lt;summary&gt;</code></strong>、不支援 CSS Grid 與多數 Flexbox 子屬性、封鎖 JavaScript</li>
+        <li>行動端強制暗色反轉 → 色值用 <code>#rrggbb</code>，不用 <code>rgba()</code></li>
+      </ul>
+      <p>因為輕量信只有三行 TL;DR 加一個連結，上述限制實質不構成問題 —— <strong>這正是內容與通知分流的價值</strong>。Artifact 端則受嚴格 CSP：禁止外部 CDN 腳本與樣式表，資源需內嵌或 Base64（Google Fonts 是唯一例外的字型來源）。</p>
+    </div>
+
+    <h3><span class="h3-mark">E.2</span>預算修正<span class="src src-hermes">hermes</span></h3>
+    <div class="body-col">
+      <p>v0.1 把 ① Grill 算進每期預算是錯的（那是首跑成本），且 ⑤ Compose 低估 —— 20 張卡片的結構化輸出約 4k，加上輸入約 2k，實際 6k 而非 4k。</p>
+    </div>
+
+    <div class="scroller">
+      <table>
+        <caption>進入 orchestrator context 的 token 量</caption>
+        <thead><tr><th>階段</th><th>首跑</th><th>穩定期</th><th>備註</th></tr></thead>
+        <tbody>
+          <tr><td>① Grill</td><td class="num">~2k</td><td class="num">0</td><td>僅換主題時</td></tr>
+          <tr><td>② Discover</td><td class="num">~1k</td><td class="num">0</td><td>僅重新探勘時</td></tr>
+          <tr><td>③ Harvest</td><td class="num">~1k</td><td class="num">~1k</td><td>只出 prompt，回收路徑</td></tr>
+          <tr><td>③.5 Prefilter</td><td class="num" style="color:var(--steel);">0</td><td class="num" style="color:var(--steel);">0</td><td>程式碼</td></tr>
+          <tr><td>④ Judge</td><td class="num">~2.5k</td><td class="num">~2.5k</td><td>30 條微摘要，非全文</td></tr>
+          <tr><td>⑤ Compose</td><td class="num">~6k</td><td class="num">~6k</td><td><strong>v0.1 低估 2k</strong></td></tr>
+          <tr><td>⑤.5 Validate</td><td class="num" style="color:var(--steel);">0</td><td class="num" style="color:var(--steel);">0</td><td>程式碼</td></tr>
+          <tr><td>⑥ Deliver</td><td class="num">~0.5k</td><td class="num">~0.5k</td><td>程式碼觸發</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td>合計</td><td class="num">~13k</td><td class="num">~10k</td><td>≈ $0.07/期 · $3.6/年</td></tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:22px;">
+      <div class="callout-label">結論</div>
+      <p><strong>成本從來不是約束，orchestrator context 才是。</strong>「大量內容永不進 orchestrator context」這條鐵律需要機制，否則是空話 —— 三條執行方式：子 agent 回覆 10 行上限寫進 dispatch prompt 的硬規則；任一階段輸入超預算即改丟檔路徑不硬塞；每階段產出物落盤，重跑 ④⑤ 直接讀檔不重新生成。</p>
+    </div>
+  </section>
+
+  <!-- ===================== F ===================== -->
+  <section id="f">
+    <div class="sec-head">
+      <div class="sec-num">§ F</div>
+      <h2>Judge：四維契約評分</h2>
+      <p class="dek">廢除「讓 LLM 憑感覺盲選標題」。總分 100，入選線 65。<span class="src src-agy">agy</span></p>
+    </div>
+
+    <div class="score-grid">
+      <div class="score-card">
+        <div class="dim">相關度 Rel</div>
+        <div class="wt">權重 0.25</div>
+        <p>與 <code>core_question</code>、<code>scope.include</code> 的語意對齊程度。</p>
+      </div>
+      <div class="score-card">
+        <div class="dim">資訊增量 Nov</div>
+        <div class="wt">權重 0.30</div>
+        <p>與 <code>known</code> 及本期已入選項目的語意距離。</p>
+        <div class="hard">命中 known 者直接歸零</div>
+      </div>
+      <div class="score-card">
+        <div class="dim">來源權威 Auth</div>
+        <div class="wt">權重 0.20</div>
+        <p>一次文獻（論文／專利／監管備案／官方財報）最高；頂級垂直分析次之；綜合新聞轉載低；農場文歸零。</p>
+      </div>
+      <div class="score-card">
+        <div class="dim">決策攻擊力 Dec</div>
+        <div class="wt">權重 0.25</div>
+        <p>是否證實或證偽 <code>uncertain</code> 與 <code>delta_triggers</code> 條目。</p>
+        <div class="hard">泛泛提及者極低分</div>
+      </div>
+    </div>
+
+    <div class="body-col" style="margin-top:24px;">
+      <p>權重<strong>視為可調參數，不是精確科學</strong> —— LLM 指派的分數本身有雜訊，過度精確的加權是假精確。四個維度的存在，加上「Nov 歸零」與「Dec 主導」兩條硬規則，才是真正起作用的部分。這讓契約真正驅動評分，而不是當裝飾。</p>
+      <p><strong>理論依據：</strong>Nov 維度來自 MMR（Carbonell &amp; Goldstein, SIGIR 1998）對「相關性 vs 新穎性」的顯式權衡，以及貝氏驚奇度 —— 重要性可客觀定義為新資訊對先驗知識造成的信念位移。事件再大，若讀者早已知道，資訊增量為零。這正是 <code>known</code> 欄位在評分裡的數學意義。</p>
+    </div>
+
+    <h3><span class="h3-mark">F.1</span>為什麼必須評微摘要而非標題</h3>
+    <div class="body-col">
+      <p>v0.1 為省 token 規定 Judge 只看 30 條標題。這有致命盲區：科技與產業新聞標題充斥點擊誘餌與誇大公關詞彙，<strong>只看標題無法判斷是否回答了 <code>uncertain</code>，也無法分辨是否為空洞公關稿</strong>。結果是 Judge 選中華而不實的標題，⑤ 調閱全文才發現內容無物 —— 既浪費 token 又劣化品質。</p>
+      <p>微摘要方案在<strong>子 agent 的 context 內</strong>完成壓縮，不佔 orchestrator 額度。30 條僅約 2.5k token —— <strong>比純標題方案更省，也更準。</strong></p>
+    </div>
+  </section>
+
+  <!-- ===================== G ===================== -->
+  <section id="g">
+    <div class="sec-head">
+      <div class="sec-num">§ G</div>
+      <h2>品質防線</h2>
+      <p class="dek">v0.1 把 PLAN.md 最值錢的三道防線整段丟掉了。主題越泛、來源越雜，數字幻覺傷害越大 —— 泛用引擎<em>更</em>需要防線。<span class="src src-hermes">hermes</span></p>
+    </div>
+
+    <div class="scroller">
+      <table>
+        <thead><tr><th>防線</th><th>機制</th><th>歸屬</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>1 · 無出處即拒收</strong></td>
+            <td>每個定量聲明必須帶出處（來源 + 章節／頁碼／DOI）。⑤.5 校驗，缺出處即拒收該欄位，<strong>不允許 LLM 填補</strong>。</td>
+            <td class="tag-code">程式碼</td>
+          </tr>
+          <tr>
+            <td><strong>2 · 量測條件強制</strong></td>
+            <td>易混情境（實驗值 vs 量產值、不同測試條件）的數值強制附帶條件欄位。</td>
+            <td class="tag-code">程式碼校驗</td>
+          </tr>
+          <tr>
+            <td><strong>3 · 發報前人工復核門</strong></td>
+            <td>寄送前確認，常態化為架構的一部分，而非臨時措施。</td>
+            <td style="font-family:var(--mono);font-size:12.5px;">人</td>
+          </tr>
+          <tr style="background:var(--ember-bg);">
+            <td><strong>4 · 對抗性查核</strong><br><span style="color:var(--ember);font-size:12.5px;font-family:var(--mono);">NEW</span></td>
+            <td>⑤ 生成每張卡片時內建反詰：「若此宣稱僅為公關修飾或常規小改版，反面證據為何？有無第三方獨立數據佐證？」無客觀佐證者強制降級標記為「未證實傳聞／行銷宣傳」。</td>
+            <td class="tag-agent">agent</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="body-col" style="margin-top:18px;">
+      <p>防線 4 借鑑 STORM 的多視角質疑機制，直接對應 §A.1 的紅鯡魚死穴。<span class="src src-agy">agy</span></p>
+    </div>
+  </section>
+
+  <!-- ===================== H ===================== -->
+  <section id="h">
+    <div class="sec-head">
+      <div class="sec-num">§ H</div>
+      <h2>空期是合法狀態，不是管線故障</h2>
+      <p class="dek">情報工作的標準準則：確認沒有重大變化，本身就是高價值情報。</p>
+    </div>
+
+    <div class="body-col">
+      <p>強制每期都要有「重大進展」，是自動情報系統產生幻覺、進而被退訂的主要原因。兩位評審都獨立指出 v0.1 沒定義失敗模式。</p>
+    </div>
+
+    <div class="scroller">
+      <table>
+        <thead><tr><th>狀態</th><th>觸發條件</th><th>fallback 行為</th></tr></thead>
+        <tbody>
+          <tr><td class="tag-code" style="color:var(--ink);">normal</td><td>通過入選線者 ≥ 2</td><td>正常流程</td></tr>
+          <tr><td class="tag-code" style="color:var(--ember);">no_news</td><td>放寬 query 重試一次後仍 0 命中</td><td>渲染「本期無實質進展」頁，附 3 條低於門檻的邊緣觀察；<strong>嚴禁塞入超界內容</strong>；下期自動觸發 ② 重新探勘</td></tr>
+          <tr><td class="tag-code" style="color:var(--ember);">all_excluded</td><td>有命中但全部命中 exclude</td><td>列出被排除標題與命中的 exclude 詞，讓使用者判斷邊界是否過嚴；<strong>只在下期 grill 建議放寬，絕不自動改契約</strong></td></tr>
+          <tr><td class="tag-code" style="color:var(--ink-soft);">partial</td><td>部分來源抓取失敗</td><td>正常出刊，加「來源缺檔告知」；失敗來源寫進 <code>source_gaps</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:22px;">
+      <div class="callout-label">核心原則</div>
+      <p>寧可誠實出一期「本期無實質進展」，也不為了出刊而塞入超出契約邊界的內容 —— 那會直接違反 §A「全部只服從契約」。<strong>契約是使用者自己畫的線，只有使用者能改</strong>：系統負責把「全被排除」這個訊號浮出來，不負責放寬。</p>
+      <p>空期預設仍發輕量通知，證明管線端到端跑完、排程沒斷；<code>skip_empty: true</code> 可關閉。</p>
+    </div>
+  </section>
+
+  <!-- ===================== I ===================== -->
+  <section id="i">
+    <div class="sec-head">
+      <div class="sec-num">§ I</div>
+      <h2>兩層檢索與三層去重</h2>
+      <p class="dek">單一籠統自然語言搜尋的三個不確定性根源：SERP 動態波動、只取前 10 筆導致長尾沈沒、LLM 生成關鍵字的隨機變異。</p>
+    </div>
+
+    <h3><span class="h3-mark">I.1</span>Harvest 兩層檢索<span class="src src-agy">agy</span></h3>
+
+    <div class="body-col">
+      <p><strong>Tier-1 錨定確定性掃描</strong> —— 對 <code>sources.json</code> 的 anchor 運算式做確定性遍歷，帶嚴格時間運算元，確保核心陣地 100% 覆蓋：</p>
+    </div>
+<pre><code>site:asml.com/en/investors after:2026-09-18</code></pre>
+
+    <div class="body-col" style="margin-top:18px;">
+      <p><strong>Tier-2 多面向正交探勘</strong> —— <strong>禁止</strong>向 agy 輸入單一籠統 prompt。由 <code>core_question</code> 與 <code>uncertain</code> 正交拆解為三組運算式：</p>
+    </div>
+<pre><code>面向 A  技術指標／架構突破
+        "{實體}" (breakthrough OR benchmark OR spec) after:{date}
+
+面向 B  產能／商業／供應鏈
+        "{實體}" (capex OR yield OR delay OR contract) after:{date}
+
+面向 C  競品／替代方案／瓶頸
+        "{實體}" (vs OR alternative OR bottleneck) after:{date}</code></pre>
+
+    <div class="body-col" style="margin-top:18px;">
+      <p><strong>覆蓋率熔斷：</strong>若兩層去重後有效條目少於 15，自動啟動查詢放寬二次檢索。<strong>嚴禁在候選不足時強行進入 Judge。</strong></p>
+      <p><strong>可重現性：</strong>搜尋固定 temperature=0，每條 query 逐字記錄進 <code>state.queries_log</code>。某來源連續 2 期 0 命中則觸發 ② 重新探勘。<span class="src src-hermes">hermes</span></p>
+    </div>
+
+    <h3><span class="h3-mark">I.2</span>去重三層</h3>
+
+    <div class="scroller">
+      <table>
+        <thead><tr><th>層</th><th>機制</th><th>成本</th><th>擋什麼</th></tr></thead>
+        <tbody>
+          <tr><td class="num">L1</td><td class="tag-code">URL 正規化後比對 state.seen</td><td class="num" style="color:var(--steel);">0 token</td><td>追蹤參數（utm_*、fbclid、gclid）、AMP／m. 子網域、尾斜線、http/https 混用</td></tr>
+          <tr><td class="num">L2</td><td class="tag-code">標題 SimHash 指紋，漢明距離比對</td><td class="num" style="color:var(--steel);">0 token</td><td><strong>通訊社通稿洗版</strong> —— 同一篇 Reuters 稿被 50 家轉載，URL 各異，L1 完全擋不到</td></tr>
+          <tr><td class="num">L3</td><td class="tag-agent">Judge prompt 加一句「標記再報導」</td><td class="num">~100 token</td><td>同一事件、不同媒體、獨立採寫的語意重複</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:22px;">
+      <div class="callout-label">設計裁決 — 兩位評審在此衝突</div>
+      <p>agy 建議建 SQLite 加內文 SimHash 基建；hermes 主張 30 條／期的量級不值得專建語意去重管線。</p>
+      <p><strong>採 hermes 的量級判斷，但吸收 agy 的通訊社洗版顧慮</strong> —— SimHash 只算<strong>標題</strong>、狀態存 JSON 而非 SQLite，約 30 行程式碼即可取得 L2 的主要收益，而不引入資料庫維運成本。去重資料<strong>永不進入 LLM context</strong>。</p>
+    </div>
+  </section>
+
+  <!-- ===================== J ===================== -->
+  <section id="j">
+    <div class="sec-head">
+      <div class="sec-num">§ J</div>
+      <h2>泛用卡片 schema</h2>
+      <p class="dek">原 EUV 卡片綁定領域太深 —— TRL 評級、WPH／mJ·cm⁻²／EPE 固定指標、影響面鎖定光罩廠與代工毛利。泛用化原則：必備欄位極少，領域欄位由契約驅動。<span class="src src-hermes">hermes</span></p>
+    </div>
+
+    <div class="scroller">
+      <table>
+        <thead><tr><th>分級</th><th>欄位</th><th>依據</th></tr></thead>
+        <tbody>
+          <tr><td><strong>必備</strong><br><span style="font-size:12.5px;color:var(--ink-faint);">任何主題成立</span></td><td><code>title</code> <code>source</code> <code>date</code> <code>importance</code> <code>summary</code></td><td>資訊單位的最小完整集</td></tr>
+          <tr><td><strong>必備</strong><br><span style="font-size:12.5px;color:var(--ink-faint);">有定量宣言時</span></td><td><code>claim_provenance</code></td><td>防線 1 泛化</td></tr>
+          <tr><td><strong>必備</strong><br><span style="font-size:12.5px;color:var(--ink-faint);">purpose = decision 時</span></td><td><code>delta_impact</code></td><td>§C.2 反制「無聊的平均值」</td></tr>
+          <tr><td><strong>必備</strong><br><span style="font-size:12.5px;color:var(--ink-faint);">對抗性查核輸出</span></td><td><code>verification</code></td><td>防線 4</td></tr>
+          <tr><td><strong>可選</strong><br><span style="font-size:12.5px;color:var(--ink-faint);">契約驅動</span></td><td><code>key_metrics</code> <code>impact</code> <code>section</code> <code>speculation</code></td><td>brief 沒定義對應契約欄位 → 整欄不渲染</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <details style="margin-top:18px;">
+      <summary>完整 card schema</summary>
+      <div class="details-body">
+<pre><code>{ "cards": [ {
+    "title": "…",
+    "source": { "name": "…", "url": "…" },
+    "date": "2026-09-25",
+    "importance": 4,
+    "summary": "2~4 句",
+    "delta_impact": "對 brief.delta_triggers 的淨衝擊",
+    "claim_provenance": [ { "claim": "…", "ref": "…" } ],
+
+    "key_metrics": [ { "label": "…", "value": "…",
+                       "condition": "量產 (HVM) vs 實驗室",
+                       "provenance": "…" } ],
+    "impact": { "favorable": ["…"], "unfavorable": ["…"] },
+    "section": "…",
+    "speculation": { "enabled": true, "text": "…" },
+    "verification": "corroborated | unverified_claim | marketing"
+  } ] }</code></pre>
+        <p>渲染規則：必備常顯；可選有值才渲染；每卡一個 <code>&lt;details&gt;</code> 摺疊；深色模式用 <code>prefers-color-scheme</code>。</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ===================== L ===================== -->
+  <section id="l">
+    <div class="sec-head">
+      <div class="sec-num">§ L</div>
+      <h2>交付層</h2>
+      <p class="dek">agy 設計，orchestrator 審核後修正五處納入。四處阻斷級。</p>
+    </div>
+
+    <h3><span class="h3-mark">L.1</span>通過審核的部分（已查證）</h3>
+
+    <div class="scroller">
+      <table>
+        <thead><tr><th>項目</th><th>查核結果</th></tr></thead>
+        <tbody>
+          <tr><td><code>send_message(draftId=…)</code> 可直接寄出既有草稿</td><td><strong style="color:var(--steel);">正確</strong> —— 工具規格明載 draftId 存在時其餘欄位忽略，草稿原樣寄出</td></tr>
+          <tr><td>102 KB = 104,448 bytes</td><td>算術正確</td></tr>
+          <tr><td><code>render.py</code> 四條禁令：不連網、不叫 LLM、不改 state、不容忍 schema 缺失</td><td>通過，且為本節最有價值的規格</td></tr>
+          <tr><td>stdout 單行 JSON + exit code 協定</td><td>通過</td></tr>
+          <tr><td>每期獨立新網址</td><td>通過 —— 情報是特定時間點的決策依據，覆寫單一網址會讓舊信的摘要與內容脫節</td></tr>
+          <tr><td>四種狀態的頁面與信件呈現</td><td>通過。<code>no_news</code> 的「基準維持」與 <code>all_excluded</code> 的「邊界捍衛」framing 正確 —— 不長得像失敗畫面</td></tr>
+          <tr><td>零空洞條件渲染（缺值時連 margin／padding 都不輸出）</td><td>通過</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3><span class="h3-mark">L.2</span>修正一：深色模式只做了一半</h3>
+
+    <div class="callout retract">
+      <div class="callout-label">阻斷級</div>
+      <p>agy 只寫了 <code>@media (prefers-color-scheme: dark)</code>。但 Artifact 檢視器有<strong>三種</strong>狀態，不是兩種 —— 明確選擇會在根元素蓋上 <code>data-theme</code>，而預設的「跟隨系統」不蓋任何標記。</p>
+      <p>agy 的寫法完全忽略 <code>data-theme</code>，後果是：<strong>讀者在亮色系統上手動切到深色，頁面不會變。</strong>這是 Artifact 最典型的壞頁 bug。</p>
+    </div>
+
+<pre><code>:root { /* 完整亮色 token 組 */ }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { /* 只覆寫 token */ }
+}
+
+:root[data-theme="dark"] { /* 再覆寫一次，讓切換鈕兩個方向都贏 */ }</code></pre>
+
+    <div class="body-col" style="margin-top:18px;">
+      <p>追加兩條硬規則：<strong><code>body</code> 必須從 token 明確指定 <code>background</code></strong>（透明 body 會借到宿主底色，導致一個主題的文字疊在另一個主題的底上）；<strong>任何顏色都不准只定義在 media 或 <code>[data-theme]</code> 區塊裡</strong>。</p>
+    </div>
+
+    <h3><span class="h3-mark">L.3</span>修正二：<code>update_draft</code> 會把 HTML 清掉</h3>
+
+    <div class="callout retract">
+      <div class="callout-label">阻斷級 · 從工具規格挖出，agy 看不到</div>
+      <p>agy 的退回流程第 4 步呼叫 <code>update_draft</code> 原地更新草稿。工具規格的隱藏行為：<strong>若提供 <code>body</code> 但省略 <code>htmlBody</code>，既有的 HTML body 會被清除。</strong></p>
+      <p>退回重製時<strong>必須同時傳 <code>body</code> 與 <code>htmlBody</code></strong>，否則草稿退化成純文字，輕量信的 table 排版全毀。已寫成硬規則。</p>
+    </div>
+
+    <h3><span class="h3-mark">L.4</span>修正三：往期導覽與不可變快照自相矛盾</h3>
+
+    <div class="body-col">
+      <p>agy 想在頁面注入 <code>[◀ 上一期]</code> 與「往期目錄清單」。但每期獨立網址的整個論證建立在<strong>快照不可變</strong>之上 —— 而一份會保持最新的目錄、或任何「下一期」連結，都需要回頭重新發布舊期，正好破壞不可變性。</p>
+      <ul class="tight">
+        <li><strong>只准向後連</strong>（指向更舊的期次）—— 那些網址在渲染時已經存在</li>
+        <li><strong>禁止「下一期」連結，禁止在期次頁內放會過期的目錄</strong></li>
+        <li>若真需要會更新的總目錄，它必須是<strong>另一個常駐 Artifact</strong></li>
+      </ul>
+    </div>
+
+    <h3><span class="h3-mark">L.5</span>修正四：「或於 Gmail 直接按傳送」是狀態漏洞</h3>
+
+    <div class="callout retract">
+      <div class="callout-label">阻斷級</div>
+      <p>agy 允許擁有者直接在 Gmail 按傳送。但那樣 orchestrator 永遠不知道信寄出去了，<code>state.json</code> 不會記錄該期，<strong>下一期的跨期去重就從此失準</strong>。</p>
+      <p>裁決：<strong>核准只走 CLI 一條路。</strong>擁有者可以在 Gmail 裡讀草稿，但傳送動作由 orchestrator 執行 —— 因為只有它會在寄出後補寫狀態。</p>
+    </div>
+
+    <h3><span class="h3-mark">L.6</span>修正五：禁用 Google Fonts 的理由是錯的</h3>
+
+    <div class="body-col">
+      <p>agy 稱 Artifact CSP「嚴格禁止外鏈字型」。<strong>此為錯誤</strong> —— Google Fonts 是 Artifact CSP 唯一放行的外部主機。</p>
+      <p>它選用系統字型棧本身是<strong>安全且可接受</strong>的決定（零外部依賴、離線可讀），故保留；但理由改為「刻意選擇零外部依賴」，避免這條錯誤事實日後無謂地限制排版選擇。其餘 CSP 規範（禁外部樣式表、禁外部腳本、圖示內嵌 SVG）正確。</p>
+    </div>
+
+    <h3><span class="h3-mark">L.7</span>非阻斷的改進</h3>
+
+    <div class="body-col">
+      <ul class="tight">
+        <li><strong><code>create_draft</code> 會回傳 <code>viewUrl</code></strong> —— agy 沒用到。放進 CLI 審查單，擁有者一點就進草稿，不必翻草稿匣。免費的體驗改善。</li>
+        <li><strong>102 KB 的估算方法不嚴謹</strong>（結論仍成立）：只數了 HTML 原始位元組，沒算傳輸編碼。UTF-8 中文每字 3 bytes，quoted-printable 對非 ASCII 約再膨脹 3 倍。即使取 6 KB × 3 ≈ 18 KB，距 102 KB 仍極遠 —— 結論通過，方法記錄修正。</li>
+        <li><strong>主旨行移除 emoji</strong>。主旨帶 emoji 會干擾 Gmail 搜尋與篩選器，觀感也接近行銷信。CTA 按鈕上保留無妨。</li>
+        <li>色票整組是 Google Material（<code>#1a73e8</code>、<code>#137333</code>…）。功能上沒問題，但會讓 anvil 看起來像 Google 的產品。實作模板時再處理。</li>
+        <li>Artifact 頁面有 <strong>16 MB</strong> 上限，agy 未提及。以本專案量級不可能觸及，備記一筆。</li>
+      </ul>
+    </div>
+
+    <h3><span class="h3-mark">L.8</span>交付層定案流程</h3>
+
+<pre><code>render.py  →  issue_NNN.html + email_NNN.html({{ARTIFACT_URL}}) + meta_NNN.json
+                │
+orchestrator ──►  發布 Artifact，取得真實 https:// 網址
+                │
+                ├─ 置換 email 的 {{ARTIFACT_URL}}
+                ├─ create_draft(to=自己, subject, body + htmlBody) → draft_id, viewUrl
+                └─ CLI 印出 6 行審查單（含 Artifact 網址與草稿 viewUrl）
+                │
+擁有者  ──►  APPROVE            → send_message(draftId) → 補寫 state.json → 結案
+        └──►  退回並給修改指示  → 改 issue.json → 重 render → 重發 Artifact
+                                  → update_draft(draftId, body + htmlBody 兩者都傳)
+                                  → 再次審查</code></pre>
+  </section>
+
+  <!-- ===================== K ===================== -->
+  <section id="k">
+    <div class="sec-head">
+      <div class="sec-num">§ K</div>
+      <h2>未解決與待決</h2>
+      <p class="dek">五項。第 4 項已由專案擁有者拍板。</p>
+    </div>
+
+    <ol class="open-list">
+      <li><div><strong>agy 的第三項主張為誤判，不採納。</strong>它稱 Artifact 連結是 <code>file:///</code> 本機路徑因此會被 Gmail 封鎖 —— 這把 Antigravity CLI 的本機 artifact 目錄誤認成 Claude Code 的 Artifact 發布工具，後者產生真實 <code>https://claude.ai</code> 網址。其隱含要求（連結必須跨裝置可點的 https）已滿足。</div></li>
+      <li><div>四維權重的初始值需要幾期實跑校準，目前為估值。</div></li>
+      <li><div>Tier-2 三面向的運算元模板對非技術主題（法規、人文、市場）是否適用，未驗證。</div></li>
+      <li><div><strong>首期主題已定案：沿用 PLAN.md 的 EUV 微影主題。</strong>領域知識已備齊，可專注驗證框架本身而非內容。</div></li>
+      <li><div>尚未設計：<code>render.py</code> 的 HTML 模板實作、Artifact 發布與 Gmail 寄送的串接細節。現階段交付物為設計文件，不含實作。</div></li>
+    </ol>
+  </section>
+
+  <footer class="doc-foot">
+    <span>anvil v0.2</span>
+    <span>2026-09-25</span>
+    <span>評審 · agy（research）＋ hermes（工程可行性）</span>
+    <span>原始文件 · DESIGN_ANVIL.md</span>
+  </footer>
+
+</div>
+
+</body></html>

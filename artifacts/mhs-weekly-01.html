@@ -1,0 +1,120 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>MHS 協議 情報週報 #01</title>
+<style>
+:root {
+  --bg-page: #f6f8fa;
+  --bg-card: #ffffff;
+  --bg-subtle: #eef2f5;
+  --text-main: #16202b;
+  --text-muted: #56646f;
+  --border-color: #dce3e9;
+  --accent: #12697a;
+  --ok-fg: #1c6b3a;
+  --ok-bg: #e4f2e9;
+  --warn-fg: #8a5200;
+  --warn-bg: #faefdc;
+  --risk-fg: #8c2f39;
+  --risk-bg: #f7e7e8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-page: #0d1318;
+    --bg-card: #151d24;
+    --bg-subtle: #1c262f;
+    --text-main: #e3eaef;
+    --text-muted: #95a3b0;
+    --border-color: #263039;
+    --accent: #57b8c8;
+    --ok-fg: #84c99b;
+    --ok-bg: #12301f;
+    --warn-fg: #e0b070;
+    --warn-bg: #33250f;
+    --risk-fg: #de8189;
+    --risk-bg: #3a1b1f;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg-page: #0d1318;
+  --bg-card: #151d24;
+  --bg-subtle: #1c262f;
+  --text-main: #e3eaef;
+  --text-muted: #95a3b0;
+  --border-color: #263039;
+  --accent: #57b8c8;
+  --ok-fg: #84c99b;
+  --ok-bg: #12301f;
+  --warn-fg: #e0b070;
+  --warn-bg: #33250f;
+  --risk-fg: #de8189;
+  --risk-bg: #3a1b1f;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-page);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  line-height: 1.75;
+}
+.wrap { max-width: 900px; margin: 0 auto; padding: 32px 20px 96px; }
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.card h3 { margin: 8px 0 6px; }
+.card-meta { color: var(--text-muted); font-size: 14px; }
+.card-meta > * + * { margin-left: 14px; }
+.summary { margin: 10px 0 0; }
+.delta-impact {
+  margin-top: 12px; padding: 12px 14px;
+  background: var(--bg-subtle); border-left: 3px solid var(--accent);
+}
+.delta-impact strong { display: block; color: var(--accent); font-size: 13px; }
+.verification { font-size: 12px; padding: 2px 8px; border-radius: 2px; }
+.v-corroborated .verification { color: var(--ok-fg); background: var(--ok-bg); }
+.v-unverified_claim .verification { color: var(--warn-fg); background: var(--warn-bg); }
+.v-marketing .verification { color: var(--risk-fg); background: var(--risk-bg); }
+.importance {
+  font-size: 12px; padding: 2px 8px; margin-right: 8px;
+  color: var(--text-muted); background: var(--bg-subtle);
+}
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border-color); }
+thead th { color: var(--text-muted); background: var(--bg-subtle); }
+.num { font-variant-numeric: tabular-nums; }
+.scroller { overflow-x: auto; }
+.impact-block { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+.impact-col { flex: 1 1 220px; }
+.impact-col.fav h4 { color: var(--ok-fg); }
+.impact-col.unfav h4 { color: var(--risk-fg); }
+.speculation {
+  margin-top: 12px; padding: 12px 14px; font-style: italic;
+  color: var(--warn-fg); background: var(--warn-bg);
+}
+details { margin-top: 12px; }
+summary { cursor: pointer; color: var(--accent); font-size: 14px; }
+.details-body > * + * { margin-top: 14px; }
+.hero { border-bottom: 2px solid var(--text-main); padding-bottom: 18px; margin-bottom: 24px; }
+.dashboard {
+  display: flex; flex-wrap: wrap; gap: 10px 20px;
+  padding: 14px 16px; margin-bottom: 24px;
+  background: var(--bg-subtle); font-size: 14px;
+}
+.issue-nav { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border-color); font-size: 14px; }
+a { color: var(--accent); }
+.status-hero {
+  padding: 18px 20px; margin-bottom: 24px;
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-left: 4px solid var(--accent);
+}
+.status-hero h2 { margin-top: 0; }
+.status-hero.partial { border-left-color: var(--warn-fg); }
+</style>
+<div class="wrap"><header class="hero"><h1>MHS 協議 情報週報 #01</h1><p class="card-meta">2026-09-26 · 程度 L2 · 狀態 normal</p><p class="core-question">核心問題：Anthropic 的 Model Hardware Standard 對二級市場該買誰、該避開誰有什麼影響？</p></header><div class="dashboard"><span>有效卡片 11</span><span>已證實 7</span><span>未證實 4</span><span>公關口徑 0</span></div><article class="card v-corroborated"><header class="card-head"><span class="importance i5">5</span><span class="verification">✓ 已多源證實</span><h3>Universal Robots 官方實測：Claude 代理自主協調 4 台協作手臂交接工件</h3><div class="card-meta"><a href="https://www.universal-robots.com/blog/testing-agentic-physical-ai-on-ur-cobots/">Universal Robots 官方部落格</a><time>2026-08-28</time><span class="section">採用與實測</span></div></header><p class="summary">協作機器人 (cobot，指可與人共處同一空間工作的機械手臂) 龍頭 Universal Robots —— Teradyne (NASDAQ: TER) 旗下 —— 官方發文說明與 Anthropic 合作測試 MHS：在次世代 PolyScope X 平台上，由 Claude 代理自主識別並協調 4 台 UR 手臂組成一個工作單元，彼此交接工件，且指令來自自然語言。關鍵設計是安全互鎖 (safety interlock) 完全由 UR 的硬體把關，不交給模型判斷 —— 這是這類系統能否進得了真實產線的前提。本期投資相關度與證據強度都最高的一條：來源是廠商自己的技術部落格（第一方），而非媒體轉述，且 Teradyne 是可直接布局的上市標的。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>Claude 代理協調 4 台 UR 手臂自主交接工件</td><td>Universal Robots 官方部落格 universal-robots.com/blog/testing-agentic-physical-ai-on-ur-cobots/</td></tr><tr><td>安全互鎖由 UR 硬體強制執行，非由模型判斷</td><td>同上</td></tr></tbody></table><div class="impact-block"><div class="impact-col fav"><h4>正面</h4><ul><li>Teradyne (TER)：UR 是直接受惠主體，且已有可展示的實測</li><li>整合成本下降有利協作機器人的終端導入量</li></ul></div><div class="impact-col unfav"><h4>風險</h4><ul><li>測試性質，未見出貨量或訂單數字</li><li>PolyScope X 為次世代平台，既有機台是否能升級未說明</li></ul></div></div></div></details></article><article class="card v-corroborated"><header class="card-head"><span class="importance i5">5</span><span class="verification">✓ 已多源證實</span><h3>阿里巴巴 Qwen 團隊已出貨 MHS 支援 —— 3k star 倉庫，9/23 仍在 commit</h3><div class="card-meta"><a href="https://github.com/QwenLM/Qwen-MM-Plugins">GitHub — QwenLM/Qwen-MM-Plugins</a><time>2026-09-20</time><span class="section">採用與實測</span></div></header><p class="summary">阿里巴巴 Qwen 團隊在其多模態插件倉庫中實作了 MHS 配接器，讓代理透過 MHS 操控相機、感測器與機械臂，並實作端側安全邊界與緊急停止。這條的重量不在功能，在於「誰做的」：Qwen 是 Anthropic 的直接競爭對手，一個競爭陣營的模型廠在協議發布約三週半後就出貨支援，意味著 MHS 可能不只是 Anthropic 的專屬介面，而有機會成為跨陣營的事實標準。這對投資判斷的影響大於任何單一廠商的合作公告 —— 標準若能跨陣營，受惠者就從「Anthropic 的夥伴」擴大為「所有原生硬體出貨商」。倉庫活躍度可查：3,000 star、7/29 建立、最後 commit 9/23，MHS 於 changelog 9/20 註記，並非發了就沒動。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>Qwen-MM-Plugins changelog 於 2026-09-20 註記 Added MHS for operating physical hardware</td><td>GitHub QwenLM/Qwen-MM-Plugins changelog</td></tr><tr><td>MHS 實作位於 src/capabilities/mhs/qwen_mm_plugins_mhs/protocol.py 等路徑</td><td>同倉庫檔案結構</td></tr><tr><td>3,000 star，倉庫建立 2026-07-29，最後 commit 2026-09-23</td><td>GitHub 倉庫中繼資料</td></tr></tbody></table><table class="key-metrics"><thead><tr><th>指標</th><th>數值</th><th>量測條件</th><th>出處</th></tr></thead><tbody><tr><td>倉庫 star 數</td><td class="num">約 3,000</td><td>GitHub 公開中繼資料，查核時點 2026-09-26</td><td>GitHub QwenLM/Qwen-MM-Plugins</td></tr><tr><td>最後 commit</td><td class="num">2026-09-23</td><td>用於區分持續開發與一次性發布；MHS 功能於 9/20 進入 changelog</td><td>同上</td></tr></tbody></table><div class="impact-block"><div class="impact-col fav"><h4>正面</h4><ul><li>標準跨陣營的第一個實證，擴大潛在受惠範圍</li><li>對原生硬體出貨商（液體處理、機器人、感測）為結構性利多</li></ul></div><div class="impact-col unfav"><h4>風險</h4><ul><li>插件層實作，不等於硬體廠商支援</li><li>Anthropic 若失去協議主導權，其自身差異化反而被稀釋</li></ul></div></div></div></details></article><article class="card v-corroborated"><header class="card-head"><span class="importance i5">5</span><span class="verification">✓ 已多源證實</span><h3>Anthropic 發布 Model Hardware Standard (MHS)：AI 代理操控實體儀器的統一介面</h3><div class="card-meta"><a href="https://www.anthropic.com/news/model-hardware-standard">Anthropic 官方公告</a><time>2026-08-27</time><span class="section">協議本體</span></div></header><p class="summary">Anthropic 與 HHMI Janelia Research Campus 共同發布 MHS。它要解決的問題是：實驗室與製造設備（液體處理器、顯微鏡、機械手臂）各用各家的封閉通訊協定，AI 代理要接上任一台都得寫專用的膠水程式碼 (glue code)，耗時數週到數月。MHS 提供一層通用抽象驅動，把控制收斂成 read 與 write 兩個原語；同時要求設備提供機器可讀的屬性清單 (machine-readable manifest)，主動宣告運動範圍、重量上限與安全邊界，讓代理在動作前能推理可行性。定位上它是 MCP (Model Context Protocol) 在實體硬體端的對應物 —— MCP 管軟體與 API，MHS 管儀器。目前為封閉研究預覽 (closed research preview)，邀請制。注意一個重要限制：規格尚未公開，有第三方開發者在嘗試對接時明確記錄「目前並無公開的 MHS 規格」。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>MHS 於 2026-08-27 發布，與 HHMI Janelia 共同開發</td><td>Anthropic 官方公告 anthropic.com/news/model-hardware-standard</td></tr><tr><td>目前為封閉研究預覽，規劃未來開源</td><td>同上</td></tr><tr><td>規格尚未公開</td><td>第三方倉庫 fastly/edge-mhs README 自述 No public MHS spec exists yet</td></tr></tbody></table><table class="key-metrics"><thead><tr><th>指標</th><th>數值</th><th>量測條件</th><th>出處</th></tr></thead><tbody><tr><td>設備整合時間</td><td class="num">數週／數月 → 數小時／數分鐘</td><td>Anthropic 官方自述之先導實驗 (pilot)，非獨立第三方量測，非量產環境</td><td>Anthropic 官方公告</td></tr></tbody></table></div></details></article><article class="card v-corroborated"><header class="card-head"><span class="importance i4">4</span><span class="verification">✓ 已多源證實</span><h3>既有標準組織查無 MHS 表態 —— SiLA 2 與 OPC UA LADS 皆未回應</h3><div class="card-meta"><a href="https://sila-standard.org/">標準組織查證（SiLA 2 官網）</a><time>2026-09-26</time><span class="section">投資面</span></div></header><p class="summary">實驗室儀器通訊早已存在開放標準：SiLA 2（基於 gRPC，負責毫秒級的機器對機器命令執行）與 OPC UA LADS（IEC 63339，提供製造商無關的設備資料模型與可追溯性）。MHS 與它們是共存還是取代，直接決定投資論述 —— 若共存（MHS 當代理語意層、SiLA／LADS 當設備層），既有廠商的軟體護城河受損有限；若取代，封閉工作流程軟體的加價能力會被侵蝕，利益轉向原生硬體出貨商。本期查證結果：兩個組織的官網皆查無任何提及 MHS 或 Anthropic 的內容。這是「查無」而非「已排除」——可能只是太早，也可能它們不視其為威脅。本期特別記錄此空白，因為它是後續最值得盯的單一訊號：任一組織的首次表態，情報價值高於任何媒體報導。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>SiLA 2 與 OPC Foundation LADS 官網查無 MHS 或 Anthropic 提及</td><td>2026-09-26 對 sila-standard.org 與 opcfoundation.org/markets-collaboration/lads/ 之全文檢索，命中數 0</td></tr></tbody></table><div class="impact-block"><div class="impact-col fav"><h4>正面</h4><ul><li>既有標準未表態，MHS 短期無正面對抗壓力</li></ul></div><div class="impact-col unfav"><h4>風險</h4><ul><li>缺乏既有標準組織背書，MHS 進入受監管環境（GxP、校正追溯）的路徑仍不明</li></ul></div></div></div></details></article><article class="card v-unverified_claim"><header class="card-head"><span class="importance i4">4</span><span class="verification">⚠ 單一來源宣稱 · 待獨立驗證</span><h3>Tecan 疑在投資人會議宣布加入 MHS —— 來源為第三方紀錄站，尚未經官方 IR 確認</h3><div class="card-meta"><a href="https://quartr.com/insights/company-research/tecan-group-morgan-stanley-24th-annual-global-healthcare-conference">Quartr（第三方投資人會議紀錄聚合站）</a><time>2026-09-14</time><span class="section">投資面</span></div></header><p class="summary">有紀錄指出瑞士液體處理自動化廠 Tecan Group (SIX: TECN) 管理層在摩根士丹利醫療保健會議上宣布與 Anthropic 達成 MHS 合作。若成立，這是投資相關度極高的一條：Tecan 是液體處理的主要玩家，原生硬體出貨會直接受惠。但本則刻意降級，原因在來源性質 —— 唯一出處是 Quartr，一個第三方投資人會議紀錄聚合站，不是 Tecan 自己的投資人關係 (IR) 公告，也不是監管備案。同一則紀錄還附帶券商評等與目標價（維持 Equal Weight、目標價自 160 調升至 178 瑞士法郎）；那是券商的結論，不是 MHS 的事實，兩者不應混為一談。待辦：以 site:tecan.com/investor-relations 查證官方是否有對應公告，確認後才升級為已證實。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>Tecan 管理層於投資人會議宣布 MHS 合作</td><td>Quartr 會議紀錄；第三方聚合站，非 Tecan 官方 IR，尚待一手來源確認</td></tr></tbody></table></div></details></article><article class="card v-unverified_claim"><header class="card-head"><span class="importance i4">4</span><span class="verification">⚠ 單一來源宣稱 · 待獨立驗證</span><h3>Genentech 用 MHS 串起三家廠牌設備完成蛋白質定量，物理邊界仍需人介入</h3><div class="card-meta"><a href="https://www.labmanager.com/new-standard-connects-ai-agents-to-laboratory-instruments-57585">Lab Manager</a><time>2026-09-08</time><span class="section">採用與實測</span></div></header><p class="summary">生技媒體 Lab Manager 報導 Genentech（羅氏 Roche 旗下）的早期測試：AI 代理透過 MHS 同時協調液體處理機、機械手臂與酵素免疫分析儀 (plate reader)，自動完成 BCA 蛋白質定量測定（一種測蛋白質濃度的標準流程），過程中能自行調整移液流速。同樣重要的是它講了做不到的部分：涉及物理邊界的處理仍需人類輔助。跨三家不同廠牌設備能協同運作，是 MHS 能否穿透各家專有協定黏著度的實證，也是判斷採用速度的觀察基準。注意此條僅單一產業媒體來源，未見 Genentech 或羅氏官方文件佐證。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>Genentech 透過 MHS 協調 3 種跨廠牌設備完成 BCA 蛋白質定量</td><td>Lab Manager 報導 labmanager.com/new-standard-connects-ai-agents-to-laboratory-instruments-57585</td></tr><tr><td>AI 能自主調整移液流速，但物理邊界處理仍需人類輔助</td><td>同上</td></tr></tbody></table></div></details></article><article class="card v-corroborated"><header class="card-head"><span class="importance i3">3</span><span class="verification">✓ 已多源證實</span><h3>QuEra 用 MHS 讓 AI 調諧量子電腦雷射，失鎖復原縮到數秒</h3><div class="card-meta"><a href="https://www.quera.com/blog/holding-the-light-teaching-an-ai-to-lock-and-tune-our-quantum-computers-lasers">QuEra Computing 官方部落格</a><time>2026-08-27</time><span class="section">採用與實測</span></div></header><p class="summary">量子運算公司 QuEra 說明他們在 MHS 環境下用 Claude 實作中性原子量子電腦的雷射鎖定 (laser locking) 與調諧：由 AI 產生可檢驗的確定性控制程式，安全互鎖強制在硬體邊界執行。結果是雷射失鎖後的復原時間，從需要專家手動調整縮短到數秒內，直接提高量子處理器 (QPU) 的可運作時間。對二級市場的意義是間接的 —— QuEra 未上市，無法直接布局 —— 但它證明 MHS 不只用在生技實驗室，適用範圍可能比發布時的生命科學情境更寬。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>QuEra 在 MHS 環境下以 Claude 實作雷射鎖定與調諧</td><td>QuEra 官方部落格（第一方自述）</td></tr><tr><td>雷射失鎖復原時間縮短至數秒內</td><td>同上；公司自述，非獨立驗證</td></tr></tbody></table></div></details></article><article class="card v-corroborated"><header class="card-head"><span class="importance i2">2</span><span class="verification">✓ 已多源證實</span><h3>MHS 的起點：Janelia 一位博士後為了讓顯微鏡彼此溝通而寫的原型</h3><div class="card-meta"><a href="https://www.hhmi.org/news/how-one-postdocs-problem-solving-is-changing-the-way-scientists-work">HHMI 官方新聞</a><time>2026-08-27</time><span class="section">協議本體</span></div></header><p class="summary">HHMI 官方報導 MHS 的由來：Janelia Research Campus 博士後研究者 Arco Bast 為解決顯微鏡各異質元件無法互通的瓶頸做了一個原型，後由 Janelia 與 Anthropic 共同發展成 MHS。這條沒有投資意涵，收錄的理由是它解釋了設計動機 —— MHS 是從實驗室現場的實際痛點長出來的，不是先有標準再找應用。這一點對判斷它會不會被真正採用有參考價值。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>MHS 源自 Janelia 博士後 Arco Bast 的顯微鏡互通原型</td><td>HHMI 官方新聞</td></tr><tr><td>設備整合除錯時間自數月縮短至數日</td><td>同上</td></tr></tbody></table></div></details></article><article class="card v-corroborated"><header class="card-head"><span class="importance i2">2</span><span class="verification">✓ 已多源證實</span><h3>前期技術：MHS 之前已有人用 MCP 做代理對儀器的控制（Opentrons × HighRes）</h3><div class="card-meta"><a href="https://opentrons.com/company/press-releases/highres-and-opentrons-debut-first-ai-agent-to-agent-lab-automation-workflow-at-slas-2026">Opentrons 新聞稿</a><time>2026-02-04</time><span class="section">協議本體</span></div></header><p class="summary">本則**不是 MHS 採用證據**，全文並未出現 MHS 或 Model Hardware Standard —— 收錄為前期技術 (prior art) 對照。2026 年 2 月，開源實驗室機器人商 Opentrons 與編排平台廠 HighRes 在 SLAS 2026 展示：以 Opentrons 的 MCP Server 搭配 Python Protocol API，由軟體代理自主生成並執行 qPCR 工作流，串聯 Opentrons Flex 與 Cellario。意義在於 MHS 出現前六個月，就已經有人用 MCP 直接做代理對儀器的控制。這說明 MHS 要證明的不是「代理能操控儀器」（已被做到），而是「不必為每家設備寫專用整合」。判斷 MHS 價值時，這是正確的對照基準。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>Opentrons 與 HighRes 於 2026-02 以 MCP Server 實作代理生成 qPCR 工作流</td><td>Opentrons 官方新聞稿</td></tr><tr><td>該新聞稿全文未提及 MHS 或 Model Hardware Standard</td><td>2026-09-26 全文比對查證</td></tr></tbody></table></div></details></article><article class="card v-unverified_claim"><header class="card-head"><span class="importance i2">2</span><span class="verification">⚠ 單一來源宣稱 · 待獨立驗證</span><h3>質疑：AI 直接控制量測設備，校正追溯性與量測不確定性怎麼辦</h3><div class="card-meta"><a href="https://metrology.news/anthropic-introduces-model-hardware-standard/">Metrology News</a><time>2026-09-10</time><span class="section">投資面</span></div></header><p class="summary">量測與製造專業媒體 Metrology News 提出本期唯一的實質質疑：AI 從純數據分析跨入實體量測設備的即時控制後，校正追溯性 (calibration traceability，指量測結果能一路追溯到國家或國際標準的能力) 與量測不確定性的認定都會出問題 —— 如果調整參數的是代理，誰為量測結果的有效性背書？這在受監管環境（製藥 GxP、計量認證）是准入門檻，不是技術偏好。收錄此條是因為它指出的是採用速度的真實阻力：技術可行不等於法規可用。本則為專業媒體分析，未附具體案例或量化數據。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>AI 即時控制量測設備引發校正追溯性與量測不確定性挑戰</td><td>Metrology News 分析文章 metrology.news/anthropic-introduces-model-hardware-standard/</td></tr></tbody></table></div></details></article><article class="card v-unverified_claim"><header class="card-head"><span class="importance i2">2</span><span class="verification">⚠ 單一來源宣稱 · 待獨立驗證</span><h3>開發者興趣訊號：第三方在發布隔天做出 MHS 邊緣安全網關原型（但只是原型）</h3><div class="card-meta"><a href="https://github.com/fastly/edge-mhs">GitHub — fastly/edge-mhs</a><time>2026-08-31</time><span class="section">協議本體</span></div></header><p class="summary">MHS 發布隔天就出現一個第三方倉庫，實作 MCP 代理與 MHS 硬體驅動之間的邊緣安全網關：JWT 身分驗證、設備操作範圍檢查、配額限流、雜湊審計日誌。但本則刻意降級，因為查核後它撐不起「採用證據」的重量：0 star、0 fork、後端全是模擬佔位符 (mock)，README 自述為工程師用 AI coding agent 在協議發布後快速建構的原型。它證明的是開發者興趣，不是廠商採用。真正有價值的是它附帶的一個事實：該 README 明確記錄「目前並無公開的 MHS 規格」—— 這是一位實際嘗試對接者的第一手陳述，也解釋了為何目前看不到廠商級的實作。</p><details><summary>展開技術細節、定量出處與對抗性查核</summary><div class="details-body"><table class="provenance-table"><thead><tr><th>關鍵陳述 (Claim)</th><th>出處 (Ref)</th></tr></thead><tbody><tr><td>倉庫為 0 star、0 fork，後端為模擬佔位符，README 自述為 AI 生成原型</td><td>GitHub fastly/edge-mhs 倉庫中繼資料與 README</td></tr><tr><td>目前並無公開的 MHS 規格</td><td>同 README 自述 No public MHS spec exists yet</td></tr></tbody></table><table class="key-metrics"><thead><tr><th>指標</th><th>數值</th><th>量測條件</th><th>出處</th></tr></thead><tbody><tr><td>倉庫 star 數</td><td class="num">0</td><td>GitHub 公開中繼資料，查核時點 2026-09-26；建立 08-28、最後 commit 08-31</td><td>GitHub fastly/edge-mhs</td></tr></tbody></table></div></details></article></div>
+
+</body></html>

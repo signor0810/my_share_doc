@@ -1,0 +1,447 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>油電休旅決選表</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+
+<style>
+:root{
+  --paper:#F6F7F8;
+  --card:#FFFFFF;
+  --sunk:#ECEFF1;
+  --ink:#12171C;
+  --slate:#59646E;
+  --hair:#D8DEE3;
+  --accent:#0E7C86;
+  --accent-soft:#E0F0F1;
+  --pass:#2E7D4F;
+  --pass-soft:#E2F0E7;
+  --fail:#B03A2E;
+  --warn:#A8761A;
+  --warn-soft:#F8EEDB;
+  --shadow:0 1px 2px rgba(18,23,28,.06),0 6px 20px rgba(18,23,28,.05);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1216;
+    --card:#161C22;
+    --sunk:#1D242B;
+    --ink:#E8EDF1;
+    --slate:#9AA7B1;
+    --hair:#2A333B;
+    --accent:#4FBFC7;
+    --accent-soft:#122C2F;
+    --pass:#63C58C;
+    --pass-soft:#14281C;
+    --fail:#E2796A;
+    --warn:#DBA84A;
+    --warn-soft:#2A2113;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1216;
+  --card:#161C22;
+  --sunk:#1D242B;
+  --ink:#E8EDF1;
+  --slate:#9AA7B1;
+  --hair:#2A333B;
+  --accent:#4FBFC7;
+  --accent-soft:#122C2F;
+  --pass:#63C58C;
+  --pass-soft:#14281C;
+  --fail:#E2796A;
+  --warn:#DBA84A;
+  --warn-soft:#2A2113;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Noto Sans TC","Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px;
+  line-height:1.75;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:52rem;margin:0 auto;padding:2.25rem 1.15rem 5rem;display:flex;flex-direction:column;gap:2.75rem}
+
+.eyebrow{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--slate);margin:0;
+}
+h1{
+  font-family:"Archivo","Noto Sans TC",sans-serif;
+  font-weight:800;font-size:clamp(1.85rem,6vw,2.6rem);
+  line-height:1.2;margin:.4rem 0 0;text-wrap:balance;letter-spacing:-.01em;
+}
+.sub{color:var(--slate);margin:.65rem 0 0;max-width:38em}
+h2{
+  font-family:"Archivo","Noto Sans TC",sans-serif;
+  font-weight:700;font-size:1.15rem;line-height:1.4;
+  margin:0 0 .2rem;text-wrap:balance;
+  display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap;
+}
+h2 .n{
+  font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:600;
+  color:var(--accent);letter-spacing:.1em;
+}
+section{display:flex;flex-direction:column;gap:1rem}
+p{margin:0}
+.lede{color:var(--slate);font-size:.94rem;max-width:40em}
+.lede strong{color:var(--ink);font-weight:700}
+
+.verdict{
+  background:var(--card);border:1px solid var(--hair);border-radius:4px;
+  box-shadow:var(--shadow);overflow:hidden;
+}
+.verdict-top{
+  display:flex;align-items:center;gap:.7rem;
+  padding:.6rem 1.1rem;background:var(--accent-soft);
+  border-bottom:1px solid var(--hair);
+}
+.verdict-top .tag{
+  font-family:"IBM Plex Mono",monospace;font-size:.7rem;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--accent);
+}
+.verdict-body{padding:1.25rem 1.1rem 1.4rem;display:flex;flex-direction:column;gap:.9rem}
+.model{
+  font-family:"Archivo","Noto Sans TC",sans-serif;font-weight:800;
+  font-size:clamp(1.3rem,4.6vw,1.7rem);line-height:1.25;margin:0;letter-spacing:-.01em;
+}
+.price{
+  font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
+  font-size:1.05rem;font-weight:600;color:var(--accent);margin:0;
+}
+.why{color:var(--slate);font-size:.94rem}
+.why strong{color:var(--ink);font-weight:500}
+
+.chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.chip{
+  font-size:.8rem;padding:.2rem .6rem;border-radius:2px;
+  border:1px solid transparent;background:var(--pass-soft);color:var(--pass);
+  font-weight:500;
+}
+
+.scroller{overflow-x:auto;border:1px solid var(--hair);border-radius:4px;background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:36rem;font-size:.88rem}
+th,td{padding:.62rem .8rem;text-align:left;border-bottom:1px solid var(--hair);vertical-align:top}
+thead th{
+  background:var(--sunk);font-weight:700;font-size:.82rem;white-space:nowrap;
+}
+thead th .rk{
+  display:block;font-family:"IBM Plex Mono",monospace;font-size:.66rem;
+  font-weight:600;letter-spacing:.12em;color:var(--slate);text-transform:uppercase;
+}
+tbody th{font-weight:500;color:var(--slate);white-space:nowrap;font-size:.83rem;background:var(--card)}
+tbody tr:last-child th,tbody tr:last-child td{border-bottom:none}
+td{font-variant-numeric:tabular-nums}
+td.num{font-family:"IBM Plex Mono",monospace;font-weight:600}
+.mark{font-weight:700;font-size:.95rem}
+.mark.y{color:var(--pass)}
+.mark.n{color:var(--fail)}
+.mark.w{color:var(--warn)}
+.note{display:block;color:var(--slate);font-size:.78rem;line-height:1.5;margin-top:.1rem;font-family:"Noto Sans TC",sans-serif;font-weight:400}
+.hero-col{background:var(--accent-soft)}
+
+.cut{display:flex;flex-direction:column;border:1px solid var(--hair);border-radius:4px;overflow:hidden;background:var(--card)}
+.cut-row{display:grid;grid-template-columns:minmax(9rem,auto) 1fr;gap:.2rem 1rem;padding:.75rem 1rem;border-bottom:1px solid var(--hair)}
+.cut-row:last-child{border-bottom:none}
+.cut-row .name{font-weight:700;font-size:.92rem;text-decoration:line-through;text-decoration-color:var(--fail);text-decoration-thickness:1.5px}
+.cut-row .rsn{color:var(--slate);font-size:.87rem}
+@media (max-width:34rem){.cut-row{grid-template-columns:1fr}}
+
+.flag{
+  border-left:3px solid var(--warn);background:var(--warn-soft);
+  padding:1rem 1.1rem;border-radius:0 4px 4px 0;
+  display:flex;flex-direction:column;gap:.7rem;
+}
+.flag h3{margin:0;font-size:.95rem;font-weight:700;color:var(--ink)}
+.flag p{font-size:.89rem;color:var(--ink)}
+.flag strong{font-weight:700}
+.flag .src{font-family:"IBM Plex Mono",monospace;font-size:.78rem;color:var(--warn)}
+
+.list{display:flex;flex-direction:column;gap:.5rem}
+.item{
+  display:flex;gap:.8rem;align-items:flex-start;
+  background:var(--card);border:1px solid var(--hair);border-radius:4px;
+  padding:.85rem 1rem;cursor:pointer;transition:border-color .15s,background .15s;
+}
+.item:hover{border-color:var(--accent)}
+.item:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.item input{
+  appearance:none;-webkit-appearance:none;margin:.3rem 0 0;flex:none;
+  width:1.05rem;height:1.05rem;border:1.5px solid var(--slate);border-radius:2px;
+  cursor:pointer;position:relative;background:transparent;
+}
+.item input:checked{background:var(--accent);border-color:var(--accent)}
+.item input:checked::after{
+  content:"";position:absolute;left:.3rem;top:.08rem;
+  width:.28rem;height:.55rem;border:solid var(--card);
+  border-width:0 2px 2px 0;transform:rotate(42deg);
+}
+.item .txt{display:flex;flex-direction:column;gap:.15rem}
+.item .t{font-weight:500;font-size:.94rem;line-height:1.5}
+.item .d{color:var(--slate);font-size:.85rem;line-height:1.6}
+.item.done .t,.item.done .d{color:var(--slate);text-decoration:line-through;text-decoration-color:var(--hair)}
+.item.done{background:var(--sunk)}
+
+.tip{
+  background:var(--sunk);border:1px dashed var(--hair);border-radius:4px;
+  padding:.95rem 1.05rem;font-size:.88rem;color:var(--slate);line-height:1.8;
+}
+.tip b{color:var(--ink);font-weight:700}
+
+footer{border-top:1px solid var(--hair);padding-top:1.2rem;font-size:.8rem;color:var(--slate);line-height:1.7}
+
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Showroom sheet / 2026-08</p>
+    <h1>油電休旅決選表</h1>
+    <p class="sub">六個條件、五輪查證後的決選結果。預算上限 200 萬，實際建議花費約 130 萬。這頁是帶去展間用的，不是最終答案——第 04 節有兩件必須親自驗證的事。</p>
+  </header>
+
+  <section>
+    <div class="verdict">
+      <div class="verdict-top"><span class="tag">建議首選</span></div>
+      <div class="verdict-body">
+        <p class="model">Toyota RAV4 六代<br>2.5 油電旗艦版</p>
+        <p class="price">約 NT$ 1,300,000</p>
+        <p class="why">全場<strong>唯一六項條件全滿</strong>的車。關鍵在於它是原裝進口，用的是原廠 Toyota Audio Multimedia 主機（開機 2–3 秒），<strong>不是國產車美仕那套</strong>（開機 15–25 秒、與 Android 交握常失敗）。</p>
+        <div class="chips">
+          <span class="chip">油電 HEV</span>
+          <span class="chip">200 萬內</span>
+          <span class="chip">360 環景標配</span>
+          <span class="chip">Level 2</span>
+          <span class="chip">實體冷氣旋鈕</span>
+          <span class="chip">無線 Android Auto</span>
+        </div>
+      </div>
+    </div>
+    <p class="lede">妥協點：車長 4,600mm，不是你偏好的 B-Segment 小尺碼；2.5L 每年牌照燃料稅比 1.8L 多約 1 萬元。</p>
+  </section>
+
+  <section>
+    <h2><span class="n">01</span>決選三強對照</h2>
+    <p class="lede">左右滑動看完整欄位。綠＝符合，紅＝不符合，橘＝有但打折。</p>
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th class="hero-col"><span class="rk">1st</span>RAV4 六代 旗艦</th>
+            <th><span class="rk">2nd</span>X-Trail e-POWER 旗艦</th>
+            <th><span class="rk">3rd</span>Tucson L Premium-B</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>價格</th>
+            <td class="num hero-col">130 萬<span class="note">待正式價目表確認</span></td>
+            <td class="num">151.9 萬</td>
+            <td class="num">118.9 萬</td>
+          </tr>
+          <tr>
+            <th>年繳牌照＋燃料稅</th>
+            <td class="num hero-col">22,410<span class="note">2,487cc，2401–3000 級距</span></td>
+            <td class="num">11,920<span class="note">1,497cc</span></td>
+            <td class="num">11,920<span class="note">1,598cc</span></td>
+          </tr>
+          <tr>
+            <th>8 年持有後實際價差</th>
+            <td class="hero-col">基準</td>
+            <td class="num">+13.5 萬<span class="note">車價貴 21.9 萬，扣掉 8 年稅金差 8.4 萬</span></td>
+            <td class="num">−19.5 萬</td>
+          </tr>
+          <tr>
+            <th>無線 Android Auto</th>
+            <td class="hero-col"><span class="mark y">✓</span><span class="note">原廠 TAM 雙頻 Wi-Fi 直連，需親自實測</span></td>
+            <td><span class="mark n">✗</span><span class="note">官方規配表：AA 僅限有線，只有 CarPlay 無線</span></td>
+            <td><span class="mark y">✓</span><span class="note">啟動約 5–8 秒</span></td>
+          </tr>
+          <tr>
+            <th>車機開機速度</th>
+            <td class="hero-col">2–3 秒<span class="note">原廠 TAM 12.3 吋</span></td>
+            <td>快<span class="note">NissanConnect 12.3 吋，穩定度最佳</span></td>
+            <td>中<span class="note">韓國原廠 10.25 吋</span></td>
+          </tr>
+          <tr>
+            <th>實體按鍵盲操</th>
+            <td class="hero-col"><span class="mark y">✓</span><span class="note">大型冷氣旋鈕＋除霧實體鍵</span></td>
+            <td><span class="mark y">✓</span><span class="note">雙區溫控旋鈕＋音量旋鈕，全場最佳</span></td>
+            <td><span class="mark n">✗</span><span class="note">冷氣為全平面觸控，無法盲操</span></td>
+          </tr>
+          <tr>
+            <th>撞測 · 兒童保護</th>
+            <td class="hero-col">TNCAP 5★ · COP 85%<span class="note">兒童動態撞擊滿分 24/24</span></td>
+            <td>Euro NCAP 5★ · COP 90%<span class="note">AOP 91% / SA 95%，全場最高</span></td>
+            <td>Euro NCAP 5★ · COP 87%<span class="note">台灣未列入 TNCAP 抽測</span></td>
+          </tr>
+          <tr>
+            <th>360 環景</th>
+            <td class="hero-col"><span class="mark y">✓</span> 旗艦標配 PVM</td>
+            <td><span class="mark y">✓</span> 標配 AVM</td>
+            <td><span class="mark y">✓</span> 標配 3D SVM</td>
+          </tr>
+          <tr>
+            <th>後方主動煞停</th>
+            <td class="hero-col"><span class="mark y">✓</span> PKSB</td>
+            <td><span class="mark y">✓</span> P-IEB</td>
+            <td><span class="mark y">✓</span> RCCA</td>
+          </tr>
+          <tr>
+            <th>App 遠端預冷</th>
+            <td class="hero-col"><span class="mark y">✓</span><span class="note">TOYOTA Connect，大電池供電，10 分鐘上限</span></td>
+            <td><span class="mark w">部分</span><span class="note">進口版具部分遠端控制</span></td>
+            <td><span class="mark n">✗</span><span class="note">南陽未引進 Bluelink，原廠無解</span></td>
+          </tr>
+          <tr>
+            <th>後座冷氣出風口</th>
+            <td class="hero-col"><span class="mark y">✓</span></td>
+            <td><span class="mark y">✓</span></td>
+            <td><span class="mark y">✓</span></td>
+          </tr>
+          <tr>
+            <th>軸距</th>
+            <td class="num hero-col">2,690 mm</td>
+            <td class="num">2,705 mm</td>
+            <td class="num">2,755 mm</td>
+          </tr>
+          <tr>
+            <th>3 年殘值</th>
+            <td class="num hero-col">70–73%</td>
+            <td>—</td>
+            <td class="num">58–63%<span class="note">比日系多折 10–15%</span></td>
+          </tr>
+          <tr>
+            <th>交期</th>
+            <td class="hero-col">1–2 個月</td>
+            <td>1–2 個月</td>
+            <td>1–2 個月</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">02</span>為什麼「有線」可能才是對的</h2>
+    <p class="lede">這一段直接影響第二名能不能翻盤。你怕的是分心，而不是插線。</p>
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr><th></th><th>無線 Android Auto</th><th class="hero-col">有線 USB-C PD</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>連線妥善率</th><td>92–97%（斷線率 3–8%）</td><td class="hero-col">99.9%</td></tr>
+          <tr><th>Pixel 10 機身溫度</th><td>20 分鐘內破 43°C，觸發熱保護降頻</td><td class="hero-col">低 6–10°C</td></tr>
+          <tr><th>啟動時間</th><td>5–8 秒交握</td><td class="hero-col">插上即 0 秒</td></tr>
+          <tr><th>充電</th><td>舊 Qi 平躺板，晃動易跑位空燒<span class="note">候選車全數不支援 Qi2 磁吸</span></td><td class="hero-col">18–30W PD，下車滿電</td></tr>
+          <tr><th>分心風險</th><td>斷線時伸手撿手機重連<span class="note">這才是真正危險的動作</span></td><td class="hero-col">全程不用碰手機</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="lede">若你接受上車插一條線，<strong>Nissan X-Trail e-POWER 立刻回到並列第一</strong>——它的實體雙旋鈕是全場最好的盲操介面，撞測分數也是全場最高。代價是多花 22 萬。</p>
+  </section>
+
+  <section>
+    <h2><span class="n">03</span>已淘汰，以及淘汰的理由</h2>
+    <div class="cut">
+      <div class="cut-row"><span class="name">Tesla Model 3 / Y</span><span class="rsn">家中無法裝充電樁。曝曬每天吃掉 12–18% 電量純粹拿來防曬；完全不支援 Android Auto；全觸控盲操實測 23.5 秒，實體鍵只要 10 秒。</span></div>
+      <div class="cut-row"><span class="name">Toyota Corolla Cross HV</span><span class="rsn">98.9 萬，配備都在，但國產車美仕主機開機 15–25 秒、與 Android 交握常失敗。3C 整合列為重點後直接出局。</span></div>
+      <div class="cut-row"><span class="name">Lexus LBX</span><span class="rsn">唯一 TNGA-B，但 360 環景綁死 169 萬頂規、要多付 39.1 萬；後座膝部僅 14cm、無冷氣出風口、後門開啟角 62 度。</span></div>
+      <div class="cut-row"><span class="name">Lexus UX 300h</span><span class="rsn">全車系原廠沒有 360 環景。</span></div>
+      <div class="cut-row"><span class="name">Honda Civic e:HEV</span><span class="rsn">無 360 環景；Android Auto 原廠僅有線，要破解工程模式才有無線。</span></div>
+      <div class="cut-row"><span class="name">Honda ZR-V e:HEV</span><span class="rsn">2026/9 才上市、售價未公布、首批交期不可控；Euro NCAP 僅 4 星。</span></div>
+      <div class="cut-row"><span class="name">Nissan Kicks e-POWER</span><span class="rsn">無車道置中，不是真正的 Level 2。</span></div>
+      <div class="cut-row"><span class="name">Toyota Prius PHEV</span><span class="rsn">進口配額稀少，實質候車期常超過 6–12 個月。</span></div>
+      <div class="cut-row"><span class="name">日規 Yaris Cross</span><span class="rsn">右駕車在台完全無法掛牌（道安規則 §39）。歐規左駕平行輸入落地 140–160 萬且無原廠保固，比 LBX 還貴。</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">04</span>兩件必須自己驗證的事</h2>
+    <div class="flag">
+      <h3>RAV4 六代的 TAM 主機，到底有沒有無線 Android Auto？</h3>
+      <p>這是第一名成不成立的<strong>唯一關鍵規格</strong>，而查證依據是推論（「原廠 TAM 標配雙頻 Wi-Fi 直連晶片」），不是 Toyota 台灣規配表的直接引用。Toyota 在許多市場歷史上就是「無線 CarPlay ＋有線 Android Auto」。</p>
+      <p class="src">→ 帶 Pixel 10 到展間當場配對，這是唯一可靠的驗證方式。</p>
+    </div>
+    <div class="flag">
+      <h3>RAV4 六代的正式價目表</h3>
+      <p>查到的「104 萬起 / 旗艦 130 萬」沒有附官網來源，而且兩輪查證給出的數字不一致。五代末期 2.0 汽油就要 101–111 萬，全新世代不太可能把油電入門壓到 104 萬。</p>
+      <p class="src">→ 向業務索取紙本正式價目表，確認旗艦版 PVM 與 PKSB 是標配。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">05</span>展間 30 分鐘清單</h2>
+    <p class="lede">勾選狀態會存在這台裝置的瀏覽器裡。</p>
+    <div class="list" id="list">
+      <label class="item"><input type="checkbox" data-k="c1"><span class="txt"><span class="t">拿出 Pixel 10，不插線試投放 Android Auto</span><span class="d">能不能成功？幾秒？然後插線再測一次。這一項決定 RAV4 和 X-Trail 誰是第一。</span></span></label>
+      <label class="item"><input type="checkbox" data-k="c2"><span class="txt"><span class="t">索取紙本正式價目表</span><span class="d">確認旗艦版 360 PVM 與 PKSB 後方主動煞停是標配，不是選配。</span></span></label>
+      <label class="item"><input type="checkbox" data-k="c3"><span class="txt"><span class="t">摸天窗遮陽簾</span><span class="d">實體布簾還是紗網？紗網在台灣夏天等於沒有。能選無天窗版本，對你的曝曬環境更好。</span></span></label>
+      <label class="item"><input type="checkbox" data-k="c4"><span class="txt"><span class="t">當場用手機 App 跑一次遠端空調</span><span class="d">問清楚免費連網幾年、之後年費多少（約 1,200–2,000 元／年）。</span></span></label>
+      <label class="item"><input type="checkbox" data-k="c5"><span class="txt"><span class="t">把兒童安全座椅實裝進後座</span><span class="d">裝好後坐進前座，膝蓋會不會頂到？彎腰扣安全帶會不會撞頭？</span></span></label>
+      <label class="item"><input type="checkbox" data-k="c6"><span class="txt"><span class="t">閉眼摸冷氣旋鈕與音量鍵</span><span class="d">不看螢幕能不能調溫度、風量、音量？這是你防分心需求的實測。</span></span></label>
+      <label class="item"><input type="checkbox" data-k="c7"><span class="txt"><span class="t">確認前座 USB-C 是 PD 快充</span><span class="d">瓦數多少？若走有線路線，這是每天都會用到的。</span></span></label>
+      <label class="item"><input type="checkbox" data-k="c8"><span class="txt"><span class="t">問實際交期</span><span class="d">要落在 3–6 個月內。順便問有無現車或轉單。</span></span></label>
+      <label class="item"><input type="checkbox" data-k="c9"><span class="txt"><span class="t">問旗艦版 vs ADVENTURE 差在哪</span><span class="d">價差約 3 萬。ADVENTURE 是 4WD，配備與底盤調校不同。這一項還沒查過。</span></span></label>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">補</span>一支值得看的影片</h2>
+    <div class="tip">
+      <b>《RAV4 六代 妥善率的代價！沒懂就買超後悔！》</b>／一起來耍廢 VEG OUT LIFE／2026-03-15／22:53／22.8 萬次觀看<br><br>
+      作者的命題是：<b>Toyota 的高妥善率，是用底盤、隔音、駕馭感、配備取捨換來的</b>。它不唱衰 RAV4，是要你先想清楚代價。片中同場比較 CR-V、X-Trail、Territory、CX-60，並討論「旗艦跟 ADV 怎麼選」。<br><br>
+      這支影片沒有推翻本頁的規格結論，但它正對著你最初那句話：你喜歡的是日規 Yaris Cross 的<b>靈巧</b>，而那正是 RAV4 被換掉的東西。規格表贏不過你自己坐進去的感覺。
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">06</span>回家先做這件事</h2>
+    <div class="tip">
+      Pixel 特有的坑：<b>設定 → 電池 → 把 Android Auto 和 Google 地圖改成「不受限制（Unrestricted）」</b>。否則 Adaptive Battery 會在螢幕熄滅 10 分鐘後判定它們背景耗能而降頻，導航畫面會直接凍結。<br><br>
+      另外，Pixel 對 Wi-Fi Direct 的 DFS 頻道管制較嚴格，若車機熱點使用雷達避讓頻段，會出現「搜尋不到車機 Wi-Fi」。Toyota TAM 與 Hyundai 原廠機相容性佳，車美仕最常出問題。
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">07</span>省下來的錢怎麼花</h2>
+    <div class="tip">
+      預算 200 萬，實際花約 130 萬。<b>優先順序：全車隔熱紙（1.5–3 萬）＞ 行車紀錄器 ＞ 一條好的編織 USB-C 線。</b>不要買外觀套件。<br><br>
+      油電大電池原廠保固 8 年／16 萬公里，<b>綁 VIN 隨車移轉</b>，過保後自費更換約 5.5–6.5 萬（含工資），不是天價。若走中古路線，2022–2024 年式 RAV4 Hybrid 旗艦約 85–108 萬、即買即交，配備與撞測成績相同。
+    </div>
+  </section>
+
+  <footer>
+    資料由 Gemini 經五輪網路查證彙整、Claude 審核統整，基準日 2026-08-29。價格、配備與交期以各車廠官方正式價目表為準。標示「待確認」的項目請勿直接採信。
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var KEY = "buycar.checklist.v1";
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { saved = {}; }
+  var boxes = document.querySelectorAll("#list input[type=checkbox]");
+  Array.prototype.forEach.call(boxes, function (b) {
+    if (saved[b.dataset.k]) { b.checked = true; b.closest(".item").classList.add("done"); }
+    b.addEventListener("change", function () {
+      b.closest(".item").classList.toggle("done", b.checked);
+      saved[b.dataset.k] = b.checked;
+      try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+    });
+  });
+})();
+</script>
+
+</body></html>

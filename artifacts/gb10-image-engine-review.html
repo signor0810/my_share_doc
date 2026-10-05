@@ -1,0 +1,782 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
+<title>GB10 生圖引擎審查</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{
+  --ground:#F6F8F9;
+  --surface:#FFFFFF;
+  --surface-2:#EDF1F3;
+  --line:#D3DBDF;
+  --line-soft:#E4EAEC;
+  --ink:#141B1F;
+  --ink-2:#3D4B52;
+  --ink-3:#6B7C85;
+  --accent:#0C6E78;
+  --accent-soft:#E0F0F1;
+  --warn:#9A6206;
+  --warn-soft:#FBF0DC;
+  --crit:#A93A22;
+  --crit-soft:#FBE7E1;
+  --ok:#2F6B4F;
+  --ok-soft:#E2F0E8;
+
+  --f-display:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --f-mono:"IBM Plex Mono","SF Mono",Menlo,Consolas,monospace;
+
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:36px; --s7:56px; --s8:84px;
+  --maxw:1120px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0C1215;
+    --surface:#121A1E;
+    --surface-2:#182327;
+    --line:#26353B;
+    --line-soft:#1D2A2F;
+    --ink:#E6EDEF;
+    --ink-2:#AFC0C6;
+    --ink-3:#7B8D95;
+    --accent:#3FB6C0;
+    --accent-soft:#113134;
+    --warn:#DFA850;
+    --warn-soft:#332711;
+    --crit:#E1735A;
+    --crit-soft:#361A14;
+    --ok:#6FBF95;
+    --ok-soft:#12291F;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0C1215;
+  --surface:#121A1E;
+  --surface-2:#182327;
+  --line:#26353B;
+  --line-soft:#1D2A2F;
+  --ink:#E6EDEF;
+  --ink-2:#AFC0C6;
+  --ink-3:#7B8D95;
+  --accent:#3FB6C0;
+  --accent-soft:#113134;
+  --warn:#DFA850;
+  --warn-soft:#332711;
+  --crit:#E1735A;
+  --crit-soft:#361A14;
+  --ok:#6FBF95;
+  --ok-soft:#12291F;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--f-body);
+  font-size:16.5px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--s5)}
+
+/* ---------- masthead ---------- */
+.masthead{
+  border-bottom:2px solid var(--ink);
+  padding:var(--s7) 0 var(--s5);
+  margin-bottom:var(--s6);
+}
+.eyebrow{
+  font-family:var(--f-mono);
+  font-size:11.5px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin:0 0 var(--s3);
+}
+h1{
+  font-family:var(--f-display);
+  font-weight:700;
+  font-size:clamp(30px,5.2vw,46px);
+  line-height:1.08;
+  letter-spacing:-.02em;
+  margin:0 0 var(--s4);
+  text-wrap:balance;
+}
+.standfirst{
+  font-size:18px;
+  color:var(--ink-2);
+  max-width:60ch;
+  margin:0 0 var(--s5);
+}
+.metarow{
+  display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);
+  font-family:var(--f-mono);font-size:12px;color:var(--ink-3);
+}
+.metarow b{color:var(--ink-2);font-weight:500}
+
+/* ---------- sections ---------- */
+section{margin:var(--s8) 0}
+.sec-head{
+  display:flex;align-items:baseline;gap:var(--s3);
+  border-bottom:1px solid var(--line);
+  padding-bottom:var(--s3);margin-bottom:var(--s5);
+}
+.sec-num{
+  font-family:var(--f-mono);font-size:12px;color:var(--accent);
+  letter-spacing:.1em;
+}
+h2{
+  font-family:var(--f-display);font-weight:600;
+  font-size:clamp(21px,3vw,27px);letter-spacing:-.012em;
+  margin:0;text-wrap:balance;
+}
+h3{
+  font-family:var(--f-display);font-weight:600;font-size:18px;
+  margin:var(--s6) 0 var(--s3);letter-spacing:-.01em;
+}
+p{margin:0 0 var(--s4);max-width:68ch}
+a{color:var(--accent)}
+
+/* ---------- verdict ---------- */
+.verdict{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-left:3px solid var(--accent);
+  padding:var(--s5);
+  display:grid;gap:var(--s4);
+}
+.verdict p{margin:0}
+.verdict .lead{
+  font-family:var(--f-display);font-size:19px;font-weight:600;
+  line-height:1.4;letter-spacing:-.01em;
+}
+.split{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:var(--s3);margin-top:var(--s2);
+}
+.split div{
+  background:var(--surface-2);padding:var(--s4);
+  border:1px solid var(--line-soft);
+}
+.split h4{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);margin:0 0 var(--s2);font-weight:500;
+}
+.split p{font-size:15px;color:var(--ink-2)}
+
+/* ---------- diagrams ---------- */
+.diagram{
+  background:var(--surface);
+  border:1px solid var(--line);
+  padding:var(--s5) var(--s4);
+  overflow-x:auto;
+  margin-bottom:var(--s5);
+}
+.diagram pre.mermaid{margin:0;text-align:center;background:none}
+.dcap{
+  font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);
+  letter-spacing:.06em;margin:var(--s3) 0 0;text-align:center;
+}
+
+/* ---------- item lists ---------- */
+.items{display:grid;gap:var(--s3);counter-reset:item}
+.item{
+  background:var(--surface);
+  border:1px solid var(--line);
+  padding:var(--s4) var(--s5);
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:var(--s2) var(--s4);
+  align-items:start;
+}
+.item::before{
+  counter-increment:item;
+  content:counter(item,decimal-leading-zero);
+  font-family:var(--f-mono);font-size:13px;font-weight:500;
+  color:var(--ink-3);
+  padding-top:2px;
+  font-variant-numeric:tabular-nums;
+}
+.item-body{min-width:0}
+.item h4{
+  font-family:var(--f-display);font-size:16.5px;font-weight:600;
+  margin:0 0 var(--s2);letter-spacing:-.005em;line-height:1.35;
+}
+.item p{font-size:15px;color:var(--ink-2);margin:0 0 var(--s2)}
+.item p:last-child{margin-bottom:0}
+.chips{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s2);margin:0 0 var(--s2)}
+.chip{
+  font-family:var(--f-mono);font-size:10.5px;letter-spacing:.07em;
+  text-transform:uppercase;padding:2px 7px;border:1px solid transparent;
+}
+.c-crit{background:var(--crit-soft);color:var(--crit);border-color:var(--crit)}
+.c-warn{background:var(--warn-soft);color:var(--warn);border-color:var(--warn)}
+.c-ok{background:var(--ok-soft);color:var(--ok);border-color:var(--ok)}
+.c-src{background:var(--surface-2);color:var(--ink-3);border-color:var(--line)}
+.c-acc{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+
+code{
+  font-family:var(--f-mono);font-size:.87em;
+  background:var(--surface-2);padding:1px 5px;
+  border:1px solid var(--line-soft);
+  word-break:break-word;
+}
+.item pre{
+  font-family:var(--f-mono);font-size:12.5px;line-height:1.55;
+  background:var(--surface-2);border:1px solid var(--line-soft);
+  padding:var(--s3);overflow-x:auto;margin:0 0 var(--s2);
+  color:var(--ink-2);
+}
+
+/* ---------- table ---------- */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:620px}
+th,td{padding:10px var(--s4);text-align:left;border-bottom:1px solid var(--line-soft)}
+th{
+  font-family:var(--f-mono);font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-3);font-weight:500;
+  background:var(--surface-2);white-space:nowrap;
+}
+td{font-family:var(--f-display);color:var(--ink-2)}
+td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+td.repo{font-family:var(--f-mono);font-size:12.5px;color:var(--ink)}
+tr:last-child td{border-bottom:none}
+
+.note{
+  font-size:14.5px;color:var(--ink-3);
+  border-left:2px solid var(--line);padding-left:var(--s4);
+  margin:var(--s5) 0 0;max-width:66ch;
+}
+
+footer{
+  border-top:1px solid var(--line);
+  margin-top:var(--s8);padding:var(--s5) 0 var(--s7);
+  font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);
+  display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);
+}
+@media (max-width:640px){
+  .item{grid-template-columns:1fr;gap:var(--s2)}
+  .item::before{padding-top:0}
+  body{font-size:16px}
+}
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">DGX Spark · GB10 · 規劃審查</p>
+  <h1>生圖引擎統一計畫：審查、調研與修正路線</h1>
+  <p class="standfirst">
+    兩份計畫文件經 agy agent 審查並全網調研後的結果。14 個引用專案已逐一驗證存在，
+    最重要的一條缺陷確認為真 —— 而且可以用一次轉檔修掉。
+  </p>
+  <div class="metarow">
+    <span><b>審查</b> agy · Gemini 3.8 Flash</span>
+    <span><b>驗證</b> 14/14 repo 存在，star 數吻合</span>
+    <span><b>日期</b> 2026-09-15</span>
+    <span><b>來源</b> DGX-UNIFIED-ENGINE-PLAN.md · AGY-REVIEW.md</span>
+  </div>
+</header>
+
+<section>
+  <div class="sec-head"><span class="sec-num">01</span><h2>核心判斷：統一控制平面，不必統一執行時</h2></div>
+
+  <div class="verdict">
+    <p class="lead">
+      agy 主張「別重寫 Diffusers 引擎，留著 ComfyUI」；原計畫主張「統一到 Diffusers」。
+      兩邊都只對一半 —— 因為它們在爭論的是後端，而真正該統一的是前面那一層。
+    </p>
+    <p>
+      ComfyUI 的動態記憶體調度確實比手寫的成熟，這點 agy 說得對；
+      但我們那顆 Qwen-Image-Edit int8 是 diffusers 格式，搬進 ComfyUI 要重新量化，
+      而 FLUX.2 Klein NVFP4 反過來 diffusers 讀不了。<strong>兩個後端各有各讀得動的權重，這是事實而不是偏好。</strong>
+    </p>
+    <div class="split">
+      <div>
+        <h4>統一這些</h4>
+        <p>admission control、單一把鎖、manifest registry、能力契約、provenance、HTTP／MCP 介面</p>
+      </div>
+      <div>
+        <h4>不必統一這些</h4>
+        <p>誰去載權重。Diffusers 管 edit（int8 在這），ComfyUI 管 txt2img（NVFP4 在這）</p>
+      </div>
+      <div>
+        <h4>換到的東西</h4>
+        <p>一個服務、一份契約、一把鎖；而且不用重寫 ComfyUI 的記憶體調度器</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">02</span><h2>流程圖</h2></div>
+
+  <h3>建置階段與決策分支</h3>
+  <div class="diagram">
+<pre class="mermaid">
+flowchart TD
+  S([現況：兩條管線<br/>兩把互不相識的鎖]) --> P0
+
+  subgraph PH0 [Phase 0 · 驗證 spike · 0.5 天 · 只讀不寫]
+    P0[三個待驗假設] --> V1[Z-Image<br/>from_single_file<br/>吃不吃 ComfyUI 單檔]
+    P0 --> V2[int8 + LoRA<br/>adapter 掛不掛得上]
+    P0 --> V3[transformer<br/>能否轉 safetensors]
+  end
+
+  V1 --> D1{Z-Image<br/>搬得動？}
+  V2 --> D2{LoRA<br/>可用？}
+  V3 --> D3{safetensors<br/>成功？}
+
+  D3 -->|是| FIX[重存 transformer<br/>解掉 host RAM 衝擊<br/>+ 版本鎖死 + 載入變快]
+  D3 -->|否| PIN[manifest 釘死版本<br/>torchao 0.18 / diffusers 0.40]
+
+  D1 -->|是| P1
+  D1 -->|否| ALT[txt2img 留在 ComfyUI<br/>走 HTTP proxy]
+  D2 -->|否| NOLORA[LoRA 願景延後<br/>先不做模板 + LoRA 組合]
+
+  FIX --> P1
+  PIN --> P1
+  ALT --> P1
+  NOLORA --> P1
+
+  P1[Phase 1 · registry + admission<br/>舊 CLI 保留不動] --> P2
+  P2[Phase 2 · 接第二個後端<br/>首次測換模型路徑] --> P3
+  P3[Phase 3 · 一個 skill 取代兩個<br/>舊的標 deprecated 不刪] --> GATE
+
+  GATE{{Phase 4 前置<br/>先修 vLLM bind}} --> P4
+  P4[Phase 4 · HTTP :8100<br/>只綁 Tailscale] --> P5
+  P5[Phase 5 · stdio MCP shim]
+
+  style PH0 fill:none,stroke-dasharray:4 4
+  style FIX stroke-width:2px
+  style GATE stroke-width:2px
+</pre>
+    <p class="dcap">Phase 0 是單點依賴 —— 三個假設的答案決定後面所有事的形狀</p>
+  </div>
+
+  <h3>請求流程與記憶體閘門</h3>
+  <div class="diagram">
+<pre class="mermaid">
+flowchart LR
+  subgraph CLIENTS [客戶端]
+    RC[遠端 Claude<br/>≈200 tokens／次]
+    HS[Hermes 本機<br/>0 token]
+  end
+
+  RC -->|MCP stdio shim| API
+  HS -->|skill| API
+
+  subgraph CTRL [控制平面 · 統一這一層]
+    API[FastAPI :8100<br/>只綁 100.77.199.82] --> AUTH[金鑰 · 配額 · 稽核]
+    AUTH --> ADM[admission control]
+    ADM --> LOCK[[跨行程 flock<br/>單槽]]
+    LOCK --> RSV[[額度保留制<br/>非檢查制]]
+    RSV --> REG[registry<br/>讀 manifest 的 peak_gb]
+    REG --> COOL{同模型？}
+  end
+
+  COOL -->|是| RUN
+  COOL -->|否，需換載| DWELL[冷卻水位<br/>佇列清空 + 最小停留]
+  DWELL --> RUN
+
+  RUN{{選後端}} -->|edit / style| DIF[Diffusers<br/>Qwen-Image-Edit int8]
+  RUN -->|txt2img| CUI[ComfyUI :8188<br/>FLUX.2 Klein NVFP4]
+
+  DIF --> OUT
+  CUI --> OUT
+  OUT[回 asset_id + URL + 縮圖<br/>永不回全尺寸 base64]
+
+  VLLM[(vLLM 52GB 常駐<br/>受保護，優先序最高)]
+  ADM -.監看 mem_get_info + PSI.-> VLLM
+  BRK[[熔斷器<br/>逼近水位即 503]] -.-> ADM
+
+  style CTRL fill:none,stroke-dasharray:4 4
+  style VLLM stroke-width:2px
+  style BRK stroke-width:2px
+</pre>
+    <p class="dcap">後端可以有兩個，閘門只能有一個 —— 目前是兩把鎖互相看不見</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">03</span><h2>十個需要改進的地方</h2></div>
+  <p>
+    嚴重度以「在這台機器上出事的後果」評定，不是以修起來的難度。
+    標「已驗證」的是我在這台上跑過指令或讀過原始碼確認的。
+  </p>
+
+  <div class="items">
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-crit">致命</span><span class="chip c-src">agy 發現 · 已驗證</span></div>
+      <h4>int8 模型存成 pickle <code>.bin</code>，不是 safetensors</h4>
+      <p>
+        safetensors 是 <code>mmap</code> 零拷貝；pickle 要在<strong>系統 RAM</strong> 解包出完整緩衝區再逐一送進 GPU。
+        在 GB10 上 CPU RAM 與 GPU 記憶體是同一塊 128GB，這個緩衝區直接跟 vLLM 的 52GB 搶同一池。
+      </p>
+      <pre>transformer/  diffusion_pytorch_model-0000{1,2,3}-of-00003.bin   ← 20GB pickle
+text_encoder/ model.safetensors                                 ← 這個已經對了</pre>
+      <p>
+        實測撐過去了（MemAvailable 60→24GB），但沒有餘裕。而且這讓那 29GB 綁死在 torchao 0.18.0 上。
+      </p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-crit">致命</span><span class="chip c-src">natolambert/dgx-spark-setup · 181★</span></div>
+      <h4>這台的 OOM 會凍結整機，不是殺掉行程</h4>
+      <p>
+        原計畫寫「生圖 process OOM → 這個 job 失敗，可接受」—— 那是<strong>獨立顯卡</strong>的假設。
+        unified memory 下 GPU OOM 直接變成全系統實體記憶體耗盡，SSH 會斷，要走硬體重開。
+      </p>
+      <p>整份計畫的風險模型建立在一個不成立的前提上，連帶影響第 5、8 條。</p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-crit">致命</span><span class="chip c-src">agy 發現</span></div>
+      <h4>模型切換抖動：交錯請求會讓吞吐量趨近於零</h4>
+      <p>
+        47.9GB 上限容不下兩個模型同時常駐，計畫因此說「先卸載再載入」。
+        但 <code>txt2img → edit → txt2img</code> 這種再正常不過的序列，每個請求都要重載 170 秒。
+      </p>
+      <p>計畫承認了「一次一個模型」的算術，卻沒處理它的後果。</p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-warn">嚴重</span><span class="chip c-src">agy 發現 · 部分成立</span></div>
+      <h4>跨機的檔案路徑語意斷裂</h4>
+      <p>
+        DGX 回 <code>/home/spark-66b8/.../out.png</code>，遠端 Windows 上的 Claude 讀不到那個檔案。
+      </p>
+      <p>
+        <strong>但這條只對一半</strong>：stdio shim 跑在客戶端本機，會把 bytes 下載成本機檔再回路徑 —— 那條路徑沒問題。
+        真正沒解的是遠端 HTTP MCP（:8101），以及現在 <code>i2i.py</code> 掃
+        <code>$HERMES_HOME/images/</code> 找上傳圖的做法 —— 那是純本機語意，跨機直接失效。
+      </p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-warn">嚴重</span><span class="chip c-src">原計畫缺漏</span></div>
+      <h4>admission control 的「檢查 → 配置」沒有原子性</h4>
+      <p>
+        兩個請求可以同時通過 <code>mem_get_info()</code> 檢查，然後一起開始載入 —— 正是要避免的那件事。
+        flock 鎖得住自己人，但「檢查」和「實際配置」之間的時間窗沒有保護。
+      </p>
+      <p>配合第 2 條（OOM 會凍結整機），這個競態的代價是硬體重開機。</p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-warn">嚴重</span><span class="chip c-src">已驗證 · 仍在</span></div>
+      <h4><code>ollama</code> 還在跑，第四道防線有破口</h4>
+      <p>
+        <code>LISTEN *:11434</code>。統一之後這台仍有兩個會吃 GPU 的東西，而 flock 只鎖得住自己人。
+      </p>
+      <p>計畫把它列成「需要你決定」，但沒有在架構上處理 —— 等於沒有處理。</p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-warn">嚴重</span><span class="chip c-src">ecarmen16/SparkyUI · 15★</span></div>
+      <h4><code>torch.compile</code> 與 Triton 在 sm_121 上不穩</h4>
+      <p>
+        SparkyUI 作者踩過：GB10 上 <code>torch.compile()</code> 會引發 kernel 捕獲失敗，必須停用。
+        另外 <code>flash-attn</code> 沒有 aarch64 + CUDA 13 + sm_121 的預編譯 wheel，要改用 PyTorch 原生 SDPA。
+      </p>
+      <p>998 行計畫裡完全沒提這兩件事，但 diffusers 有些路徑會自動啟用 compile。</p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-warn">嚴重</span><span class="chip c-src">agy 發現 · 我原本只是承認它</span></div>
+      <h4>venv 寄生 ComfyUI 是架構上的自相矛盾</h4>
+      <p>
+        計畫一邊說「統一離開 ComfyUI」，一邊讓引擎的 torch 透過
+        <code>_inherit_comfyui.pth</code> 指向 ComfyUI 的 site-packages。
+      </p>
+      <p>
+        ComfyUI-Manager 或任何人一次 <code>pip install -U</code>，引擎就爆。
+        我原本的結論是「維持繼承但記下版本」—— 那是接受風險，不是解決它。
+      </p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-ok">中等</span><span class="chip c-src">原計畫缺漏</span></div>
+      <h4>模板要當版本控制的主體，卻沒有 schema</h4>
+      <p>
+        沒有 schema 就沒有驗證，沒有驗證的「版本控制」只是檔案改名。
+        而模板是會從 5 個長到 50 個的東西 —— 這是最需要 schema 的一類資產。
+      </p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-ok">中等</span><span class="chip c-src">原計畫缺漏</span></div>
+      <h4>沒有測試策略，也沒有回滾的觸發條件</h4>
+      <p>
+        998 行沒有一個字講怎麼測。生圖是非確定性的，傳統 assert 用不上 —— 這需要刻意設計。
+      </p>
+      <p>
+        Phase 3 說舊 skill 標 deprecated 不刪，但沒說<strong>什麼情況該回去用</strong>。
+        沒有觸發條件的回滾計畫，實際上不會發生 —— 只會硬撐。
+      </p>
+    </div></div>
+
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">04</span><h2>十個建議</h2></div>
+  <p>依「投報率」排序，不是依難度。前三個做完，第 1、2、3、5 條缺陷一起消失。</p>
+
+  <div class="items">
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-acc">最高投報</span><span class="chip c-ok">一次轉檔</span><span class="chip c-src">解 #1</span></div>
+      <h4>把 transformer 重存成 safetensors</h4>
+      <p>我在這台上讀了原始碼，這條路是通的：</p>
+      <pre>diffusers/quantizers/torchao/torchao_quantizer.py:442
+  def supports_safetensors_serialization(self):
+      if not is_torchao_version("&gt;=", "0.16.0"):   # 我們是 0.18.0
+          return False
+      return True                                  # ← 支援</pre>
+      <p>
+        當初存成 <code>.bin</code> 應該是量化時 torchao 版本較舊。重存一次同時解掉三件事：
+        host RAM 的反序列化衝擊、torchao 版本鎖死、以及大機率縮短那 170 秒的冷載入。
+      </p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-acc">高投報</span><span class="chip c-warn">需重啟 vLLM</span><span class="chip c-src">agy 找到</span></div>
+      <h4>vLLM sleep mode 當緊急閥門</h4>
+      <p>
+        <code>--enable-sleep-mode</code> 加上 <code>POST /sleep?level=1</code>。
+        在 GB10 上把權重搬去 CPU RAM <strong>不會</strong>省下實體記憶體（同一塊），
+        但<strong>丟棄 KV cache 會</strong> —— 這台 131K context 的 KV cache 約佔 36GB。
+      </p>
+      <p>
+        代價是休眠期間 LLM 不可用。當成「需要跑大模型生圖時的手動閥門」，不是常態。
+      </p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-acc">高投報</span><span class="chip c-src">解 #5 · 防 #2</span></div>
+      <h4>admission control 改成「保留制」而非「檢查制」</h4>
+      <p>
+        不是「檢查還有沒有 35GB」，而是「向一個中央計數器<strong>申請</strong> 35GB 額度」——
+        申請成功才開始載入，行程結束時歸還。
+      </p>
+      <p>
+        檢查和配置之間的競態就此消失。額度表同時可以把 ollama 的用量算進去，補上第 6 條的破口。
+      </p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-acc">高投報</span><span class="chip c-src">解 #3</span></div>
+      <h4>換模型加「冷卻水位」，並提供 <code>dry_run</code></h4>
+      <p>
+        切換前要求：佇列裡沒有原模型的待處理請求，且現任模型已停留超過最小時間（例如 120 秒）。
+        同模型的請求批次處理完再換。
+      </p>
+      <p>
+        搭配一個 <code>dry_run</code> 參數 —— 回「會用哪個模型、要不要換載、預計多久、排隊幾個」但不生圖。
+        約 30 tokens，讓客戶端自己決定要不要等，比讓它 timeout 好得多。
+      </p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-acc">高投報</span><span class="chip c-src">joenorton/comfyui-mcp-server · 408★</span></div>
+      <h4>MCP 回三件套，不要只回一個路徑</h4>
+      <p>抄一個已經被 408 顆星驗證過的做法，不要自己發明：</p>
+      <pre>{"asset_id":"ast_9a8f21",
+ "asset_url":"http://spark-66b8:8100/view?id=...",
+ "filename":"...png", "mime_type":"image/png",
+ "width":1024, "height":1024}
+
+return_inline_preview = False          # 預設關閉
+# 開啟時才縮到 max_dim=256 且 base64 上限 100,000 字元</pre>
+      <p>
+        <code>asset_url</code> 讓遠端 agent 讀得到圖（解第 4 條），
+        預設關閉的縮圖讓「要看圖」變成客戶端的選擇而不是強制成本。
+      </p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-ok">中等</span><span class="chip c-src">lansespirit/image-gen-mcp · 68★</span></div>
+      <h4>模板 schema 直接抄現成的</h4>
+      <p>
+        <code>id</code> / <code>version</code>（語意化版號）/ <code>category</code> /
+        <code>template</code>（帶插值的字串）/ <code>parameters</code>（型別＋預設＋enum）/
+        <code>metadata</code>（建議尺寸、steps、搭配模型）。
+      </p>
+      <p>整個模板目錄進 git，客戶端只傳 <code>template_id</code> 加參數字典。解第 9 條。</p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-ok">中等</span><span class="chip c-src">ComfyUI-Manager 慣例</span></div>
+      <h4>LoRA manifest 用 <code>sha256</code> + <code>base_model</code></h4>
+      <p>
+        權重不進 git；manifest 記 <code>{name, sha256, base_model, default_weight}</code>。
+        <code>sha256</code> 防權重漂移，<code>base_model</code> 讓 registry 自動擋掉不相容的 LoRA
+        —— 這同時就是「只收註冊過的名字」那條安全規則的落點。
+      </p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-ok">中等</span><span class="chip c-src">因為 #2 才成為必要</span></div>
+      <h4>熔斷器：逼近水位就拒絕服務</h4>
+      <p>
+        因為這台的 OOM 會凍結整機而不是殺掉行程，熔斷不是 nice-to-have。
+        連續 N 次逼近上限就回 <code>503 + Retry-After</code>，並主動卸載模型。
+      </p>
+      <p>
+        監看的是 <code>torch.cuda.mem_get_info()</code> 和 <code>/proc/pressure/memory</code> 的
+        <code>some avg60</code> —— <strong>不是</strong> swap used（那個長期非零但無害）。
+      </p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-ok">中等</span><span class="chip c-src">解 #10</span></div>
+      <h4>Golden image 回歸測試，用感知雜湊</h4>
+      <p>
+        固定 seed + 固定模板 → 存一張基準圖 → 用 pHash 比對。
+        容忍浮點層級的差異，但抓得到「模型載錯」「LoRA 沒掛上」「量化壞了」這類真正的回歸。
+      </p>
+      <p>
+        同一套測試順便當記憶體回歸測試：每次跑完檢查 <code>mem_get_info</code> 有沒有回到基線。
+      </p>
+    </div></div>
+
+    <div class="item"><div class="item-body">
+      <div class="chips"><span class="chip c-ok">低成本</span><span class="chip c-src">文件衛生</span></div>
+      <h4>把 <code>DGX-IMAGE-ENGINE.md</code> 標為 superseded</h4>
+      <p>
+        現在 workspace 有四份文件，其中最舊那份的三個數字是錯的：
+        <code>fraction 0.20</code>（實際會 OOM）、FLUX 大小（少算一半）、
+        「Hermes 改 base_url 就能用」（只有 deepinfra 吃 base_url，而它拒絕 img2img）。
+      </p>
+      <p>留著不標記，遲早有人照它做。同時把環境斷言寫進 manifest：停用 <code>torch.compile</code>、用 SDPA 不用 flash-attn。</p>
+    </div></div>
+
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">05</span><h2>調研結果：14 個專案全部驗證存在</h2></div>
+  <p>
+    agy 宣稱的 star 數與實際 GitHub API 回傳吻合到 ±1，沒有編造。
+    唯一系統性偏差是「最後更新」日期偏新 —— 它應該用了 <code>updated_at</code> 而非 <code>pushed_at</code>。
+    下表的日期是我用 API 重新抓的 <code>pushed_at</code>。
+  </p>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>專案</th><th class="num">★</th><th class="num">最後 push</th><th>對我們的意義</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="repo">mudler/LocalAI</td><td class="num">49,108</td><td class="num">2026-09-14</td><td>全功能一體機，只要生圖的話過重</td></tr>
+        <tr><td class="repo">xorbitsai/inference</td><td class="num">9,567</td><td class="num">2026-09-14</td><td>有 <code>/v1/images/generations</code>，但 Xoscar 在 aarch64+cu13 上難裝</td></tr>
+        <tr><td class="repo">joenorton/comfyui-mcp-server</td><td class="num">408</td><td class="num">2026-02-17</td><td><strong>回傳格式直接抄</strong>（建議 5）</td></tr>
+        <tr><td class="repo">Comfy-Org/comfy-mcp</td><td class="num">219</td><td class="num">2026-09-13</td><td>官方 MCP，純檔案路徑範式</td></tr>
+        <tr><td class="repo">natolambert/dgx-spark-setup</td><td class="num">181</td><td class="num">2026-02-26</td><td><strong>OOM 凍結整機的警告來源</strong>（缺陷 2）</td></tr>
+        <tr><td class="repo">lansespirit/image-gen-mcp</td><td class="num">68</td><td class="num">2026-04-25</td><td><strong>模板 schema 抄它</strong>（建議 6）</td></tr>
+        <tr><td class="repo">modelship-ai/modelship</td><td class="num">48</td><td class="num">2026-09-13</td><td>Ray 分數 GPU 配置，我們單卡用不上</td></tr>
+        <tr><td class="repo">spartanz51/imagegen-mcp</td><td class="num">37</td><td class="num">2025-05-02</td><td>本機快取 + 可選託管 URL</td></tr>
+        <tr><td class="repo">Aquiles-ai/Aquiles-Image</td><td class="num">26</td><td class="num">2026-08-24</td><td>Diffusers + 非同步佇列，仍 alpha</td></tr>
+        <tr><td class="repo">ecarmen16/SparkyUI</td><td class="num">15</td><td class="num">2026-05-22</td><td><strong>GB10 踩坑全錄</strong>（缺陷 7）</td></tr>
+        <tr><td class="repo">HanseWare/FastFusion</td><td class="num">9</td><td class="num">2026-08-10</td><td>最接近的參考，但無併發鎖與水位保護</td></tr>
+        <tr><td class="repo">CUHKSZ-ITSO-Dev/Qwen-Image-Series-Service</td><td class="num">7</td><td class="num">2025-10-07</td><td>同款模型的 OpenAI 封裝，可讀它的取捨</td></tr>
+        <tr><td class="repo">CINOAdam/nvml-unified-shim</td><td class="num">3</td><td class="num">2026-01-28</td><td>GB10 的 NVML 回 <code>[N/A]</code>，healthz 要防護</td></tr>
+        <tr><td class="repo">cognis-digital/promptpack</td><td class="num">0</td><td class="num">2026-06-30</td><td>0★，參考價值低</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="note">
+    最重要的一條調研結論：<strong>市面上沒有「Diffusers 界的 vLLM」。</strong>
+    最接近的 FastFusion 只有 9★ 且沒有記憶體保護；成熟的 LocalAI 與 Xinference 都是全功能框架。
+    CUHKSZ 那個專案的作者在 README 直接寫「目前市面上缺乏為 Diffusion 類模型提供 OpenAI 兼容接口的框架」——
+    所以自己寫這層薄的是合理的，agy 反對的是「連記憶體調度也自己寫」，那點它說得對。
+  </p>
+</section>
+
+<footer>
+  <span>來源 · DGX-UNIFIED-ENGINE-PLAN.md（998 行）</span>
+  <span>審查 · AGY-REVIEW.md（23 KB）</span>
+  <span>Repo 驗證 · GitHub REST API · 2026-09-15</span>
+</footer>
+
+</div>
+
+<!--claude-mermaid-runtime-begin:3477-->
+<style>.mermaid-diagram{margin-block:4px}.mermaid-diagram svg{display:block;margin:0 auto;max-width:100%;height:auto}</style>
+<script src="/_runtime/mermaid-11.16.1.min.js"></script>
+<script>(function(){
+var CFG={"palettes":{"light":{"surface":"#f4efe4","text":"#42392e","line":"#8a7f6d","border":"#7a6c52","bg":"#fffdf8"},"dark":{"surface":"#262b34","text":"#f2f3f5","line":"#a8adb8","border":"#9aa4b8","bg":"#1f232b"}}};
+if(typeof mermaid==='undefined')return;
+var pres=Array.prototype.slice.call(document.querySelectorAll('pre.mermaid')).filter(function(p){if(p.hasAttribute('data-claude-mermaid-claimed'))return false;p.setAttribute('data-claude-mermaid-claimed','1');return true;});
+if(!pres.length)return;
+var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+var root=document.documentElement;
+var items=pres.map(function(pre){
+var mount=document.createElement('div');mount.className='mermaid-diagram';
+return {pre:pre,mount:mount,src:pre.textContent||''};
+});
+var seq=0;
+var renderGen=0;
+var lastKey='';
+function pageBg(fallback){
+var els=[document.body,document.documentElement];
+for(var i=0;i<els.length;i++){
+var c=els[i]&&getComputedStyle(els[i]).backgroundColor;
+if(c&&c!=='transparent'&&c!=='rgba(0, 0, 0, 0)')return c;
+}
+return fallback;
+}
+function render(){
+var theme=root.getAttribute('data-theme');
+var dark=theme==='dark'||(!!(mq&&mq.matches)&&theme!=='light');
+var pal=dark?CFG.palettes.dark:CFG.palettes.light;
+var bg=pageBg(pal.bg);
+var key=(dark?'d':'l')+'|'+bg;
+if(key===lastKey)return;
+lastKey=key;
+var gen=++renderGen;
+var font=getComputedStyle(document.body).fontFamily||'sans-serif';
+var nat={useMaxWidth:false};
+mermaid.initialize({
+startOnLoad:false,securityLevel:'strict',theme:'base',
+flowchart:nat,sequence:nat,er:nat,state:nat,class:nat,pie:nat,
+gantt:nat,journey:nat,timeline:nat,gitGraph:nat,mindmap:nat,xyChart:nat,
+quadrantChart:nat,sankey:nat,c4:nat,requirement:nat,block:nat,
+packet:nat,kanban:nat,architecture:nat,radar:nat,
+themeVariables:{background:bg,mainBkg:pal.surface,primaryColor:pal.surface,
+primaryTextColor:pal.text,lineColor:pal.line,primaryBorderColor:pal.border,
+nodeBorder:pal.border,clusterBorder:pal.border,edgeLabelBackground:bg,
+clusterBkg:'rgba(127,127,127,0.07)',titleColor:pal.text,
+darkMode:dark,rowOdd:bg,rowEven:'rgba(127,127,127,0.07)',
+attributeBackgroundColorOdd:bg,attributeBackgroundColorEven:'rgba(127,127,127,0.07)',
+fontSize:'16px',fontFamily:font},
+themeCSS:'.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke-width: 2px; }'
+});
+items.forEach(function(it){
+var id='claude-mermaid-'+seq++;
+mermaid.render(id,it.src).then(function(r){
+if(gen!==renderGen)return;
+var prev=it.pre.previousElementSibling;
+if(prev&&prev.className==='mermaid-diagram'&&prev!==it.mount)return;
+it.mount.innerHTML=r.svg;
+if(!it.mount.parentNode)it.pre.parentNode.insertBefore(it.mount,it.pre);
+it.pre.style.display='none';
+},function(){
+var scratch=document.getElementById(id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+scratch=document.getElementById('d'+id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+if(gen!==renderGen)return;
+if(it.mount.parentNode)it.mount.parentNode.removeChild(it.mount);
+it.pre.style.display='';
+});
+});
+}
+render();
+if(mq&&mq.addEventListener)mq.addEventListener('change',render);
+if(typeof MutationObserver!=='undefined')new MutationObserver(render).observe(root,{attributes:true,attributeFilter:['data-theme']});
+})();</script>
+<!--claude-mermaid-runtime-end-->
+
+</body></html>

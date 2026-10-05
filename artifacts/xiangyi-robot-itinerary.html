@@ -1,0 +1,811 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>祥儀機器人行程卡</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700&display=swap">
+
+<style>
+  /* ---- Light palette (also the un-stamped default) ---- */
+  :root {
+    --bg:        #EEF1F5;
+    --surface:   #FFFFFF;
+    --surface-2: #E3E8EE;
+    --ink:       #16202B;
+    --muted:     #5A6A7A;
+    --line:      #C9D2DC;
+    --line-soft: #DDE3EA;
+
+    --brass:     #9A6410;
+    --brass-ink: #7C4F08;
+    --brass-bg:  #F7EBD5;
+
+    --ok:        #216B4C;
+    --ok-bg:     #DDEDE4;
+    --warn:      #A8481A;
+    --warn-bg:   #F8E4D8;
+    --stop:      #9B2727;
+    --stop-bg:   #F7DEDE;
+
+    --shadow: 0 1px 2px rgba(22,32,43,.07), 0 6px 16px -8px rgba(22,32,43,.18);
+
+    --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+    --serif: "Noto Serif TC", "Songti TC", serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
+  }
+
+  /* ---- Dark, for viewers on system-dark who never stamped a choice ---- */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:        #0E141A;
+      --surface:   #18212B;
+      --surface-2: #212C38;
+      --ink:       #E4ECF3;
+      --muted:     #94A5B6;
+      --line:      #33404E;
+      --line-soft: #263240;
+
+      --brass:     #E3A241;
+      --brass-ink: #F0BC6C;
+      --brass-bg:  #33270F;
+
+      --ok:        #6FC59B;
+      --ok-bg:     #12291F;
+      --warn:      #E9975F;
+      --warn-bg:   #33200F;
+      --stop:      #E58585;
+      --stop-bg:   #331616;
+
+      --shadow: 0 1px 2px rgba(0,0,0,.5), 0 6px 18px -8px rgba(0,0,0,.7);
+    }
+  }
+
+  /* ---- Dark, explicitly chosen ---- */
+  :root[data-theme="dark"] {
+    --bg:        #0E141A;
+    --surface:   #18212B;
+    --surface-2: #212C38;
+    --ink:       #E4ECF3;
+    --muted:     #94A5B6;
+    --line:      #33404E;
+    --line-soft: #263240;
+
+    --brass:     #E3A241;
+    --brass-ink: #F0BC6C;
+    --brass-bg:  #33270F;
+
+    --ok:        #6FC59B;
+    --ok-bg:     #12291F;
+    --warn:      #E9975F;
+    --warn-bg:   #33200F;
+    --stop:      #E58585;
+    --stop-bg:   #331616;
+
+    --shadow: 0 1px 2px rgba(0,0,0,.5), 0 6px 18px -8px rgba(0,0,0,.7);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
+    margin: 0;
+    padding: 0 14px 56px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .wrap {
+    max-width: 520px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding-top: 22px;
+  }
+
+  /* ---------- masthead ---------- */
+  .mast {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .mast .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    color: var(--brass-ink);
+    text-transform: uppercase;
+  }
+  .mast h1 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 1.25;
+    letter-spacing: .01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .mast .sub {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  /* ---------- three decisive facts ---------- */
+  .facts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .fact {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-left: 4px solid var(--brass);
+    border-radius: 3px;
+    padding: 13px 15px;
+    box-shadow: var(--shadow);
+  }
+  .fact .big {
+    font-family: var(--mono);
+    font-size: 25px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--brass-ink);
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+  .fact .lbl { font-size: 14.5px; line-height: 1.5; }
+  .fact .lbl b { font-weight: 700; }
+  .fact .lbl small {
+    display: block;
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+
+  /* ---------- callouts ---------- */
+  .note {
+    border-radius: 3px;
+    padding: 13px 15px;
+    font-size: 14.5px;
+    line-height: 1.6;
+    border: 1px solid transparent;
+  }
+  .note b { font-weight: 700; }
+  .note .tag {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .note.warn { background: var(--warn-bg); border-color: var(--warn); color: var(--ink); }
+  .note.warn .tag { color: var(--warn); }
+  .note.ok   { background: var(--ok-bg);   border-color: var(--ok);   color: var(--ink); }
+  .note.ok .tag   { color: var(--ok); }
+  .note.stop { background: var(--stop-bg); border-color: var(--stop); color: var(--ink); }
+  .note.stop .tag { color: var(--stop); }
+
+  /* ---------- section shell ---------- */
+  h2.sec {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 12px 0 -6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2.sec::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: 3px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  /* ---------- timeline ---------- */
+  .tl { display: flex; flex-direction: column; }
+  .tl .row {
+    display: grid;
+    grid-template-columns: 62px 1fr;
+    gap: 14px;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .tl .row:last-child { border-bottom: 0; }
+  .tl .row.key { background: var(--brass-bg); }
+  .tl time {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--brass-ink);
+    padding-top: 2px;
+  }
+  .tl .what { font-size: 15px; line-height: 1.55; }
+  .tl .what b { font-weight: 700; }
+  .tl .what small {
+    display: block;
+    color: var(--muted);
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+  .tl .row.key .what small { color: var(--brass-ink); }
+
+  /* ---------- data rows ---------- */
+  .rows { display: flex; flex-direction: column; }
+  .rows .r {
+    display: grid;
+    grid-template-columns: 88px 1fr;
+    gap: 12px;
+    padding: 11px 15px;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 14.5px;
+    align-items: start;
+  }
+  .rows .r:last-child { border-bottom: 0; }
+  .rows .k {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.55;
+    padding-top: 1px;
+  }
+  .rows .v b { font-weight: 700; }
+  .rows .v small { display: block; color: var(--muted); font-size: 12.5px; }
+
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; }
+
+  /* ---------- pills ---------- */
+  .pill {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 2px;
+    vertical-align: 2px;
+    margin-left: 6px;
+    white-space: nowrap;
+  }
+  .pill.free { background: var(--ok-bg);   color: var(--ok);   border: 1px solid var(--ok); }
+  .pill.no   { background: var(--stop-bg); color: var(--stop); border: 1px solid var(--stop); }
+  .pill.unk  { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+  .pill.src  { background: var(--brass-bg); color: var(--brass-ink); border: 1px solid var(--brass); }
+
+  /* ---------- options (lunch etc) ---------- */
+  .opts { display: flex; flex-direction: column; }
+  .opt {
+    display: grid;
+    grid-template-columns: 26px 1fr;
+    gap: 12px;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 14.5px;
+  }
+  .opt:last-child { border-bottom: 0; }
+  .opt .rank {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--brass-ink);
+    padding-top: 2px;
+  }
+  .opt .name { font-weight: 700; }
+  .opt .why { color: var(--muted); font-size: 13px; line-height: 1.55; display: block; }
+  .opt.out .name { text-decoration: line-through; color: var(--muted); }
+
+  /* ---------- details ---------- */
+  details.card > summary {
+    cursor: pointer;
+    padding: 13px 15px;
+    font-size: 15px;
+    font-weight: 700;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+  details.card > summary::-webkit-details-marker { display: none; }
+  details.card > summary::after {
+    content: "＋";
+    font-family: var(--mono);
+    font-size: 15px;
+    color: var(--brass-ink);
+    flex: none;
+  }
+  details.card[open] > summary::after { content: "−"; }
+  details.card[open] > summary { border-bottom: 1px solid var(--line-soft); }
+  details.card > summary:focus-visible {
+    outline: 2px solid var(--brass);
+    outline-offset: -2px;
+  }
+
+  /* ---------- checklist ---------- */
+  .pack { display: flex; flex-direction: column; }
+  .pack label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 15px;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 15px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .pack label:last-child { border-bottom: 0; }
+  .pack input {
+    appearance: none;
+    -webkit-appearance: none;
+    flex: none;
+    width: 21px;
+    height: 21px;
+    border: 1.5px solid var(--line);
+    border-radius: 3px;
+    background: var(--surface);
+    display: grid;
+    place-content: center;
+    margin: 0;
+    cursor: pointer;
+  }
+  .pack input::after {
+    content: "";
+    width: 11px;
+    height: 6px;
+    border-left: 2.5px solid var(--surface);
+    border-bottom: 2.5px solid var(--surface);
+    transform: rotate(-45deg) translate(1px, -1px);
+    opacity: 0;
+  }
+  .pack input:checked {
+    background: var(--brass);
+    border-color: var(--brass);
+  }
+  .pack input:checked::after { opacity: 1; }
+  .pack input:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+  .pack input:checked + span { color: var(--muted); text-decoration: line-through; }
+
+  .packfoot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-top: 1px solid var(--line);
+    background: var(--surface-2);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .packfoot button {
+    font-family: var(--sans);
+    font-size: 12.5px;
+    color: var(--brass-ink);
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 4px 10px;
+    cursor: pointer;
+  }
+  .packfoot button:focus-visible { outline: 2px solid var(--brass); outline-offset: 1px; }
+
+  /* ---------- links ---------- */
+  a { color: var(--brass-ink); text-underline-offset: 3px; }
+  a:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; border-radius: 2px; }
+
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 15px 14px; }
+  .actions a {
+    flex: 1 1 auto;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 12px;
+    border: 1px solid var(--brass);
+    color: var(--brass-ink);
+    border-radius: 3px;
+    background: var(--brass-bg);
+    min-width: 130px;
+  }
+
+  ul.plain { margin: 0; padding: 12px 15px 14px 32px; font-size: 14.5px; line-height: 1.7; }
+  ul.plain li { margin-bottom: 6px; }
+  ul.plain li:last-child { margin-bottom: 0; }
+
+  footer.src {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    margin-top: 6px;
+  }
+
+  /* ---------- lunch plans ---------- */
+  .plan > .ph {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 13px 15px;
+    border-bottom: 1px solid var(--line-soft);
+    background: var(--surface-2);
+  }
+  .plan .pn { font-size: 16px; font-weight: 700; line-height: 1.4; }
+  .plan .pn small {
+    display: block;
+    font-weight: 400;
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .plan .badge {
+    flex: none;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 2px;
+    white-space: nowrap;
+    border: 1px solid var(--brass);
+    color: var(--brass-ink);
+    background: var(--brass-bg);
+  }
+  .plan .badge.pick { border-color: var(--ok);   color: var(--ok);   background: var(--ok-bg); }
+  .plan .badge.fast { border-color: var(--warn); color: var(--warn); background: var(--warn-bg); }
+
+  .plan .stat {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .plan .stat > div {
+    padding: 10px 6px;
+    text-align: center;
+    border-right: 1px solid var(--line-soft);
+  }
+  .plan .stat > div:last-child { border-right: 0; }
+  .plan .stat .sv {
+    display: block;
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.35;
+  }
+  .plan .stat .sk { font-size: 11px; color: var(--muted); letter-spacing: .04em; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <div class="eyebrow">2026 / 08 / 23 · 週日</div>
+    <h1>祥儀機器人夢工廠</h1>
+    <div class="sub">桃園市桃園區桃鶯路 461 巷 5 號 · 從八德廣豐路 36 號出發 · 4 歲・99 公分</div>
+  </header>
+
+  <section class="facts">
+    <div class="fact">
+      <div class="big">免票</div>
+      <div class="lbl"><b>兒子不用買票</b><small>門檻是身高 100 公分以下,不是年齡。99 &lt; 100,過關</small></div>
+    </div>
+    <div class="fact">
+      <div class="big">$200</div>
+      <div class="lbl"><b>大人全票,現場買就好</b><small>KKday 折扣只省 20–30 元,不值得冒不能當日使用的風險</small></div>
+    </div>
+    <div class="fact">
+      <div class="big">09:30</div>
+      <div class="lbl"><b>開館時間,一定要卡第一場</b><small>09:00 從家裡出發。最後入館 16:00</small></div>
+    </div>
+  </section>
+
+  <div class="note warn">
+    <span class="tag">為什麼一定要早到</span>
+    這裡<b>不是預約制,擋不住人潮</b>。實際遊記回報:假日人多時導覽場次會互相重疊,上一組還沒逛完、下一組已經開始,體感擁擠、走馬看花。<b>晚一小時到,體驗差很多。</b>
+  </div>
+
+  <h2 class="sec">當天流程</h2>
+  <div class="card tl">
+    <div class="row">
+      <time>08:45</time>
+      <div class="what">出門前看一次氣象<small>雷雨若提前到中午,下午備案就整個往前挪</small></div>
+    </div>
+    <div class="row">
+      <time>09:00</time>
+      <div class="what"><b>從廣豐路出發</b></div>
+    </div>
+    <div class="row">
+      <time>09:20</time>
+      <div class="what">到館,停館內免費停車場<small>客滿就轉對面住都大飯店</small></div>
+    </div>
+    <div class="row key">
+      <time>09:30</time>
+      <div class="what"><b>開館 — 卡第一場導覽</b><small>先問櫃檯今天的場次時間,官網查不到</small></div>
+    </div>
+    <div class="row">
+      <time>11:00</time>
+      <div class="what">參觀結束<small>導覽 30–40 分 + 自由活動約 50 分</small></div>
+    </div>
+    <div class="row">
+      <time>11:30</time>
+      <div class="what">選配:DIY 體驗包<small>$149,約 30 分鐘</small></div>
+    </div>
+    <div class="row">
+      <time>12:00</time>
+      <div class="what">午餐<small>預設饗泰多(置地 1F)。想吃好一點改住都自助餐,那邊 12:00 才開</small></div>
+    </div>
+    <div class="row key">
+      <time>13:15</time>
+      <div class="what"><b>回家午睡</b><small>4 歲的體力到這裡差不多了,別硬排</small></div>
+    </div>
+    <div class="row">
+      <time>14:00</time>
+      <div class="what">有電才去:利百代彩筆文創館<small>室內,順便躲雷陣雨</small></div>
+    </div>
+  </div>
+
+  <h2 class="sec">票務</h2>
+  <div class="card rows">
+    <div class="r"><div class="k">全票</div><div class="v"><span class="num">200</span> 元<span class="pill src">官網確認</span></div></div>
+    <div class="r"><div class="k">99cm 兒童</div><div class="v"><b>免費</b><span class="pill free">免票</span><small>官網原文:免費資格為 100 公分以下兒童</small></div></div>
+    <div class="r"><div class="k">怎麼買</div><div class="v"><b>現場買</b><small>只買 1 張票,線上通路折扣不明顯,且不確定能否當日使用</small></div></div>
+    <div class="r"><div class="k">帶證件</div><div class="v">建議帶兒童手冊<small>99 / 100 只差 1 公分,官網沒寫現場怎麼認定</small></div></div>
+    <div class="r"><div class="k">開放時間</div><div class="v"><span class="num">09:30–17:00</span><small>最後入館 16:00</small></div></div>
+    <div class="r"><div class="k">8/23 開嗎</div><div class="v"><b>有開</b><span class="pill free">已確認</span><small>8 月包場休館日是 4、7、11–14、18–21、25、31 — 都避開了</small></div></div>
+  </div>
+
+  <div class="note stop">
+    <span class="tag">別被舊文章騙了</span>
+    網路上 2021 年的部落格寫「250 元」,<b>票價已經改過</b>,現在官網是 200 元。看到舊價格別以為被多收。
+  </div>
+
+  <h2 class="sec">停車</h2>
+  <div class="card opts">
+    <div class="opt"><div class="rank">1</div><div><span class="name">館內免費停車場</span><span class="why">官網交通指南寫「停車格都可以停車」。車位數官方沒公布</span></div></div>
+    <div class="opt"><div class="rank">2</div><div><span class="name">對面 住都大飯店 地下室</span><span class="why">約 600 個車位。館內滿的時候門口警衛會引導過去</span></div></div>
+  </div>
+
+  <h2 class="sec">DIY 要不要做</h2>
+  <div class="card opts">
+    <div class="opt">
+      <div class="rank">✓</div>
+      <div><span class="name">自己動手做體驗包 — $149 / 30 分</span>
+      <span class="why">衝天小火箭・跳跳磁力蛙・烏龜漫步・磁力小跑車。官方寫「建議 5 歲以上」是建議不是限制,4 歲可做。每份限 2 人共同製作,須當日完成</span></div>
+    </div>
+    <div class="opt out">
+      <div class="rank">✕</div>
+      <div><span class="name">AI 實作課程 — $330~580 / 60–90 分</span>
+      <span class="why">建議年齡 6+ 或 8+,難度高又坐得久,4 歲撐不住。跳過</span></div>
+    </div>
+  </div>
+
+  <div class="note warn">
+    <span class="tag">先把期待值調好</span>
+    依實際遊記,這個年紀做 DIY 多半會變成<b>家長組裝、小孩在旁邊看</b>。當成陪伴體驗就好,別期待他自己完成。
+  </div>
+
+  <h2 class="sec">午餐 · 四個方案</h2>
+
+  <div class="note ok">
+    <span class="tag">今晚就能做的一件事</span>
+    <b>先線上訂位</b>,明天就不用賭現場。饗泰多可用 EZTABLE 訂,古拉爵上官網選分店。住都大飯店只能打電話,要等早上。
+  </div>
+
+  <!-- 方案 1 -->
+  <div class="card plan">
+    <div class="ph">
+      <div class="pn">饗泰多 泰式<small>置地生活廣場 1F · 介壽路一段 728 號</small></div>
+      <span class="badge pick">預設</span>
+    </div>
+    <div class="stat">
+      <div><span class="sv">13 分</span><span class="sk">祥儀開過去</span></div>
+      <div><span class="sv">600 m</span><span class="sk">離家距離</span></div>
+      <div><span class="sv">$400</span><span class="sk">每人低消</span></div>
+    </div>
+    <div class="rows">
+      <div class="r"><div class="k">停車</div><div class="v"><b>商場 1,120 個車位</b><small>$40/時(首小時計次,之後每半小時 $20),消費可折抵。<b>停 B3/B4 搭電梯直上 1F,全程室內不淋雨</b></small></div></div>
+      <div class="r"><div class="k">時間</div><div class="v">假日 <span class="num">11:00–16:00</span><small>中午不休息,11:55 到剛好避開尖峰</small></div></div>
+      <div class="r"><div class="k">訂位</div><div class="v"><a href="https://tw.eztable.com/restaurant/17841" target="_blank" rel="noopener">EZTABLE 線上訂位</a><small>刷卡最高 15% 折扣</small></div></div>
+      <div class="r"><div class="k">菜色</div><div class="v">招牌 <b>2 公分厚月亮蝦餅</b><small>50 多道單點與套餐。完整菜單定價查不到</small></div></div>
+      <div class="r"><div class="k">小孩</div><div class="v"><b>有兒童椅 + 兒童餐具</b><span class="pill free">4 歲免白飯錢</span><small>店規是 6 歲以上才另計 1 人份白飯,他還沒到</small></div></div>
+      <div class="r"><div class="k">另計</div><div class="v">服務費 10%</div></div>
+    </div>
+  </div>
+
+  <!-- 方案 2 -->
+  <div class="card plan">
+    <div class="ph">
+      <div class="pn">住都大飯店 波根第自助餐<small>桃鶯路 398 號 · 就在祥儀正對面</small></div>
+      <span class="badge">小孩免費</span>
+    </div>
+    <div class="stat">
+      <div><span class="sv">2 分</span><span class="sk">祥儀開過去</span></div>
+      <div><span class="sv">10 分</span><span class="sk">開回家</span></div>
+      <div><span class="sv">$720</span><span class="sk">大人吃到飽</span></div>
+    </div>
+    <div class="rows">
+      <div class="r"><div class="k">停車</div><div class="v"><b>飯店自有 600 個平面車位</b><span class="pill free">用餐免費</span><small>B1、B2。車位多到不用擔心</small></div></div>
+      <div class="r"><div class="k">時間</div><div class="v">午餐 <span class="num">12:00–14:00</span><small><b>12:00 才開</b>。11:40 離館、2 分鐘車程 → 會早到,先在飯店大廳等一下</small></div></div>
+      <div class="r"><div class="k">訂位</div><div class="v"><a href="tel:033766177">03-376-6177</a><small>只能電話訂,沒有線上訂位。假日建議先訂</small></div></div>
+      <div class="r"><div class="k">菜色</div><div class="v">吃到飽自助餐<small>冷盤熱食、生猛海鮮、牛排、哈根達斯冰淇淋、手工甜點</small></div></div>
+      <div class="r"><div class="k">小孩</div><div class="v"><b>110 公分以下免費</b><span class="pill free">99cm 免費</span><small>門檻比祥儀的 100cm 還鬆。小孩票是 $430,他不用</small></div></div>
+    </div>
+    <div class="note warn" style="border-radius:0;border-left:0;border-right:0;border-bottom:0;">
+      <span class="tag">這個價格要再確認</span>
+      720 / 430 / 110cm 免費這組數字的來源比較弱,不是官網原文。<b>打電話訂位時順口問一次</b>,也順便問服務費和兒童椅。
+    </div>
+  </div>
+
+  <!-- 方案 3 -->
+  <div class="card plan">
+    <div class="ph">
+      <div class="pn">古拉爵 義式屋<small>置地生活廣場 1F · 同方案 1 那棟</small></div>
+      <span class="badge">同商場備選</span>
+    </div>
+    <div class="stat">
+      <div><span class="sv">13 分</span><span class="sk">祥儀開過去</span></div>
+      <div><span class="sv">11–22</span><span class="sk">營業時間</span></div>
+      <div><span class="sv">$600+</span><span class="sk">人均起跳</span></div>
+    </div>
+    <div class="rows">
+      <div class="r"><div class="k">停車</div><div class="v">同置地生活廣場<small>B3/B4 電梯直上 1F</small></div></div>
+      <div class="r"><div class="k">訂位</div><div class="v"><a href="https://www.grazie.com.tw/menu" target="_blank" rel="noopener">官網線上訂位</a><small>要自己選「八德廣豐店」,查不到分店直達連結</small></div></div>
+      <div class="r"><div class="k">菜色</div><div class="v">玉米酥皮湯、義大利麵、拿坡里披薩<small>另有 2–6 人份派對套餐。招牌菜完整定價查不到</small></div></div>
+      <div class="r"><div class="k">小孩</div><div class="v">訂位時可指定兒童椅、兒童餐具<small>有沒有專屬兒童餐查不到</small></div></div>
+      <div class="r"><div class="k">另計</div><div class="v">服務費 10%,人均 600–1200 元</div></div>
+    </div>
+  </div>
+
+  <!-- 方案 4 -->
+  <div class="card plan">
+    <div class="ph">
+      <div class="pn">麥當勞得來速<small>桃鶯路 66 號 · 24 小時</small></div>
+      <span class="badge fast">撐不住時</span>
+    </div>
+    <div class="stat">
+      <div><span class="sv">4 分</span><span class="sk">祥儀開過去</span></div>
+      <div><span class="sv">10 分</span><span class="sk">開回家</span></div>
+      <div><span class="sv">0 分</span><span class="sk">下車時間</span></div>
+    </div>
+    <div class="rows">
+      <div class="r"><div class="k">用途</div><div class="v"><b>完全不用下車</b><small>小孩在館內已經玩到情緒臨界點、坐不住正式餐廳時走這案</small></div></div>
+      <div class="r"><div class="k">小孩</div><div class="v">歡樂送兒童餐附玩具</div></div>
+      <div class="r"><div class="k">查不到</div><div class="v">本店電話、車位數、內用區與兒童設施</div></div>
+    </div>
+  </div>
+
+  <div class="note ok">
+    <span class="tag">怎麼選</span>
+    <b>預設走方案 1</b>(離家最近、雨天不淋、小孩免白飯錢)。<b>想吃好一點就走方案 2</b> —— 小孩免費、車位最多、離祥儀只要過個馬路。<b>小孩崩潰就走方案 4。</b>
+  </div>
+
+  <div class="note warn">
+    <span class="tag">兩件要自己核對的事</span>
+    <b>①</b> 上一版寫的「廣豐新天地」已在 2021 年改名<b>置地生活廣場</b>,導航搜新名字。<br>
+    <b>②</b> 查到的「置地 → 家 600 公尺卻要 8 分鐘」數字互相矛盾,實際應該更快,<b>以你自己的導航為準</b>。<br>
+    另外:所有店家<b>近三個月的週日中午等候時間評論全部查不到</b>,只有通用的「假日人潮較多」。所以才建議先訂位。</div>
+
+  <h2 class="sec">下午備案</h2>
+  <div class="card opts">
+    <div class="opt"><div class="rank">✓</div><div><span class="name">利百代彩筆文創館</span><span class="why">桃園區大誠路 2 號。室內,一般參觀免預約(只有 DIY 課要 3 天前約)。假日 09:00–17:00,週二公休 → 8/23 正常開放。車程未實測,導航前確認</span></div></div>
+    <div class="opt out"><div class="rank">✕</div><div><span class="name">可口可樂博物館</span><span class="why">免門票又是熱門室內親子景點,但要 <b>7 天前預約</b>,明天進不去。想去要提早一週</span></div></div>
+  </div>
+
+  <h2 class="sec">天氣</h2>
+  <div class="card rows">
+    <div class="r"><div class="k">降雨機率</div><div class="v"><b class="num">60%</b><small>多雲短暫陣雨或雷雨</small></div></div>
+    <div class="r"><div class="k">氣溫</div><div class="v"><span class="num">26–34°C</span><small>體感 <span class="num">29–38°C</span> — 氣象署提醒注意中暑</small></div></div>
+    <div class="r"><div class="k">對策</div><div class="v">行程已全部排成室內<small>出門前再看一次即時預報,雷雨提前就把下午備案往前挪</small></div></div>
+  </div>
+
+  <h2 class="sec">行前清單</h2>
+  <div class="card">
+    <div class="pack" id="pack">
+      <label><input type="checkbox" data-k="p1"><span>兒童手冊(證明身高用)</span></label>
+      <label><input type="checkbox" data-k="p2"><span>健保卡</span></label>
+      <label><input type="checkbox" data-k="p3"><span>小水壺</span></label>
+      <label><input type="checkbox" data-k="p4"><span>濕紙巾</span></label>
+      <label><input type="checkbox" data-k="p5"><span>薄外套(館內冷氣強)</span></label>
+      <label><input type="checkbox" data-k="p6"><span>輕便雨具</span></label>
+      <label><input type="checkbox" data-k="p7"><span>一套備用衣物</span></label>
+      <label><input type="checkbox" data-k="p8"><span>手機充飽電</span></label>
+      <label><input type="checkbox" data-k="p9"><span>現金(DIY 體驗包)</span></label>
+      <label><input type="checkbox" data-k="p10"><span>午餐訂位已完成</span></label>
+    </div>
+    <div class="packfoot">
+      <span id="packcount">0 / 10 已備妥</span>
+      <button type="button" id="packreset">全部清除</button>
+    </div>
+  </div>
+
+  <h2 class="sec">出發前自己確認</h2>
+  <details class="card">
+    <summary>三件查不到的事 <span class="pill unk">查不到</span></summary>
+    <ul class="plain">
+      <li><b>週日導覽場次時刻表</b> — 官網行事曆抓不到逐場次時間,館方電話 <a href="tel:0333621252">03-3621252</a> 但官網寫假日電話服務暫停。<b>現場問櫃檯最快</b>,這也是要 09:30 到的另一個理由:萬一第一場是 10:00,你還有緩衝。</li>
+      <li><b>KKday / Klook 實際折扣與使用限制</b> — 兩個平台都被 Cloudflare 擋住讀不到。但結論不變:<b>現場買</b>。</li>
+      <li><b>近三個月的評論</b> — Google 地圖評論列表在自動化工具下反覆當機,Mobile01 回 403。只拿到整體評分 <b class="num">4.2</b>。出門前自己在手機滑一下最新幾則。</li>
+    </ul>
+  </details>
+
+  <div class="card">
+    <div class="actions">
+      <a href="https://www.google.com/maps/search/?api=1&amp;query=%E7%A5%A5%E5%84%80%E6%A9%9F%E5%99%A8%E4%BA%BA%E5%A4%A2%E5%B7%A5%E5%BB%A0" target="_blank" rel="noopener">導航到祥儀</a>
+      <a href="tel:0333621252">撥打 03-3621252</a>
+    </div>
+  </div>
+
+  <footer class="src">
+    資料由 sonnet-travel agent 於 2026/08/22 上網查證。票價、免費身高門檻、開放時間、包場休館日、DIY 品項與價格、館內停車皆取自官網原文;導覽節奏與擁擠情形取自 2017 / 2021 年遊記,非近況。標「查不到」的項目是真的查不到,沒有補值。
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('#pack input'));
+  var out = document.getElementById('packcount');
+  var KEY = 'xiangyi-pack-20260823';
+
+  function readStore() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+  function writeStore(obj) {
+    try { localStorage.setItem(KEY, JSON.stringify(obj)); } catch (e) {}
+  }
+  function paint() {
+    var n = boxes.filter(function (b) { return b.checked; }).length;
+    out.textContent = n + ' / ' + boxes.length + ' 已備妥';
+  }
+
+  var saved = readStore();
+  boxes.forEach(function (b) {
+    if (saved[b.dataset.k]) { b.checked = true; }
+    b.addEventListener('change', function () {
+      var s = readStore();
+      if (b.checked) { s[b.dataset.k] = 1; } else { delete s[b.dataset.k]; }
+      writeStore(s);
+      paint();
+    });
+  });
+
+  document.getElementById('packreset').addEventListener('click', function () {
+    boxes.forEach(function (b) { b.checked = false; });
+    writeStore({});
+    paint();
+  });
+
+  paint();
+})();
+</script>
+
+</body></html>

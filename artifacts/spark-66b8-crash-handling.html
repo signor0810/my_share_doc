@@ -1,0 +1,491 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
+<title>spark-66b8 死機處置</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --ground:#F6F7F9;
+    --surface:#FFFFFF;
+    --surface-2:#EFF2F6;
+    --ink:#161A20;
+    --muted:#5B6573;
+    --line:#DCE1E8;
+    --line-strong:#C3CBD6;
+    --accent:#A25C08;
+    --accent-soft:#FBEFDC;
+    --critical:#9E2A2A;
+    --critical-soft:#FAE9E9;
+    --ok:#1C6644;
+    --ok-soft:#E4F1EA;
+    --code-bg:#EDF0F4;
+    --shadow:0 1px 2px rgba(20,28,40,.06),0 8px 20px -12px rgba(20,28,40,.18);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#0E1116;
+      --surface:#151A21;
+      --surface-2:#1B222B;
+      --ink:#E7EBF1;
+      --muted:#98A2B1;
+      --line:#252D38;
+      --line-strong:#354050;
+      --accent:#E8A648;
+      --accent-soft:#2B2114;
+      --critical:#E97C7C;
+      --critical-soft:#2E1A1A;
+      --ok:#57B98C;
+      --ok-soft:#13271E;
+      --code-bg:#101620;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 24px -14px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0E1116;
+    --surface:#151A21;
+    --surface-2:#1B222B;
+    --ink:#E7EBF1;
+    --muted:#98A2B1;
+    --line:#252D38;
+    --line-strong:#354050;
+    --accent:#E8A648;
+    --accent-soft:#2B2114;
+    --critical:#E97C7C;
+    --critical-soft:#2E1A1A;
+    --ok:#57B98C;
+    --ok-soft:#13271E;
+    --code-bg:#101620;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 24px -14px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground);
+    color:var(--ink);
+    font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    font-size:15.5px;
+    line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px 96px}
+  h1,h2,h3{font-family:Archivo,"Noto Sans TC","PingFang TC",sans-serif;text-wrap:balance;margin:0}
+  code,kbd,pre{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+
+  /* ---------- masthead ---------- */
+  .mast{display:flex;flex-direction:column;gap:14px;padding-bottom:26px;border-bottom:2px solid var(--line-strong)}
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  h1{font-size:clamp(28px,4.4vw,40px);font-weight:700;letter-spacing:-.015em;line-height:1.14}
+  .mast-meta{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:13px;color:var(--muted)}
+  .mast-meta b{color:var(--ink);font-weight:600}
+
+  /* ---------- premise ---------- */
+  .premise{
+    margin-top:30px;background:var(--surface);border:1px solid var(--line);
+    border-radius:4px;padding:22px 24px;box-shadow:var(--shadow);
+  }
+  .premise h2{font-size:15px;font-weight:600;letter-spacing:.01em;margin-bottom:10px}
+  .premise p{margin:0 0 12px;max-width:68ch}
+  .premise p:last-child{margin-bottom:0}
+  .flag{
+    display:flex;gap:12px;align-items:flex-start;margin-top:18px;padding:14px 16px;
+    background:var(--critical-soft);border-left:3px solid var(--critical);border-radius:0 3px 3px 0;
+  }
+  .flag-tag{
+    font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--critical);font-weight:500;white-space:nowrap;padding-top:3px;
+  }
+  .flag p{margin:0;font-size:14px}
+
+  /* ---------- the branch ---------- */
+  .branch-head{margin:52px 0 20px}
+  .branch-head h2{font-size:22px;font-weight:700;letter-spacing:-.01em}
+  .branch-head p{margin:6px 0 0;color:var(--muted);font-size:14px}
+  .branch{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:840px){.branch{grid-template-columns:1fr}}
+  .lane{
+    background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--accent);
+    border-radius:4px;padding:24px;box-shadow:var(--shadow);display:flex;flex-direction:column;
+  }
+  .lane-when{
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--accent);font-weight:500;
+  }
+  .lane h3{font-size:19px;font-weight:700;margin:8px 0 4px;letter-spacing:-.01em}
+  .lane-sub{color:var(--muted);font-size:13.5px;margin:0 0 20px}
+
+  ol.steps{list-style:none;counter-reset:s;margin:0;padding:0;display:flex;flex-direction:column;gap:20px}
+  ol.steps>li{counter-increment:s;display:grid;grid-template-columns:26px 1fr;gap:12px}
+  ol.steps>li::before{
+    content:counter(s);font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;
+    width:24px;height:24px;display:grid;place-items:center;border-radius:50%;
+    background:var(--surface-2);color:var(--ink);border:1px solid var(--line-strong);margin-top:1px;
+  }
+  .step-t{font-weight:600;font-size:15px;margin:1px 0 6px}
+  .step-b{font-size:14px;color:var(--muted);margin:0 0 10px}
+  .step-b:last-child{margin-bottom:0}
+  .step-b strong{color:var(--ink);font-weight:600}
+
+  pre{
+    background:var(--code-bg);border:1px solid var(--line);border-radius:3px;
+    padding:12px 14px;overflow-x:auto;font-size:13px;line-height:1.7;margin:0 0 10px;color:var(--ink);
+  }
+  pre:last-child{margin-bottom:0}
+  pre .cm{color:var(--muted)}
+  p code{background:var(--code-bg);border:1px solid var(--line);border-radius:3px;padding:1px 5px;font-size:12.5px}
+
+  /* keycaps — the SysRq chord is muscle memory under stress */
+  .chord{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 8px}
+  .chord-row{display:flex;gap:5px;align-items:center}
+  kbd{
+    display:inline-block;min-width:30px;text-align:center;font-size:12px;font-weight:500;
+    padding:5px 8px;border-radius:4px;background:var(--surface-2);
+    border:1px solid var(--line-strong);border-bottom-width:2px;color:var(--ink);
+  }
+  .chord-note{font-size:12.5px;color:var(--muted)}
+  .plus{color:var(--muted);font-size:12px}
+
+  .callout{
+    margin:0 0 10px;padding:11px 14px;border-radius:3px;font-size:13.5px;
+    background:var(--accent-soft);border-left:3px solid var(--accent);
+  }
+  .callout.crit{background:var(--critical-soft);border-left-color:var(--critical)}
+  .callout.ok{background:var(--ok-soft);border-left-color:var(--ok)}
+  .callout p{margin:0}
+  .callout p+p{margin-top:7px}
+
+  /* ---------- sections ---------- */
+  section{margin-top:52px}
+  section>h2{font-size:22px;font-weight:700;letter-spacing:-.01em;margin-bottom:6px}
+  .sec-sub{color:var(--muted);font-size:14px;margin:0 0 20px;max-width:70ch}
+
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:4px;background:var(--surface);box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
+  th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{
+    font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+    color:var(--muted);font-weight:500;background:var(--surface-2);border-bottom:1px solid var(--line-strong);
+  }
+  tbody tr:last-child td{border-bottom:none}
+  td code{font-size:12.5px;background:var(--code-bg);border:1px solid var(--line);border-radius:3px;padding:1px 5px}
+  .sig{font-weight:600;white-space:nowrap}
+  .sig.bad{color:var(--critical)}
+  .sig.good{color:var(--ok)}
+  .sig.warn{color:var(--accent)}
+  td.file code{background:none;border:none;padding:0;font-weight:500;color:var(--ink)}
+
+  /* ---------- never-do ---------- */
+  .nevers{display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow)}
+  .never{display:grid;grid-template-columns:auto 1fr;gap:14px;padding:16px 18px;border-bottom:1px solid var(--line)}
+  .never:last-child{border-bottom:none}
+  .never-x{color:var(--critical);font-weight:700;font-family:"IBM Plex Mono",monospace;font-size:14px;padding-top:1px}
+  .never-t{font-weight:600;font-size:14.5px;margin:0 0 3px}
+  .never-w{font-size:13.5px;color:var(--muted);margin:0}
+
+  footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+  footer p{margin:0 0 6px;max-width:74ch}
+  a{color:var(--accent)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <div class="eyebrow">On-call runbook · 交接文件</div>
+    <h1>spark-66b8 死機處置</h1>
+    <div class="mast-meta">
+      <span>機器 <b>DGX Spark · GB10</b></span>
+      <span>統一記憶體 <b>119.7 GiB</b></span>
+      <span>更新 <b>2026-09-10</b></span>
+      <span>完整版 <b>sop_dgx_freeze.md</b></span>
+    </div>
+  </header>
+
+  <div class="premise">
+    <h2>一句話背景</h2>
+    <p>
+      這台機器上有<strong>兩套 LLM runtime 共用同一塊 119.7 GiB 統一記憶體</strong>：
+      vLLM 固定佔 53 GB（Hermes 在用），ollama 給 open-webui 用。
+      <strong>ollama 不知道 vLLM 的存在</strong> —— 它以為 119.7 GB 全是它的，
+      所以會去載入根本放不下的模型。記憶體耗盡後，GPU 配置無法被 swap 出去，
+      核心會在 OOM killer 動作前就硬鎖死，而且來不及留下任何 log。
+    </p>
+    <p>
+      已知死機五次：07-09、08-15、08-16、08-18、08-29。
+      2026-09-10 已刪掉肇事的 86 GB 模型並替 ollama 加上限。
+    </p>
+    <div class="flag">
+      <span class="flag-tag">不要往這修</span>
+      <p>
+        <strong>和 Qwen3.8 或模型量化版本無關。</strong>
+        07-09 那次死機時 Qwen3.8 根本還不存在。不要把時間花在「換模型」上。
+        另外請注意：根因目前是<strong>強推論，尚未被時間證實</strong> —— 八月的記憶體歷史已因保留期過短而消失。
+      </p>
+    </div>
+  </div>
+
+  <div class="branch-head">
+    <h2>你到場時，機器是哪一種狀態？</h2>
+    <p>這是整份文件的分岔點。先確定你在哪一欄，再往下做。</p>
+  </div>
+
+  <div class="branch">
+
+    <div class="lane">
+      <div class="lane-when">情境 A</div>
+      <h3>機器正凍著</h3>
+      <p class="lane-sub">照順序做。<strong>不要一開始就拔電。</strong></p>
+
+      <ol class="steps">
+        <li>
+          <div>
+            <p class="step-t">先從別台電腦試 ssh</p>
+            <p class="step-b">機器可能只是卡住，不是全死。</p>
+            <pre>ssh spark-66b8@100.77.199.82  <span class="cm"># Tailscale</span></pre>
+          </div>
+        </li>
+        <li>
+          <div>
+            <p class="step-t">接得上就不要重開，直接救記憶體</p>
+            <pre>sudo systemctl stop ollama
+free -g
+tail -30 /var/log/freeze-sampler.log</pre>
+            <p class="step-b">停掉最可能的兇手，看 <code>available</code> 有沒有回來。</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <p class="step-t">接不上 → 用 SysRq 安全重開</p>
+            <p class="step-b">本機鍵盤，按住 <kbd>Alt</kbd>+<kbd>SysRq</kbd> 不放，依序按下列字母，每個間隔 2 秒：</p>
+            <div class="chord">
+              <span class="chord-row"><kbd>S</kbd><span class="chord-note">sync 落盤</span></span>
+            </div>
+            <div class="chord">
+              <span class="chord-row"><kbd>U</kbd><span class="chord-note">重掛為唯讀</span></span>
+            </div>
+            <div class="chord">
+              <span class="chord-row"><kbd>B</kbd><span class="chord-note">重開機</span></span>
+            </div>
+            <div class="callout">
+              <p>
+                這台只開了 <code>S</code> <code>U</code> <code>B</code>（<code>kernel.sysrq=176</code>）。
+                <strong><kbd>Alt</kbd>+<kbd>SysRq</kbd>+<kbd>F</kbd> 手動 OOM kill 不能用。</strong>
+                硬斷電有檔案系統損毀風險，SUB 沒有。
+              </p>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <p class="step-t">SysRq 也沒反應 → 才長按電源鍵</p>
+            <div class="callout crit">
+              <p><strong>按下去之前先記下這三件事</strong> —— log 裡不會有，只有你知道：</p>
+              <p>① 當時誰在做什麼？<br>
+                 ② <strong>open-webui 有沒有在載模型？哪一顆？</strong><br>
+                 ③ 螢幕上最後顯示什麼？</p>
+            </div>
+            <p class="step-b">重開後把這三點補進 <code>sop_dgx_freeze.md</code> 第 8 節追蹤表。</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="lane">
+      <div class="lane-when">情境 B</div>
+      <h3>到場時已經重開過了</h3>
+      <p class="lane-sub">證據還在，但你得知道去哪撈。</p>
+
+      <ol class="steps">
+        <li>
+          <div>
+            <p class="step-t">先跑全套追查</p>
+            <pre>bash ~/wchien/HermesAgent_Setup/postmortem_freeze.sh</pre>
+            <div class="callout crit">
+              <p>
+                <strong>證據在「上一個 boot」，不在你現在這個 boot。</strong>
+                腳本預設就讀 <code>-b -1</code>。不要自己去翻當前 boot 然後說「什麼都沒有」——
+                這是查這類問題最常見的錯誤。
+              </p>
+            </div>
+            <p class="step-b">要查更早的：<code>postmortem_freeze.sh -2</code></p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <p class="step-t">如果只來得及看一個東西，看這個</p>
+            <pre>tail -50 /var/log/freeze-sampler.log</pre>
+            <p class="step-b">
+              這個檔案每 20 秒寫一行，<strong>每行寫完立刻 fsync 落盤</strong>，
+              所以硬鎖死也不會遺失（journald 會遺失最後幾秒到幾分鐘）。
+            </p>
+            <pre>2026-09-10T21:50:35 avail=55811MiB/122570MiB(45%)
+gpu=53019MiB ollama=[-] top=[VLLM::EngineCor:2.9G ...]</pre>
+          </div>
+        </li>
+        <li>
+          <div>
+            <p class="step-t">照下面那張表判讀</p>
+            <p class="step-b">
+              重點看兩個地方：取樣器的 <code>avail</code> 走勢，
+              以及 postmortem 第 4 段 earlyoom 有沒有出手。
+            </p>
+            <div class="callout ok">
+              <p>
+                看到 <code>earlyoom ... ollama</code> 是<strong>好消息</strong> ——
+                代表保護機制生效，只有 ollama 被殺，機器沒死。
+              </p>
+            </div>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+  </div>
+
+  <section>
+    <h2>判讀表</h2>
+    <p class="sec-sub">看到什麼 → 代表什麼 → 怎麼做。</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>你看到</th><th>意思</th><th>動作</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="sig bad"><code>avail</code> 一路掉到近 0</td>
+            <td>記憶體耗盡確認，診斷正確</td>
+            <td>看同一行的 <code>ollama=[...]</code> 是哪顆模型，回報並考慮刪除</td>
+          </tr>
+          <tr>
+            <td class="sig good">第 4 段有 earlyoom 殺 ollama</td>
+            <td>保護生效，機器其實沒死</td>
+            <td>正常結果，不用改設定。查一下是誰觸發載入</td>
+          </tr>
+          <tr>
+            <td class="sig warn">earlyoom 沒動，但 <code>avail</code> 見底</td>
+            <td>記憶體確實耗盡，但保護沒趕上</td>
+            <td>把門檻調高：<code>sudo sed -i 's/-m 10 -s 10/-m 15 -s 15/' /etc/default/earlyoom</code> 後重啟</td>
+          </tr>
+          <tr>
+            <td class="sig bad"><code>avail</code> 一直 &gt; 30000 MiB 卻死機</td>
+            <td><strong>不是記憶體問題，本文的診斷錯了</strong></td>
+            <td>改查 GPU（Xid/NVRM）、電源、散熱。見 SOP 情況 C</td>
+          </tr>
+          <tr>
+            <td class="sig warn">取樣器檔案不存在</td>
+            <td>證據保存機制沒裝成功</td>
+            <td><code>sudo bash setup_freeze_evidence.sh</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>重要檔案</h2>
+    <p class="sec-sub">全部在 <code>~/wchien/HermesAgent_Setup/</code>。前兩個是你真正會用到的。</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>檔案</th><th>用途</th><th>什麼時候用</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="file"><code>sop_dgx_freeze.md</code></td><td>完整 SOP，含判讀決策樹與事前佈署</td><td>想搞懂細節</td></tr>
+          <tr><td class="file"><code>postmortem_freeze.sh</code></td><td>死機後全套追查，9 個面向</td><td><strong>重開機後第一件事</strong></td></tr>
+          <tr><td class="file"><code>handoff_freeze_oncall.md</code></td><td>本頁的純文字版</td><td>機器上查看時</td></tr>
+          <tr><td class="file"><code>fix_dgx_freeze.sh</code></td><td>根因修復：刪大模型、ollama 加上限、裝 earlyoom</td><td>重灌／還原後重跑</td></tr>
+          <tr><td class="file"><code>fix_earlyoom_args.sh</code></td><td>earlyoom 參數修正</td><td>保護參數掉了時</td></tr>
+          <tr><td class="file"><code>setup_freeze_evidence.sh</code></td><td>佈署證據保存：journald 10s sync + 取樣器</td><td>重灌／還原後重跑</td></tr>
+          <tr><td class="file"><code>freeze_sampler.sh</code></td><td>20 秒取樣器本體</td><td>由 service 呼叫，不用手動跑</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="sec-sub" style="margin-top:22px">產生的證據檔：</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>路徑</th><th>說明</th></tr></thead>
+        <tbody>
+          <tr><td class="file"><code>/var/log/freeze-sampler.log</code></td><td><strong>最可靠</strong> —— 每行已 fsync，20 秒間隔，保留 30 天</td></tr>
+          <tr><td class="file"><code>/var/log/sysstat/saYYYYMMDD</code></td><td>10 分鐘間隔記憶體歷史，保留 30 天（注意是長檔名，不是 <code>saDD</code>）</td></tr>
+          <tr><td class="file"><code>journalctl -b -1</code></td><td>系統 log，最多缺最後 10 秒</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>平時健康檢查</h2>
+    <p class="sec-sub">30 秒，每週跑一次就好。</p>
+    <pre>free -g                                      <span class="cm"># available 應 &gt; 40 GB</span>
+nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv
+                                             <span class="cm"># 只應有 vLLM ~53000 MiB</span>
+ollama ps                                    <span class="cm"># 平時應為空</span>
+systemctl is-active earlyoom freeze-sampler ollama
+ps -eo args | grep '[e]arlyoom'              <span class="cm"># 必須含 --avoid 和 --prefer</span>
+tail -3 /var/log/freeze-sampler.log          <span class="cm"># 取樣器還活著嗎</span></pre>
+    <div class="callout crit" style="margin-top:14px">
+      <p>
+        最後那行 <code>ps</code> <strong>必須</strong>看到 <code>--avoid</code> 和 <code>--prefer</code>。
+        如果只有 <code>-r 3600</code>，代表保護失效，而且
+        <strong>earlyoom 反而可能去殺 vLLM</strong> —— 立刻跑 <code>sudo bash fix_earlyoom_args.sh</code>。
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>不要做這些</h2>
+    <p class="sec-sub">每一條都有人踩過，或差點踩到。</p>
+    <div class="nevers">
+      <div class="never">
+        <span class="never-x">✕</span>
+        <div>
+          <p class="never-t">不要為了「更穩」把 vLLM 換成官方 FP8</p>
+          <p class="never-w">FP8 佔 88 GB，只剩 31 GB 餘裕，在這個根因下<strong>反而更容易死機</strong>。目前的 NVFP4 佔 52.9 GB 是最安全的。</p>
+        </div>
+      </div>
+      <div class="never">
+        <span class="never-x">✕</span>
+        <div>
+          <p class="never-t">不要拉超過 40 GB 的 ollama 模型</p>
+          <p class="never-w">規則：新模型 + 53 GB（vLLM）+ 11 GB（系統）必須 &lt; 110 GB。<code>OLLAMA_GPU_OVERHEAD</code> 會擋，但別依賴它。</p>
+        </div>
+      </div>
+      <div class="never">
+        <span class="never-x">✕</span>
+        <div>
+          <p class="never-t">不要升級 vLLM 容器到 26.06 以上</p>
+          <p class="never-w">26.06/26.07 需要 driver 610.43、26.08 需要 615.65，本機是 580.126.09，而 DGX OTA 7.4.0 仍只帶 580。升上去開不起來。</p>
+        </div>
+      </div>
+      <div class="never">
+        <span class="never-x">✕</span>
+        <div>
+          <p class="never-t">不要裝 Ubuntu 通用 nvidia driver</p>
+          <p class="never-w"><code>nvidia-driver-595/610-open</code> 會覆蓋 DGX 專用平台模組，重開後 GPU 可能無法列舉。只能走 DGX OTA。</p>
+        </div>
+      </div>
+      <div class="never">
+        <span class="never-x">✕</span>
+        <div>
+          <p class="never-t">不要直接拔電</p>
+          <p class="never-w">先試 SysRq <kbd>S</kbd> → <kbd>U</kbd> → <kbd>B</kbd>。硬斷電有檔案系統損毀風險。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      <strong>交接時尚未完成：</strong><code>setup_freeze_evidence.sh</code> 當時還在等 sudo 密碼。
+      接手前請先確認 <code>systemctl is-active freeze-sampler</code> 回 <code>active</code>、
+      <code>tail -3 /var/log/freeze-sampler.log</code> 有近期時間戳、
+      且 <code>/etc/systemd/journald.conf.d/10-freeze-evidence.conf</code> 含 <code>SyncIntervalSec=10s</code>。
+      任一項不符就重跑該腳本。
+    </p>
+    <p>下次死機後，請在 <code>sop_dgx_freeze.md</code> 第 8 節追蹤表補一行，並附上判讀結論（情況 A/B/C/D）。</p>
+  </footer>
+
+</div>
+
+</body></html>
