@@ -1,0 +1,4 @@
+# Codex-specific settings. UNVERIFIED: codex is not installed on the author's machine,
+# so this field name comes from memory of the Codex skills docs and was never tested.
+policy:
+  allow_implicit_invocation: false
