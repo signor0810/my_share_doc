@@ -75,11 +75,9 @@ def register_agy(dry):
         return f"agy: ok (already registered in {path})"
     entries.append({"path": root})
     if not dry:
-        with open(path, "w", encoding="utf-8", newline="
-") as f:
+        with open(path, "w", encoding="utf-8", newline="\n") as f:
             json.dump(data, f, indent=2)
-            f.write("
-")
+            f.write("\n")
     return f"agy: {'would register' if dry else 'registered'} {root} in {path}"
 
 
@@ -99,12 +97,8 @@ def main():
             make_link(link, SKILL_DIR)
         print(f"{agent}: {'would link' if dry else 'linked'} {link} -> {SKILL_DIR}")
     print(register_agy(dry))
-    print("hermes: its slash command is /wc-share-art; for /wc_share_art add to config.yaml:
-"
-          "  quick_commands:
-    wc_share_art:
-      type: alias
-      target: /wc-share-art")
+    print("hermes: its slash command is /wc-share-art; for /wc_share_art add to config.yaml:\n"
+          "  quick_commands:\n    wc_share_art:\n      type: alias\n      target: /wc-share-art")
     if os.path.isdir(PI_DIR):
         print(render_pi_prompt(dry))
 
