@@ -15,7 +15,12 @@ PATTERNS = [
     ("github-token", re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{22,})\b")),
     ("slack-token", re.compile(r"\bxox[baprs]-[A-Za-z0-9-]{10,}")),
     ("sk-api-key", re.compile(r"\bsk-[A-Za-z0-9_-]{20,}")),
-    ("jwt", re.compile(r"\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}")),
+    ("vendor-token", re.compile(
+        r"\b(?:hf_[A-Za-z0-9]{30,}|gsk_[A-Za-z0-9]{30,}|xai-[A-Za-z0-9]{30,}|glpat-[A-Za-z0-9_-]{20,}"
+        r"|npm_[A-Za-z0-9]{36}|\d{8,10}:AA[A-Za-z0-9_-]{33})")),
+    ("bearer-token", re.compile(r"(?i)\bbearer\s+[A-Za-z0-9._~+/-]{20,}=*")),
+    ("url-credentials", re.compile(r"[a-z][a-z0-9+.-]*://[^\s/:@\"'<>]+:[^\s/@\"'<>]{3,}@")),
+    ("jwt",re.compile(r"\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}")),
     ("credential-assignment", re.compile(
         r"(?i)\b(?:api[_-]?key|secret|token|passwd|password|pwd)\b[\"']?\s*[:=]\s*[\"']?[^\s\"'<>,;]{8,}")),
     ("email", re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+")),

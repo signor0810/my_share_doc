@@ -37,6 +37,15 @@ class ScanTests(unittest.TestCase):
         for ip in ("8.8.8.8", "172.32.0.1", "100.128.0.1", "110.0.0.5", "1.10.0.0.5"):
             self.assertNotIn("internal-ip", cats("host " + ip), ip)
 
+    def test_vendor_tokens(self):
+        for t in ("hf_" + "a" * 34, "gsk_" + "B" * 40, "123456789:AA" + "x" * 33):
+            self.assertIn("vendor-token", cats("key " + t), t)
+
+    def test_bearer_and_url_credentials(self):
+        self.assertIn("bearer-token", cats("Authorization: Bearer " + "a1" * 15))
+        self.assertIn("url-credentials", cats("postgres://admin:hunter2@db.host/x"))
+        self.assertEqual(scan_text('<a href="https://example.org/a:b">x</a> at 10:30'), [])
+
     def test_masking(self):
         (_, _, hit), = [f for f in scan_text("ghp_" + "z" * 36)]
         self.assertNotIn("zzzzzzzz", hit)

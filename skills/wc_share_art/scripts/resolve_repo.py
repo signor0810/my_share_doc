@@ -52,6 +52,14 @@ def main():
             return fail(f"cannot switch {path} from '{branch}' to main:\n{r.stderr}")
     if not os.path.isfile(os.path.join(path, "publish.py")):
         return fail(f"publish.py missing in {path}")
+    # publish.py commits; without an identity git aborts. The repo is public, so the
+    # address ends up in public history -- recommend the GitHub noreply address.
+    if not git(path, "config", "user.email").stdout.strip() or not git(path, "config", "user.name").stdout.strip():
+        return fail(
+            "git identity is not set for this clone, so publish.py cannot commit. Ask the user to run:\n"
+            f'  git -C "{path}" config user.name "signor0810"\n'
+            f'  git -C "{path}" config user.email "signor0810@users.noreply.github.com"\n'
+            "(commit emails are public in this repo; do not use a private address)")
     print(path)
     return 0
 

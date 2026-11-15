@@ -13,6 +13,7 @@ import sys
 SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NAME = "wc_share_art"
 HOME = os.path.expanduser("~")
+PI_DIR = os.environ.get("PI_CODING_AGENT_DIR") or os.path.join(HOME, ".pi", "agent")
 
 
 def candidates():
@@ -21,7 +22,7 @@ def candidates():
     hermes = os.environ.get("HERMES_HOME") or os.path.join(HOME, ".hermes")
     return [
         ("claude", os.path.join(claude, "skills"), claude),
-        ("pi", os.path.join(HOME, ".pi", "agent", "skills"), os.path.join(HOME, ".pi", "agent")),
+        ("pi", os.path.join(PI_DIR, "skills"), PI_DIR),
         ("hermes", os.path.join(hermes, "skills"), hermes),
         ("agy", os.path.join(HOME, ".gemini", "config", "skills"), os.path.join(HOME, ".gemini", "config")),
         ("codex", os.path.join(HOME, ".codex", "skills"), os.path.join(HOME, ".codex")),
@@ -46,9 +47,9 @@ def make_link(link, target):
 
 def render_pi_prompt(dry):
     src = os.path.join(SKILL_DIR, "agents", "pi-prompt.md")
-    prompts = os.path.join(HOME, ".pi", "agent", "prompts")
+    prompts = os.path.join(PI_DIR, "prompts")
     dest = os.path.join(prompts, NAME + ".md")
-    skill_md = os.path.join(HOME, ".pi", "agent", "skills", NAME, "SKILL.md").replace("\\", "/")
+    skill_md = os.path.join(PI_DIR, "skills", NAME, "SKILL.md").replace("\\", "/")
     text = open(src, encoding="utf-8").read().replace("{{SKILL_MD}}", skill_md)
     if os.path.exists(dest) and open(dest, encoding="utf-8").read() == text:
         return "pi prompt template: up to date"
@@ -74,7 +75,7 @@ def main():
             os.makedirs(skills, exist_ok=True)
             make_link(link, SKILL_DIR)
         print(f"{agent}: {'would link' if dry else 'linked'} {link} -> {SKILL_DIR}")
-    if os.path.isdir(os.path.join(HOME, ".pi", "agent")):
+    if os.path.isdir(PI_DIR):
         print(render_pi_prompt(dry))
 
 
