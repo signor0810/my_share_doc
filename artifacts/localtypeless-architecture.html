@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Local Typeless 架構</title>
+<style>
+  :root {
+    --bg: #ffffff; --panel: #f3f7ff; --side: #f1f5f9; --border: #cbd5e1;
+    --accent: #1d4ed8; --accent-soft: #dbeafe; --ink: #172554; --text: #1e3a8a;
+    --muted: #64748b; --local: #0f766e; --local-soft: #ccfbf1;
+    --remote: #b45309; --remote-soft: #fef3c7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b1220; --panel: #111c33; --side: #0f172a; --border: #334155;
+      --accent: #93c5fd; --accent-soft: #1e3a8a; --ink: #e2e8f0; --text: #bfdbfe;
+      --muted: #94a3b8; --local: #5eead4; --local-soft: #134e4a;
+      --remote: #fcd34d; --remote-soft: #78350f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font-family: "Microsoft JhengHei UI", "PingFang TC", "Noto Sans TC", system-ui, sans-serif;
+         line-height: 1.7; }
+  main { max-width: 980px; margin: 0 auto; padding: 40px 16px 72px; }
+  h1 { color: var(--accent); font-size: 2rem; margin: 0 0 4px; }
+  h2 { color: var(--accent); font-size: 1.3rem; margin: 48px 0 12px; }
+  h3 { color: var(--text); font-size: 1rem; margin: 0 0 6px; }
+  p { margin: 0 0 12px; }
+  .lead { color: var(--muted); margin-bottom: 24px; }
+  code { font-family: Consolas, "SF Mono", monospace; font-size: .88em;
+         background: var(--side); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: .88rem; color: var(--muted); margin: 8px 0 16px; }
+  .dot { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .dot.l { background: var(--local-soft); border: 1px solid var(--local); }
+  .dot.r { background: var(--remote-soft); border: 1px solid var(--remote); }
+  .dot.f { background: var(--accent-soft); border: 1px solid var(--accent); }
+
+  .flow { display: grid; gap: 0; }
+  .step { border: 1px solid var(--border); border-left: 5px solid var(--local);
+          background: var(--panel); border-radius: 8px; padding: 12px 16px; }
+  .step.remote { border-left-color: var(--remote); background: var(--remote-soft); }
+  .step.file { border-left-color: var(--accent); }
+  .step .where { float: right; font-size: .78rem; color: var(--muted); margin-left: 12px; }
+  .step p { margin: 0; font-size: .93rem; }
+  .arrow { text-align: center; color: var(--muted); font-size: 1.1rem; line-height: 1.6; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 640px) { .split { grid-template-columns: 1fr; } .step .where { float: none; display: block; margin: 0; } }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 12px; }
+  .card { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; background: var(--bg); }
+  .card ul { margin: 0; padding-left: 18px; font-size: .9rem; }
+  .card li { margin: 2px 0; }
+  .card .note { color: var(--muted); font-size: .85rem; margin: 0 0 6px; }
+
+  .tablewrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--text); background: var(--side); white-space: nowrap; }
+  .rules { border: 1px solid var(--accent); background: var(--accent-soft); border-radius: 8px; padding: 14px 18px; }
+  .rules ol { margin: 0; padding-left: 20px; }
+  footer { margin-top: 48px; color: var(--muted); font-size: .85rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Local Typeless 架構</h1>
+  <p class="lead">本機語音口述轉成整理好的文字。語音辨識在自己的電腦上跑，文字整理交給遠端 LLM；專為中英夾雜的工程口述設計。Windows、Python、Tkinter。</p>
+
+  <div class="rules">
+    <h3>三條不能違反的原則</h3>
+    <ol>
+      <li><strong>聲音、圖片、附件不離開這台電腦。</strong>遠端 LLM 只看得到文字，圖片和檔案在文字裡是 <code>[圖1]</code>、<code>[檔案1]</code> 這種標記。</li>
+      <li><strong>斷線不丟字。</strong>LLM 連不上、逾時、或輸出沒通過檢查，就改用不需要模型的規則整理，口述內容一定留得住。</li>
+      <li><strong>Prompt 和詞庫放在程式外面。</strong>改檔案就生效，不用改程式、不用重開。</li>
+    </ol>
+  </div>
+
+  <h2>一次口述怎麼走完</h2>
+  <div class="legend">
+    <span><span class="dot l"></span>在本機執行</span>
+    <span><span class="dot r"></span>送到遠端 LLM（只有文字）</span>
+    <span><span class="dot f"></span>寫到本機檔案</span>
+  </div>
+
+  <div class="flow">
+    <div class="step"><span class="where"><code>hotkey/daemon.py</code></span>
+      <h3>1. 按快捷鍵</h3><p>全域快捷鍵（預設 Alt+Q 開始／停止、Alt+V 貼上參照）。也可以按視窗上的按鈕。</p></div>
+    <div class="arrow">↓</div>
+    <div class="step"><span class="where"><code>recorder/</code></span>
+      <h3>2. 錄音並依靜音切段</h3><p><code>audio_recorder.py</code> 收麥克風，<code>chunker.py</code> 在停頓處切成一段一段，長口述不用等到最後。</p></div>
+    <div class="arrow">↓</div>
+    <div class="step"><span class="where"><code>sessions.py</code>、<code>stt/</code></span>
+      <h3>3. 邊錄邊辨識</h3><p>每一段交給 faster-whisper。三種跑法可選：<code>cpu_fast</code>、<code>cpu_accurate</code>、<code>gpu_local</code>；GPU 起不來會自動退回 CPU。</p></div>
+    <div class="arrow">↓</div>
+    <div class="step"><span class="where"><code>glossary/manager.py</code></span>
+      <h3>4. 詞庫校正</h3><p>把聽錯的專有名詞換回正確寫法（例如把音近的字換成 OPC、EUV）。</p></div>
+    <div class="arrow">↓</div>
+    <div class="step"><span class="where"><code>ui/draft_window.py</code>、<code>ui/draft_model.py</code></span>
+      <h3>5. 進到草稿</h3><p>辨識出的文字出現在草稿框，可以直接改。貼上的截圖、表格、拖進來的檔案變成標記，內容留在本機（<code>capture/</code>、<code>textblocks.py</code>）。</p></div>
+    <div class="arrow">↓</div>
+    <div class="step remote"><span class="where"><code>pipeline.py</code>、<code>llm/</code></span>
+      <h3>6. 整理</h3><p>依選的模式組出 prompt（模式檔＋個人規則＋詞庫），連同草稿文字送給 LLM。介面是 OpenAI 相容的 Chat Completions，換設定檔就能換服務。</p></div>
+    <div class="arrow">↓</div>
+    <div class="split">
+      <div class="step"><span class="where"><code>cleanup/guard.py</code></span>
+        <h3>7a. 檢查有沒有亂加</h3><p>LLM 可以刪贅字、改排版，不能新增沒講過的內容，也不能弄丟標記。</p></div>
+      <div class="step"><span class="where"><code>cleanup/rules.py</code></span>
+        <h3>7b. 沒通過或連不上</h3><p>改用規則整理（去贅字、修標點），並標示「未經 LLM」。</p></div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="step"><span class="where"><code>output/</code></span>
+      <h3>8. 送出</h3><p>貼回上一個視窗（<code>rich_paste.py</code> 會把文字和圖片依順序交錯貼上）、複製到剪貼簿，或附加到筆記檔。</p></div>
+    <div class="arrow">↓</div>
+    <div class="step file"><span class="where"><code>output/record_store.py</code></span>
+      <h3>9. 存成紀錄</h3><p>按「完成」存一個 Markdown 檔到 <code>records/年-月/</code>，含整理結果與原文；超過保留天數自動清掉。</p></div>
+  </div>
+
+  <h2>整理模式</h2>
+  <div class="tablewrap">
+  <table>
+    <tr><th>模式</th><th>Prompt 檔</th><th>做什麼</th></tr>
+    <tr><td>整理</td><td><code>prompts/clean.md</code></td><td>去贅字、修標點、分段，意思不變</td></tr>
+    <tr><td>AI 提示</td><td><code>prompts/prompt.md</code></td><td>把口述改寫成給另一個 AI 的清楚指示</td></tr>
+    <tr><td>摘要</td><td><code>prompts/summary.md</code></td><td>濃縮成重點</td></tr>
+    <tr><td>投影片</td><td><code>prompts/slide.md</code></td><td>整理成投影片條列</td></tr>
+    <tr><td>轉換</td><td><code>prompts/transform.md</code></td><td>依口述的指示改寫選取的文字</td></tr>
+  </table>
+  </div>
+  <p style="margin-top:12px">每次整理都重新讀檔，所以送給 LLM 的內容是三層疊起來的：<code>&lt;模式&gt;.md</code>（基本指示）＋ <code>&lt;模式&gt;.user.md</code>（教學模式學到的個人規則）＋ <code>{glossary}</code>（詞庫）。</p>
+
+  <h2>視窗</h2>
+  <p>每個視窗都拆成兩半：不碰 Tkinter 的邏輯（可以直接測試）和只負責畫面的視窗。背景執行緒只把事件丟進佇列，由畫面執行緒取出來更新。</p>
+  <div class="cards">
+    <div class="card"><h3>草稿視窗（主視窗）</h3>
+      <p class="note">上面草稿、下面整理結果</p>
+      <ul><li><code>ui/draft_window.py</code> 畫面</li><li><code>ui/draft_model.py</code> 草稿內容與標記</li><li><code>ui/draft_bridge.py</code> 背景執行緒到畫面的橋</li><li><code>ui/file_drop.py</code> 拖放檔案</li></ul></div>
+    <div class="card"><h3>資訊面板</h3>
+      <p class="note">Home／History／System prompt</p>
+      <ul><li><code>ui/info_window.py</code> 畫面</li><li><code>ui/info_controller.py</code> 用量統計、歷史、prompt 讀寫</li><li>System prompt 頁可直接改，按「載入」下一次整理就用新的</li></ul></div>
+    <div class="card"><h3>檢查口述紀錄</h3>
+      <p class="note">從舊紀錄找出該加進詞庫的詞</p>
+      <ul><li><code>ui/review_window.py</code>、<code>ui/review_controller.py</code></li><li><code>review/detect.py</code> 規則找候選詞</li><li><code>review/advisor.py</code> 請 LLM 補定義</li></ul></div>
+    <div class="card"><h3>教學模式</h3>
+      <p class="note">從使用者的修改學詞庫與規則</p>
+      <ul><li><code>ui/teach_window.py</code>、<code>ui/teach_controller.py</code></li><li><code>teach/align.py</code> 比對「聽到的」和「要的」</li><li><code>teach/apply.py</code> 寫入個人詞庫與個人規則</li></ul></div>
+  </div>
+
+  <h2>程式目錄</h2>
+  <div class="tablewrap">
+  <table>
+    <tr><th>位置</th><th>負責</th></tr>
+    <tr><td><code>types.py</code></td><td>各模組共用的資料格式與介面</td></tr>
+    <tr><td><code>pipeline.py</code></td><td>主流程：辨識 → 整理 → 檢查 → 輸出</td></tr>
+    <tr><td><code>sessions.py</code></td><td>邊錄邊辨識、背景佇列</td></tr>
+    <tr><td><code>textblocks.py</code></td><td>標記、分段、標記在時間軸上的位置</td></tr>
+    <tr><td><code>stt/</code></td><td>faster-whisper 語音辨識</td></tr>
+    <tr><td><code>llm/</code></td><td>OpenAI 相容的 LLM 客戶端與 gateway 轉接</td></tr>
+    <tr><td><code>cleanup/</code></td><td>規則整理與防呆檢查</td></tr>
+    <tr><td><code>glossary/</code>、<code>config/</code></td><td>詞庫、設定檔與 prompt 載入</td></tr>
+    <tr><td><code>recorder/</code>、<code>hotkey/</code>、<code>capture/</code></td><td>錄音、全域快捷鍵、剪貼簿的圖片與表格</td></tr>
+    <tr><td><code>output/</code></td><td>貼上、剪貼簿、筆記檔、紀錄檔</td></tr>
+    <tr><td><code>review/</code>、<code>teach/</code></td><td>從紀錄和修改裡學詞庫與規則</td></tr>
+    <tr><td><code>ui/</code></td><td>所有視窗，另有 <code>theme.py</code>（顏色與按鈕樣式）、<code>diagnostics.py</code>（記錄檔與當機偵測）</td></tr>
+    <tr><td><code>cli.py</code></td><td>命令列入口</td></tr>
+  </table>
+  </div>
+
+  <h2>程式外面的檔案</h2>
+  <div class="tablewrap">
+  <table>
+    <tr><th>檔案</th><th>內容</th></tr>
+    <tr><td><code>config/config.yaml</code></td><td>快捷鍵、辨識跑法、LLM 設定檔、保留天數</td></tr>
+    <tr><td><code>config/glossary.yaml</code></td><td>詞庫；個人新增的另存一份，不會蓋掉原本的</td></tr>
+    <tr><td><code>prompts/*.md</code></td><td>各模式的 prompt</td></tr>
+    <tr><td><code>records/</code></td><td>完成的口述紀錄與貼進來的圖片</td></tr>
+  </table>
+  </div>
+
+  <footer>Local Typeless 1.0.0。測試：<code>tests/</code> 下約 530 個，不需要麥克風或真的 LLM 就能跑。</footer>
+</main>
+</body>
+</html>
