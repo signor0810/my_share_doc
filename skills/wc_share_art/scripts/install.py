@@ -3,9 +3,11 @@
 
 Usage:  python install.py [--dry-run]
 Windows: directory junction (no admin needed). Linux/macOS: symlink.
+agy ignores linked directories, so it is registered through ~/.gemini/config/skills.json instead.
 Never overwrites an existing path that is not already a link to this skill.
 An agent is installed only if its config directory already exists. Standard library only.
 """
+import json
 import os
 import subprocess
 import sys
@@ -24,7 +26,6 @@ def candidates():
         ("claude", os.path.join(claude, "skills"), claude),
         ("pi", os.path.join(PI_DIR, "skills"), PI_DIR),
         ("hermes", os.path.join(hermes, "skills"), hermes),
-        ("agy", os.path.join(HOME, ".gemini", "config", "skills"), os.path.join(HOME, ".gemini", "config")),
         ("codex", os.path.join(HOME, ".codex", "skills"), os.path.join(HOME, ".codex")),
     ]
 
@@ -60,6 +61,28 @@ def render_pi_prompt(dry):
     return f"pi prompt template: {'would write' if dry else 'written'} {dest}"
 
 
+def register_agy(dry):
+    """agy does not discover junction/symlink skill dirs; register the repo's skills/ in skills.json."""
+    cfg = os.path.join(HOME, ".gemini", "config")
+    if not os.path.isdir(cfg):
+        return f"agy: SKIP (not installed: {cfg} missing)"
+    path = os.path.join(cfg, "skills.json")
+    root = os.path.dirname(SKILL_DIR).replace("\\", "/")
+    data = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
+    entries = data.setdefault("entries", [])
+    if any(os.path.normcase(os.path.normpath(e.get("path", ""))) == os.path.normcase(os.path.normpath(root))
+           for e in entries):
+        return f"agy: ok (already registered in {path})"
+    entries.append({"path": root})
+    if not dry:
+        with open(path, "w", encoding="utf-8", newline="
+") as f:
+            json.dump(data, f, indent=2)
+            f.write("
+")
+    return f"agy: {'would register' if dry else 'registered'} {root} in {path}"
+
+
 def main():
     dry = "--dry-run" in sys.argv
     for agent, skills, marker in candidates():
@@ -75,6 +98,13 @@ def main():
             os.makedirs(skills, exist_ok=True)
             make_link(link, SKILL_DIR)
         print(f"{agent}: {'would link' if dry else 'linked'} {link} -> {SKILL_DIR}")
+    print(register_agy(dry))
+    print("hermes: its slash command is /wc-share-art; for /wc_share_art add to config.yaml:
+"
+          "  quick_commands:
+    wc_share_art:
+      type: alias
+      target: /wc-share-art")
     if os.path.isdir(PI_DIR):
         print(render_pi_prompt(dry))
 
