@@ -18,6 +18,7 @@ repo 是**公開**的:發布後任何人都看得到。不要修改 `publish.py`
    - 有給路徑就用該路徑(必須是存在的 `.html` / `.htm`)。
    - 沒給路徑:取本次對話中最近產生或修改的 `.html`。無法確定時,列出候選並詢問使用者,**不要猜**。
    - 只發布使用者指定或確認的檔案。
+   - 不必另外用 `ls` 檢查檔案;步驟 3 的掃描腳本會回報檔案是否讀得到。Windows 路徑在 shell 指令中一律改用正斜線(`C:/Users/...`)並加引號,避免反斜線被 shell 吃掉。
 2. **找到 repo**:執行 `python <skill_dir>/scripts/resolve_repo.py`。
    - 成功時 stdout 是 repo 路徑(順序:環境變數 `WC_SHARE_REPO`,否則 `~/my_share_doc`;不存在會自動 `git clone`)。
    - 失敗(工作樹有未提交內容、不在 main 等)就停止,把錯誤訊息原樣回報,不要自行 stash、reset 或強推。
